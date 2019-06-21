@@ -1,5 +1,7 @@
 #include <iostream>
 
+#define local
+
 using namespace std;
 
 #define MAXM    500000+5
@@ -95,32 +97,36 @@ int update(int root, int pos) {
     return tmp;
 }
 int query(int left_root, int right_root, int k) {
+    if(seg_sum[left_root] - seg_sum[right_root]<k cout<<"Poor QLW"<<endl;
+
     int l = 1, r = m;
     while(l < r) {
         int mid = (l + r) >> 1;
         if(seg_sum[rson[left_root]] - seg_sum[rson[right_root]] >= k) {
-            l=mid+1;
+            l = mid + 1;
             left_root = rson[left_root];
             right_root = rson[right_root];
         } else {
-            r=mid;
+            r = mid;
             k -= seg_sum[rson[left_root]] - seg_sum[rson[right_root]];
             left_root = lson[left_root];
             right_root = lson{right_root};
         }
     }
-    return seg_num[r];
+    cout<<seg_num[r]<<endl;
 }
 
 
 void work1() {
     n = C;
-    m=max_page;
+    m = max_page;
     T[n + 1] = build(1, max_page);
     for(int i = n; i >= 1; i--) {
-        update(T[n + 1], buf1[i]);
+        update(T[i + 1], buf1[i]);
     }
-    for(int i=)
+    for(int i = 1; i <= que_num; i++) {
+        query(T[questions[i].start_y], T[questions[i].end_y], questions[i].min_page);
+    }
 }
 
 int get_value(int m, int mid) {
@@ -144,22 +150,30 @@ void work2() {
         int mid;
         int low = 1;
         high = max_page;
-        if(get_value(i,1)<questions[i].min_page){
-            cout<<"Poor QLW"<<endl;
+        if(get_value(i, 1) < questions[i].min_page) {
+            cout << "Poor QLW" << endl;
             continue;
         }
         while(low <= high) {
             mid = (low + high) >> 1;
-            if(get_value(i,mid) < questions[i].min_page)
-                high=mid-1;
+            if(get_value(i, mid) < questions[i].min_page)
+                high = mid - 1;
             else
-                low=mid+1;
+                low = mid + 1;
         }
-        cout<<get_num(i,high)<<endl;
+        cout << get_num(i, high) << endl;
     }
 }
 
 int main() {
+
+#ifdef local
+    freopen("testdata.in", "r", stdin);
+    freopen("testdata.out", "w", stdout);
+#endif // local
+
+    ios::sync_with_stdio(false);
+
     init();
 
     if(R == 1)
