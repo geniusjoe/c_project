@@ -98,23 +98,24 @@ int query(int left_root, int right_root, int k) {
     int l = 1, r = m;
     while(l < r) {
         int mid = (l + r) >> 1;
-        if(c[lson[left_root]] - c[lson[right_root]] >= k) {
-            r=mid;
-            left_root = lson[left_root];
-            right_root = lson[right_root];
-        } else {
-            l = mid + 1;
-            k -= c[lson[left_root]] - c[lson[right_root]];
+        if(seg_sum[rson[left_root]] - seg_sum[rson[right_root]] >= k) {
+            l=mid+1;
             left_root = rson[left_root];
-            right_root = rson{right_root};
+            right_root = rson[right_root];
+        } else {
+            r=mid;
+            k -= seg_sum[rson[left_root]] - seg_sum[rson[right_root]];
+            left_root = lson[left_root];
+            right_root = lson{right_root};
         }
     }
-    return l;
+    return seg_num[r];
 }
 
 
 void work1() {
     n = C;
+    m=max_page;
     T[n + 1] = build(1, max_page);
     for(int i = n; i >= 1; i--) {
         update(T[n + 1], buf1[i]);
@@ -143,13 +144,16 @@ void work2() {
         int mid;
         int low = 1;
         high = max_page;
-        if(get_value(i,1)<questions[i].)
+        if(get_value(i,1)<questions[i].min_page){
+            cout<<"Poor QLW"<<endl;
+            continue;
+        }
         while(low <= high) {
             mid = (low + high) >> 1;
-            if(get_value(i,mid) >= questions[i].min_page)
-                low = mid + 1;
+            if(get_value(i,mid) < questions[i].min_page)
+                high=mid-1;
             else
-                high = mid - 1;
+                low=mid+1;
         }
         cout<<get_num(i,high)<<endl;
     }
