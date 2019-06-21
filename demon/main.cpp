@@ -88,11 +88,12 @@ int T[MAXN], lson[M], rson[M], c[M];
 int seg_sum[MAXN], seg_num[MAXN];
 int build(int l, int r) {
     int root = tot++;
-    c[root] = 0;
+    seg_sum[root] = 0;
+    seg_num[root] = 0;
     if(l != r) {
         int mid = (l + r) >> 1;
         lson[root] = build(l, mid);
-        rson[root] = build(m + 1, r);
+        rson[root] = build(mid + 1, r);
     }
     return root;
 }
@@ -125,21 +126,22 @@ void query(int left_root, int right_root, int k) {
     if(seg_sum[left_root] - seg_sum[right_root] < k)
         cout << "Poor QLW" << endl;
 
-    int l = 1, r = m;
-    while(l < r) {
+    int l = 1, r = m,times=0;
+    while(l <= r) {
         int mid = (l + r) >> 1;
         if(seg_sum[rson[left_root]] - seg_sum[rson[right_root]] >= k) {
             l = mid + 1;
             left_root = rson[left_root];
             right_root = rson[right_root];
         } else {
-            r = mid;
+            r = mid-1;
+            times+=seg_num[rson[left_root]] - seg_num[rson[right_root]];
             k -= seg_sum[rson[left_root]] - seg_sum[rson[right_root]];
             left_root = lson[left_root];
             right_root = lson[right_root];
         }
     }
-    cout << seg_num[r] << endl;
+    cout << times << endl;
 }
 
 
@@ -148,10 +150,19 @@ void work1() {
     m = max_page;
     T[n + 1] = build(1, max_page);
     for(int i = n; i >= 1; i--) {
-        update(T[i + 1], buf1[i]);
+        T[i] = update(T[i + 1], buf1[i]);
     }
+#ifdef debug
+    for(int i = n; i >= 1; i--)
+        cout << seg_sum[T[i]] << "\t";
+    cout << endl;
+
+    for(int i = n; i >= 1; i--)
+        cout << seg_num[T[i]] << "\t";
+    cout << endl;
+#endif // debug
     for(int i = 1; i <= que_num; i++) {
-        query(T[questions[i].start_y], T[questions[i].end_y], questions[i].min_page);
+        query(T[questions[i].start_y], T[questions[i].end_y + 1], questions[i].min_page);
     }
 }
 
@@ -202,9 +213,9 @@ void work2() {
                 low = mid + 1;
         }
 #ifdef debug
-        cout<<endl;
+        cout << endl;
 #endif // debug
-        cout << get_num(i, high)-(get_value(i,high)-questions[i].min_page)/high << endl;
+        cout << get_num(i, high) - (get_value(i, high) - questions[i].min_page) / high << endl;
     }
 }
 
