@@ -169,7 +169,7 @@ int main() {
 
 #ifdef local
     freopen("testdata.in", "r", stdin);
-    freopen("testdata.out", "w", stdout);
+    freopen("testdata.output", "w", stdout);
 #endif // local
 
     ios::sync_with_stdio(false);
