@@ -42,7 +42,7 @@ void init() {
                     prefix_sum[i][j][k] = prefix_sum[i - 1][j][k] + prefix_sum[i][j - 1][k] - prefix_sum[i - 1][j - 1][k];
                     prefix_num[i][j][k] = prefix_num[i - 1][j][k] + prefix_num[i][j - 1][k] - prefix_num[i - 1][j - 1][k];
 
-                    if(buf2[i][j] <= k) {
+                    if(buf2[i][j] >= k) {
                         prefix_sum[i][j][k] += buf2[i][j];
                         prefix_num[i][j][k]++;
                     }
@@ -108,7 +108,7 @@ int update(int root, int pos) {
     }
     return tmp;
 }
-int query(int left_root, int right_root, int k) {
+void query(int left_root, int right_root, int k) {
     if(seg_sum[left_root] - seg_sum[right_root] < k)
         cout << "Poor QLW" << endl;
 
@@ -145,17 +145,17 @@ void work1() {
 int get_value(int m, int mid) {
     return
         prefix_sum[questions[m].end_x][questions[m].end_y][mid] -
-        prefix_sum[questions[m].end_x][questions[m].start_y][mid] -
-        prefix_sum[questions[m].start_x][questions[m].end_y][mid] +
-        prefix_sum[questions[m].start_x][questions[m].start_y][mid];
+        prefix_sum[questions[m].end_x][questions[m].start_y - 1][mid] -
+        prefix_sum[questions[m].start_x - 1][questions[m].end_y][mid] +
+        prefix_sum[questions[m].start_x - 1][questions[m].start_y - 1][mid];
 }
 
 int get_num(int m, int mid) {
     return
         prefix_num[questions[m].end_x][questions[m].end_y][mid] -
-        prefix_num[questions[m].end_x][questions[m].start_y][mid] -
-        prefix_num[questions[m].start_x][questions[m].end_y][mid] +
-        prefix_num[questions[m].start_x][questions[m].start_y][mid];
+        prefix_num[questions[m].end_x][questions[m].start_y - 1][mid] -
+        prefix_num[questions[m].start_x - 1][questions[m].end_y][mid] +
+        prefix_num[questions[m].start_x - 1][questions[m].start_y - 1][mid];
 }
 
 void work2() {
@@ -164,6 +164,12 @@ void work2() {
         int mid;
         int low = 1, high = max_page;
         high = max_page;
+
+#ifdef debug
+        int tmp = get_value(i, 1);
+        cout << tmp << "\t";
+#endif // debug
+
         if(get_value(i, 1) < questions[i].min_page) {
             cout << "Poor QLW" << endl;
             continue;
@@ -171,11 +177,20 @@ void work2() {
 
         while(low <= high) {
             mid = (low + high) >> 1;
+
+#ifdef debug
+            tmp = get_value(i, mid);
+            cout << tmp << "\t";
+#endif // debug
+
             if(get_value(i, mid) < questions[i].min_page)
                 high = mid - 1;
             else
                 low = mid + 1;
         }
+#ifdef debug
+        cout<<endl;
+#endif // debug
         cout << get_num(i, high) << endl;
     }
 }
@@ -183,8 +198,8 @@ void work2() {
 int main() {
 
 #ifdef local
-    freopen("testdata.in", "r", stdin);
-    freopen("testdata.output", "w", stdout);
+    freopen("testdata.in", "r+", stdin);
+    freopen("testdata.out", "w+", stdout);
 #endif // local
 
     ios::sync_with_stdio(false);
