@@ -61,6 +61,19 @@ void init() {
             cout << endl;
             cout << endl;
         }
+
+        for(int k = 1; k <= max_page; k++) {
+            cout << "cur_k" << "\t" << k << endl;
+            for(int i = 1; i <= R; i++) {
+                for(int j = 1; j <= C; j++)
+                    cout << prefix_num[i][j][k] << "\t";
+                cout << endl;
+            }
+            cout << endl;
+            cout << endl;
+            cout << endl;
+        }
+
 #endif // debug
     }
 
