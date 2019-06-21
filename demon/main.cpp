@@ -204,7 +204,7 @@ void work2() {
 #ifdef debug
         cout<<endl;
 #endif // debug
-        cout << get_num(i, high) << endl;
+        cout << get_num(i, high)-(get_value(i,high)-questions[i].min_page)/high << endl;
     }
 }
 
