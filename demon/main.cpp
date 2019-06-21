@@ -118,7 +118,7 @@ int update(int root, int pos) {
             l = mid + 1;
         }
         seg_sum[newroot] = seg_sum[root] + pos;
-        seg_num[newroot]++;
+        seg_num[newroot]= seg_num[root]+1;
     }
     return tmp;
 }
@@ -134,7 +134,7 @@ void query(int left_root, int right_root, int k) {
             left_root = rson[left_root];
             right_root = rson[right_root];
         } else {
-            r = mid-1;
+            r = mid;
             times+=seg_num[rson[left_root]] - seg_num[rson[right_root]];
             k -= seg_sum[rson[left_root]] - seg_sum[rson[right_root]];
             left_root = lson[left_root];
