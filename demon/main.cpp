@@ -1,7 +1,6 @@
-#include <iostream>
-
+#include<bits/stdc++.h>
 #define local
-
+#define debug
 using namespace std;
 
 #define MAXM    500000+5
@@ -9,7 +8,7 @@ using namespace std;
 int R, C, que_num;
 const int max_page = 1000;
 
-int buf1[MAXM], buf2[(200 + 5) * (200 + 5)]; /**< buf1存放R==1时候的情形 */
+int buf1[MAXM], buf2[(200 + 5)][  (200 + 5)]; /**< buf1存放R==1时候的情形 */
 int prefix_sum[200 + 5][200 + 5][max_page + 5];
 int prefix_num[200 + 5][200 + 5][max_page + 5];
 
@@ -43,15 +42,28 @@ void init() {
                     prefix_sum[i][j][k] = prefix_sum[i - 1][j][k] + prefix_sum[i][j - 1][k] - prefix_sum[i - 1][j - 1][k];
                     prefix_num[i][j][k] = prefix_num[i - 1][j][k] + prefix_num[i][j - 1][k] - prefix_num[i - 1][j - 1][k];
 
-                    if(buf2[i][j] == k) {
-                        prefix_sum[i][j][k] += k;
+                    if(buf2[i][j] <= k) {
+                        prefix_sum[i][j][k] += buf2[i][j];
                         prefix_num[i][j][k]++;
                     }
                 }
             }
-
         }
+#ifdef debug
+        for(int k = 1; k <= max_page; k++) {
+            cout << "cur_k" << "\t" << k << endl;
+            for(int i = 1; i <= R; i++) {
+                for(int j = 1; j <= C; j++)
+                    cout << prefix_sum[i][j][k] << "\t";
+                cout << endl;
+            }
+            cout << endl;
+            cout << endl;
+            cout << endl;
+        }
+#endif // debug
     }
+
 }
 
 const int MAXN = 500000;
@@ -97,7 +109,8 @@ int update(int root, int pos) {
     return tmp;
 }
 int query(int left_root, int right_root, int k) {
-    if(seg_sum[left_root] - seg_sum[right_root]<k cout<<"Poor QLW"<<endl;
+    if(seg_sum[left_root] - seg_sum[right_root] < k)
+        cout << "Poor QLW" << endl;
 
     int l = 1, r = m;
     while(l < r) {
@@ -110,10 +123,10 @@ int query(int left_root, int right_root, int k) {
             r = mid;
             k -= seg_sum[rson[left_root]] - seg_sum[rson[right_root]];
             left_root = lson[left_root];
-            right_root = lson{right_root};
+            right_root = lson[right_root];
         }
     }
-    cout<<seg_num[r]<<endl;
+    cout << seg_num[r] << endl;
 }
 
 
@@ -146,14 +159,16 @@ int get_num(int m, int mid) {
 }
 
 void work2() {
+
     for(int i = 1; i <= que_num; i++) {
         int mid;
-        int low = 1;
+        int low = 1, high = max_page;
         high = max_page;
         if(get_value(i, 1) < questions[i].min_page) {
             cout << "Poor QLW" << endl;
             continue;
         }
+
         while(low <= high) {
             mid = (low + high) >> 1;
             if(get_value(i, mid) < questions[i].min_page)
