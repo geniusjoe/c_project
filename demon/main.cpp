@@ -1,6 +1,6 @@
 #include<bits/stdc++.h>
 #define local
-#define debug
+#define debu
 using namespace std;
 
 #define MAXM    500000+5
@@ -11,8 +11,6 @@ const int max_page = 1000;
 int buf1[MAXM], buf2[(200 + 5)][  (200 + 5)]; /**< buf1存放R==1时候的情形 */
 int prefix_sum[200 + 5][200 + 5][max_page + 5];
 int prefix_num[200 + 5][200 + 5][max_page + 5];
-
-
 
 struct question {
     int start_x, start_y, end_x, end_y, min_page;
@@ -79,13 +77,13 @@ void init() {
 
 }
 
-const int MAXN = 500000;
-const int M = MAXN * 30;
+const int MAXN = 800000;
+const int M = MAXN * 100;
 int n, q, m, tot;
 int a[MAXN], t[MAXN];
 int times[MAXN];
 int T[MAXN], lson[M], rson[M], c[M];
-int seg_sum[MAXN], seg_num[MAXN];
+int seg_sum[M], seg_num[M];
 int build(int l, int r) {
     int root = tot++;
     seg_sum[root] = 0;
@@ -118,16 +116,17 @@ int update(int root, int pos) {
             l = mid + 1;
         }
         seg_sum[newroot] = seg_sum[root] + pos;
-        seg_num[newroot]= seg_num[root]+1;
+        seg_num[newroot] = seg_num[root] + 1;
     }
     return tmp;
 }
 void query(int left_root, int right_root, int k) {
-    if(seg_sum[left_root] - seg_sum[right_root] < k)
+    if(seg_sum[left_root] - seg_sum[right_root] < k) {
         cout << "Poor QLW" << endl;
-
-    int l = 1, r = m,times=0;
-    while(l <= r) {
+        return;
+    }
+    int l = 1, r = m, times = 0;
+    while(l < r) {
         int mid = (l + r) >> 1;
         if(seg_sum[rson[left_root]] - seg_sum[rson[right_root]] >= k) {
             l = mid + 1;
@@ -135,13 +134,16 @@ void query(int left_root, int right_root, int k) {
             right_root = rson[right_root];
         } else {
             r = mid;
-            times+=seg_num[rson[left_root]] - seg_num[rson[right_root]];
+            times += seg_num[rson[left_root]] - seg_num[rson[right_root]];
             k -= seg_sum[rson[left_root]] - seg_sum[rson[right_root]];
             left_root = lson[left_root];
             right_root = lson[right_root];
         }
     }
-    cout << times << endl;
+    if(k % r == 0)
+        cout << times + k / r << endl;
+    else
+        cout << times + k / r + 1 << endl;
 }
 
 
