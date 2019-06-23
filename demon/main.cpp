@@ -9,15 +9,11 @@ int buf[100000 + 5], order[100000 + 5];
 int init_num, del_num;
 
 const int MAXN = 60010;
-const int N = 2500010;
+const int M = 2500010;
 int n, q, m, tot;
 int a[MAXN], t[MAXN];
 int T[MAXN], lson[M], rson[M], c[M];
 int S[MAXN];
-struct Query {
-    int kind;
-    int l, r, k;
-} Query[10010];
 void Init_hash(int k) {
     sort(t, t + k);
     m = unique(t, t + k) - t;
@@ -156,17 +152,20 @@ int main() {
     for(int i = 1; i <= init_num; i++) {
         res += Query(1, i - 1, buf[i], 0);
         for(int j = i; j; j -= lowbit(j))
-            T[i] = Insert(T[i], buf[i], 1);
+            T[j] = Insert(T[j], buf[i], 1);
     }
 
     for(int i = 1; i <= del_num; i++) {
         int cur_del;
         cin >> cur_del;
+
         res -= Query(1, order[cur_del], cur_del, 0);
         res -= Query(order[cur_del], init_num, cur_del, 1);
-        for(int i = cur_del; i; i -= lowbit(i))
-        }{
-        T[i] = Insert(T[i], cur_del, -1);
+        cout<<res<<endl;
+
+        for(int j = cur_del; j; j -= lowbit(j)){
+            T[j] = Insert(T[j], cur_del, -1);
+        }
     }
 }
-}
+
