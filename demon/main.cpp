@@ -5,89 +5,29 @@ using namespace std;
 
 #define MAXM    500000+5
 
-int R, C, que_num;
-const int max_page = 1000;
+int buf[100000 + 5], order[100000 + 5];
+int init_num, del_num;
 
-int buf1[MAXM], buf2[(200 + 5)][  (200 + 5)]; /**< buf1存放R==1时候的情形 */
-int prefix_sum[200 + 5][200 + 5][max_page + 5];
-int prefix_num[200 + 5][200 + 5][max_page + 5];
-
-struct question {
-    int start_x, start_y, end_x, end_y, min_page;
-} questions[200000 + 5];
-
-void init() {
-    cin >> R >> C >> que_num;
-    if(R == 1)
-        for(int i = 1; i <= C; i++)
-            cin >> buf1[i];
-    else
-        for(int i = 1; i <= R; i++) {
-            for(int j = 1; j <= C; j++) {
-                cin >> buf2[i][j];
-            }
-        }
-
-    for(int i = 1; i <= que_num; i++)
-        cin >> questions[i].start_x >> questions[i].start_y >>
-            questions[i].end_x >> questions[i].end_y >> questions[i].min_page;
-
-    if(R != 1) {
-        for(int k = max_page; k >= 1; k--) {
-            for(int i = 1; i <= R; i++) {
-                for(int j = 1; j <= C; j++) {
-
-                    prefix_sum[i][j][k] = prefix_sum[i - 1][j][k] + prefix_sum[i][j - 1][k] - prefix_sum[i - 1][j - 1][k];
-                    prefix_num[i][j][k] = prefix_num[i - 1][j][k] + prefix_num[i][j - 1][k] - prefix_num[i - 1][j - 1][k];
-
-                    if(buf2[i][j] >= k) {
-                        prefix_sum[i][j][k] += buf2[i][j];
-                        prefix_num[i][j][k]++;
-                    }
-                }
-            }
-        }
-#ifdef debug
-        for(int k = 1; k <= max_page; k++) {
-            cout << "cur_k" << "\t" << k << endl;
-            for(int i = 1; i <= R; i++) {
-                for(int j = 1; j <= C; j++)
-                    cout << prefix_sum[i][j][k] << "\t";
-                cout << endl;
-            }
-            cout << endl;
-            cout << endl;
-            cout << endl;
-        }
-
-        for(int k = 1; k <= max_page; k++) {
-            cout << "cur_k" << "\t" << k << endl;
-            for(int i = 1; i <= R; i++) {
-                for(int j = 1; j <= C; j++)
-                    cout << prefix_num[i][j][k] << "\t";
-                cout << endl;
-            }
-            cout << endl;
-            cout << endl;
-            cout << endl;
-        }
-
-#endif // debug
-    }
-
-}
-
-const int MAXN = 800000;
-const int M = MAXN * 100;
+const int MAXN = 60010;
+const int N = 2500010;
 int n, q, m, tot;
 int a[MAXN], t[MAXN];
-int times[MAXN];
 int T[MAXN], lson[M], rson[M], c[M];
-int seg_sum[M], seg_num[M];
+int S[MAXN];
+struct Query {
+    int kind;
+    int l, r, k;
+} Query[10010];
+void Init_hash(int k) {
+    sort(t, t + k);
+    m = unique(t, t + k) - t;
+}
+int hash(int x) {
+    return lower_bound(t, t + m, x) - t;
+}
 int build(int l, int r) {
     int root = tot++;
-    seg_sum[root] = 0;
-    seg_num[root] = 0;
+    c[root] = 0;
     if(l != r) {
         int mid = (l + r) >> 1;
         lson[root] = build(l, mid);
@@ -95,11 +35,11 @@ int build(int l, int r) {
     }
     return root;
 }
-int update(int root, int pos) {
+
+int Insert(int root, int pos, int val) {
     int newroot = tot++, tmp = newroot;
-    seg_sum[newroot] = seg_sum[root] + pos;
-    seg_num[newroot] = seg_num[root] + 1;
-    int l = 1, r = max_page;
+    int l = 0, r = m - 1;
+    c[newroot] = c[root] + val;
     while(l < r) {
         int mid = (l + r) >> 1;
         if(pos <= mid) {
@@ -115,109 +55,83 @@ int update(int root, int pos) {
             root = rson[root];
             l = mid + 1;
         }
-        seg_sum[newroot] = seg_sum[root] + pos;
-        seg_num[newroot] = seg_num[root] + 1;
+        c[newroot] = c[root] + val;
     }
     return tmp;
 }
-void query(int left_root, int right_root, int k) {
-    if(seg_sum[left_root] - seg_sum[right_root] < k) {
-        cout << "Poor QLW" << endl;
-        return;
+int lowbit(int x) {
+    return x & (-x);
+}
+int use[MAXN];
+void add(int x, int pos, int val) {
+    while(x <= n) {
+        S[x] = Insert(S[x], pos, val);
+        x += lowbit(x);
     }
-    int l = 1, r = m, times = 0;
+}
+int sum(int x) {
+    int ret = 0;
+    while(x > 0) {
+        ret += c[lson[use[x]]];
+        x -= lowbit(x);
+    }
+    return ret;
+}
+int Query(int left, int right, int k, int type) { /**< type==0 代表后面的点，type==1代表前面的点 */
+    int left_root = T[left - 1];
+    int right_root = T[right];
+    int l = 0, r = m - 1;
+    int res = 0;
+    for(int i = left - 1; i; i -= lowbit(i))
+        use[i] = S[i];
+    for(int i = right; i; i -= lowbit(i))
+        use[i] = S[i];
     while(l < r) {
         int mid = (l + r) >> 1;
-        if(seg_sum[rson[left_root]] - seg_sum[rson[right_root]] >= k) {
-            l = mid + 1;
-            left_root = rson[left_root];
-            right_root = rson[right_root];
-        } else {
+        if(mid >= k) {
             r = mid;
-            times += seg_num[rson[left_root]] - seg_num[rson[right_root]];
-            k -= seg_sum[rson[left_root]] - seg_sum[rson[right_root]];
+            if(type == 0) {
+                for(int i = left - 1; i; i -= lowbit(i)) {
+                    res -= rson[use[i]];
+                }
+                for(int i = right; i; i -= lowbit(i)) {
+                    res += rson[use[i]];
+                }
+            }
+            for(int i = left - 1; i; i -= lowbit(i)) {
+                res -= rson[use[i]];
+                use[i] = lson[use[i]];
+            }
+            for(int i = right; i; i -= lowbit(i)) {
+                res += rson[use[i]];
+                use[i] = lson[use[i]];
+            }
             left_root = lson[left_root];
             right_root = lson[right_root];
+        } else {
+            l = mid + 1;
+            if(type == 1) {
+                for(int i = left - 1; i; i -= lowbit(i)) {
+                    res -= lson[use[i]];
+                }
+                for(int i = right; i; i -= lowbit(i)) {
+                    res += lson[use[i]];
+                }
+            }
+            for(int i = left - 1; i; i -= lowbit(i))
+                use[i] = rson[use[i]];
+            for(int i = right; i; i -= lowbit(i))
+                use[i] = rson[use[i]];
+            left_root = rson[left_root];
+            right_root = rson[right_root];
         }
     }
-    if(k % r == 0)
-        cout << times + k / r << endl;
-    else
-        cout << times + k / r + 1 << endl;
+    return res;
 }
-
-
-void work1() {
-    n = C;
-    m = max_page;
-    T[n + 1] = build(1, max_page);
-    for(int i = n; i >= 1; i--) {
-        T[i] = update(T[i + 1], buf1[i]);
-    }
-#ifdef debug
-    for(int i = n; i >= 1; i--)
-        cout << seg_sum[T[i]] << "\t";
-    cout << endl;
-
-    for(int i = n; i >= 1; i--)
-        cout << seg_num[T[i]] << "\t";
-    cout << endl;
-#endif // debug
-    for(int i = 1; i <= que_num; i++) {
-        query(T[questions[i].start_y], T[questions[i].end_y + 1], questions[i].min_page);
-    }
-}
-
-int get_value(int m, int mid) {
-    return
-        prefix_sum[questions[m].end_x][questions[m].end_y][mid] -
-        prefix_sum[questions[m].end_x][questions[m].start_y - 1][mid] -
-        prefix_sum[questions[m].start_x - 1][questions[m].end_y][mid] +
-        prefix_sum[questions[m].start_x - 1][questions[m].start_y - 1][mid];
-}
-
-int get_num(int m, int mid) {
-    return
-        prefix_num[questions[m].end_x][questions[m].end_y][mid] -
-        prefix_num[questions[m].end_x][questions[m].start_y - 1][mid] -
-        prefix_num[questions[m].start_x - 1][questions[m].end_y][mid] +
-        prefix_num[questions[m].start_x - 1][questions[m].start_y - 1][mid];
-}
-
-void work2() {
-
-    for(int i = 1; i <= que_num; i++) {
-        int mid;
-        int low = 1, high = max_page;
-        high = max_page;
-
-#ifdef debug
-        int tmp = get_value(i, 1);
-        cout << tmp << "\t";
-#endif // debug
-
-        if(get_value(i, 1) < questions[i].min_page) {
-            cout << "Poor QLW" << endl;
-            continue;
-        }
-
-        while(low <= high) {
-            mid = (low + high) >> 1;
-
-#ifdef debug
-            tmp = get_value(i, mid);
-            cout << tmp << "\t";
-#endif // debug
-
-            if(get_value(i, mid) < questions[i].min_page)
-                high = mid - 1;
-            else
-                low = mid + 1;
-        }
-#ifdef debug
-        cout << endl;
-#endif // debug
-        cout << get_num(i, high) - (get_value(i, high) - questions[i].min_page) / high << endl;
+void Modify(int x, int p, int d) {
+    while(x <= n) {
+        S[x] = Insert(S[x], p, d);
+        x += lowbit(x);
     }
 }
 
@@ -230,11 +144,29 @@ int main() {
 
     ios::sync_with_stdio(false);
 
-    init();
+    cin >> init_num >> del_num;
+    for(int i = 1; i <= init_num; i++) {
+        cin >> buf[i];
+        order[buf[i]] = i;
+    }
 
-    if(R == 1)
-        work1();
-    else
-        work2();
+    int res = 0;
 
+    T[0] = build(1, init_num);
+    for(int i = 1; i <= init_num; i++) {
+        res += Query(1, i - 1, buf[i], 0);
+        for(int j = i; j; j -= lowbit(j))
+            T[i] = Insert(T[i], buf[i], 1);
+    }
+
+    for(int i = 1; i <= del_num; i++) {
+        int cur_del;
+        cin >> cur_del;
+        res -= Query(1, order[cur_del], cur_del, 0);
+        res -= Query(order[cur_del], init_num, cur_del, 1);
+        for(int i = cur_del; i; i -= lowbit(i))
+        }{
+        T[i] = Insert(T[i], cur_del, -1);
+    }
+}
 }
