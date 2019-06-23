@@ -74,8 +74,6 @@ int sum(int x) {
     return ret;
 }
 int Query(int left, int right, int k, int type) { /**< type==0 代表后面的点，type==1代表前面的点 */
-    int left_root = T[left - 1];
-    int right_root = T[right];
     int l = 0, r = m - 1;
     int res = 0;
     for(int i = left - 1; i; i -= lowbit(i))
@@ -102,8 +100,6 @@ int Query(int left, int right, int k, int type) { /**< type==0 代表后面的点，typ
                 res += rson[use[i]];
                 use[i] = lson[use[i]];
             }
-            left_root = lson[left_root];
-            right_root = lson[right_root];
         } else {
             l = mid + 1;
             if(type == 1) {
@@ -118,8 +114,6 @@ int Query(int left, int right, int k, int type) { /**< type==0 代表后面的点，typ
                 use[i] = rson[use[i]];
             for(int i = right; i; i -= lowbit(i))
                 use[i] = rson[use[i]];
-            left_root = rson[left_root];
-            right_root = rson[right_root];
         }
     }
     return res;
@@ -149,23 +143,23 @@ int main() {
     int res = 0;
 
     T[0] = build(1, init_num);
+    for(int i = 1; i <= init_num; i++)
+        S[i] = T[0];
+
     for(int i = 1; i <= init_num; i++) {
         res += Query(1, i - 1, buf[i], 0);
-        for(int j = i; j; j -= lowbit(j))
-            T[j] = Insert(T[j], buf[i], 1);
+        Modify(j, buf[i], 1)
     }
 
+    cout << res << endl;
     for(int i = 1; i <= del_num; i++) {
         int cur_del;
         cin >> cur_del;
 
         res -= Query(1, order[cur_del], cur_del, 0);
         res -= Query(order[cur_del], init_num, cur_del, 1);
-        cout<<res<<endl;
+        cout << res << endl;
 
-        for(int j = cur_del; j; j -= lowbit(j)){
-            T[j] = Insert(T[j], cur_del, -1);
-        }
+        Modify(order[cur_del],cur_del,-1);
     }
 }
-
