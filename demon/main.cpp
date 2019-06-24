@@ -8,8 +8,8 @@ using namespace std;
 int buf[100000 + 5], order[100000 + 5];
 int init_num, del_num;
 
-const int MAXN = 60010;
-const int M = 2500010;
+const int MAXN = 100005;
+const int M = 25000100;
 int n, q, m, tot;
 int a[MAXN], t[MAXN];
 int T[MAXN], lson[M], rson[M], c[M];
@@ -26,19 +26,24 @@ int build(int l, int r) {
 }
 
 int Insert(int root, int pos, int val) {
-    int newroot = tot++, tmp = newroot;
-    int l = 0, r = m - 1;
+    int newroot;
+    if(!root)
+        newroot = tot++;
+    else
+        newroot = root;
+    int tmp = newroot;
+    int l = 1, r = m ;
     c[newroot] = c[root] + val;
     while(l < r) {
         int mid = (l + r) >> 1;
         if(pos <= mid) {
-            lson[newroot] = tot++;
+            if(!lson[newroot]) lson[newroot]=tot++;
             rson[newroot] = rson[root];
             newroot = lson[newroot];
             root = lson[root];
             r = mid;
         } else {
-            rson[newroot] = tot++;
+            if(!rson[newroot]) rson[newroot]=tot++;
             lson[newroot] = lson[root];
             newroot = rson[newroot];
             root = rson[root];
@@ -65,9 +70,9 @@ int Query(int left, int right, int k, int type) { /**< type==0 代表后面的点，typ
             r = mid;
             if(type == 0) {
                 for(int i = left - 1; i; i -= lowbit(i))
-                    res -= c[use[i]];
+                    res -= c[rson[use[i]]];
                 for(int i = right; i; i -= lowbit(i))
-                    res += c[use[i]];
+                    res += c[rson[use[i]]];
             }
             for(int i = left - 1; i; i -= lowbit(i))
                 use[i] = lson[use[i]];
@@ -78,9 +83,9 @@ int Query(int left, int right, int k, int type) { /**< type==0 代表后面的点，typ
             l = mid + 1;
             if(type == 1) {
                 for(int i = left - 1; i; i -= lowbit(i))
-                    res -= c[use[i]];
+                    res -= c[lson[use[i]]];
                 for(int i = right; i; i -= lowbit(i))
-                    res += c[use[i]];
+                    res += c[lson[use[i]]];
             }
             for(int i = left - 1; i; i -= lowbit(i))
                 use[i] = rson[use[i]];
@@ -96,7 +101,6 @@ void Modify(int x, int p, int d) {
         x += lowbit(x);
     }
 }
-
 int main() {
 
 #ifdef local
@@ -112,7 +116,7 @@ int main() {
         order[buf[i]] = i;
     }
 
-    int res = 0;
+    long long res = 0;
     n = m = init_num;
 
 
@@ -125,14 +129,14 @@ int main() {
         Modify(i, buf[i], 1);
     }
 
-    cout << res << endl;
     for(int i = 1; i <= del_num; i++) {
         int cur_del;
         cin >> cur_del;
 
+        cout << res << endl;
+
         res -= Query(1, order[cur_del], cur_del, 0);
         res -= Query(order[cur_del], init_num, cur_del, 1);
-        cout << res << endl;
 
         Modify(order[cur_del], cur_del, -1);
     }
