@@ -14,49 +14,25 @@ int n, q, m, tot;
 int a[MAXN], t[MAXN];
 int T[MAXN], lson[M], rson[M], c[M];
 int S[MAXN];
-int build(int l, int r) {
-    int root = tot++;
-    c[root] = 0;
-    if(l != r) {
-        int mid = (l + r) >> 1;
-        lson[root] = build(l, mid);
-        rson[root] = build(mid + 1, r);
-    }
-    return root;
-}
-
-int Insert(int root, int pos, int val) {
-    int newroot;
+void Insert(int &root, int l, int r, int pos, int val) {
     if(!root)
-        newroot = tot++;
-    else
-        newroot = root;
-    int tmp = newroot;
-    int l = 1, r = m ;
-    c[newroot] = c[root] + val;
-    while(l < r) {
-        int mid = (l + r) >> 1;
-        if(pos <= mid) {
-            if(!lson[newroot]) lson[newroot]=tot++;
-            rson[newroot] = rson[root];
-            newroot = lson[newroot];
-            root = lson[root];
-            r = mid;
-        } else {
-            if(!rson[newroot]) rson[newroot]=tot++;
-            lson[newroot] = lson[root];
-            newroot = rson[newroot];
-            root = rson[root];
-            l = mid + 1;
-        }
-        c[newroot] = c[root] + val;
+        root = ++tot;
+    c[root] += val;
+    if(l == r)
+        return ;
+
+    int mid = (l + r) >> 1;
+    if(pos <= mid) {
+        Insert(lson[root], l, mid, pos, val);
+    } else {
+        Insert(rson[root], mid + 1, r, pos, val);
     }
-    return tmp;
+
 }
 int lowbit(int x) {
     return x & (-x);
 }
-int use[MAXN];
+int use[MAXM];
 int Query(int left, int right, int k, int type) { /**< type==0 代表后面的点，type==1代表前面的点 */
     int l = 1, r = m;
     int res = 0;
@@ -97,7 +73,7 @@ int Query(int left, int right, int k, int type) { /**< type==0 代表后面的点，typ
 }
 void Modify(int x, int p, int d) {
     while(x <= n) {
-        S[x] = Insert(S[x], p, d);
+        Insert(S[x], 1, m, p, d);
         x += lowbit(x);
     }
 }
@@ -119,10 +95,6 @@ int main() {
     long long res = 0;
     n = m = init_num;
 
-
-    T[0] = build(1, init_num);
-    for(int i = 1; i <= init_num; i++)
-        S[i] = T[0];
 
     for(int i = 1; i <= init_num; i++) {
         res += Query(1, i - 1, buf[i], 0);
