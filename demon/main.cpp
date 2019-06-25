@@ -1,5 +1,5 @@
 #include<bits/stdc++.h>
-#define local
+#define loc
 #define debu
 using namespace std;
 
@@ -7,7 +7,7 @@ using namespace std;
 
 int buf1[MAXM];
 
-const int MAXN = 400005;
+const int MAXN = 200005;
 const int M = MAXN * 50;
 
 int mission_num, time_num, rnk_cnt;
@@ -62,7 +62,9 @@ int T[MAXN], lson[M], rson[M], c[M];
 int seg_sum[M], seg_num[M];
 long long seg_real[M];
 int build(int l, int r) {
-    int root = ++tot;
+    int root = tot++;
+    seg_sum[root] = 0;
+    seg_num[root] = 0;
     if(l != r) {
         int mid = (l + r) >> 1;
         lson[root] = build(l, mid);
@@ -98,7 +100,7 @@ int update(int root, int pos, int val) {
     return tmp;
 }
 long long query(int root, int k) {
-    if(seg_num[root] <= k) {
+    if(seg_num[root] < k) {
         return  seg_real[root];
     }
     int l = 1, r = m;
@@ -119,7 +121,6 @@ long long query(int root, int k) {
     return res;
 }
 void _copy(int x, int y) {
-    T[x]=++tot;
     lson[x] = lson[y];
     rson[x] = rson[y];
     seg_sum[x] = seg_sum[y];
@@ -134,7 +135,7 @@ void work1() {
 
     int cur_mission = 2;
     for(int i = 1; i <= time_num; i++) {
-
+        T[i]=++tot;
         _copy(T[i], T[i - 1]);
         while(brk_missions[cur_mission].pos == i){
             T[i]=update(T[i], brk_missions[cur_mission].rnk,brk_missions[cur_mission].type);
@@ -143,7 +144,7 @@ void work1() {
     }
 
     int X, A, B, C;
-    long long res=1,K;
+    long long res = 1, K;
     for(int i = 1; i <= time_num; i++) {
         cin >> X >> A >> B >> C;
         K = 1 + (A * res + B) % C;
