@@ -47,7 +47,7 @@ void init() {
         brk_missions[i * 2].pos = missions[i].start;
         brk_missions[i * 2].type = 1;
         brk_missions[i * 2].rnk = missions[i].rnk;
-        brk_missions[i * 2 + 1].pos = missions[i].finish;
+        brk_missions[i * 2 + 1].pos = missions[i].finish+1;
         brk_missions[i * 2 + 1].type = -1;
         brk_missions[i * 2 + 1].rnk = missions[i].rnk;
     }
@@ -73,7 +73,7 @@ int build(int l, int r) {
     return root;
 }
 int update(int root, int pos, int val) {
-    int newroot = tot++, tmp = newroot;
+    int newroot = ++tot, tmp = newroot;
     seg_sum[newroot] = seg_sum[root] + pos * val;
     seg_num[newroot] = seg_num[root] + val;
     seg_real[newroot] = seg_real[root] + reverse_rnk[pos] * val;
@@ -84,13 +84,11 @@ int update(int root, int pos, int val) {
             lson[newroot] = tot++;
             rson[newroot] = rson[root];
             newroot = lson[newroot];
-            root = lson[root];
             r = mid;
         } else {
             rson[newroot] = tot++;
             lson[newroot] = lson[root];
             newroot = rson[newroot];
-            root = rson[root];
             l = mid + 1;
         }
         seg_sum[newroot] = seg_sum[root] + pos * val;
@@ -125,6 +123,7 @@ void _copy(int x, int y) {
     rson[x] = rson[y];
     seg_sum[x] = seg_sum[y];
     seg_num[x] = seg_num[y];
+    seg_real[x] = seg_real[y];
 }
 
 void work1() {
@@ -134,9 +133,10 @@ void work1() {
 
     int cur_mission = 2;
     for(int i = 1; i <= time_num; i++) {
-        _copy(i, i - 1);
+        T[i]=++tot;
+        _copy(T[i], T[i - 1]);
         while(brk_missions[cur_mission].pos == i){
-            update(T[i], brk_missions[cur_mission].rnk,brk_missions[cur_mission].type);
+            T[i]=update(T[i], brk_missions[cur_mission].rnk,brk_missions[cur_mission].type);
             cur_mission++;
         }
     }
