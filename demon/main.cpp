@@ -11,6 +11,7 @@ const int MAXN = 200005;
 const int M = MAXN * 50;
 
 int mission_num, time_num, rnk_cnt;
+int reverse_rnk[MAXN];
 struct mission {
     int start, finish, val, rnk;
     bool operator<(mission mission1) {
@@ -20,12 +21,15 @@ struct mission {
 
 struct mission1 {
     int pos, rnk;
-    bool type;
+    int type;
+    bool operator<(mission1 mission2) {
+        return this->pos < mission2.pos;
+    }
 } brk_missions[MAXN * 2 + 5];
 
 void init() {
     cin >> mission_num >> time_num;
-    for(int i = 1; i <= init_num; i++) {
+    for(int i = 1; i <= mission_num; i++) {
         cin >> missions[i].start >> missions[i].finish >> missions[i].val;
     }
     sort(missions + 1, missions + 1 + mission_num);
@@ -35,19 +39,19 @@ void init() {
             missions[i].rnk = ++rnk_cnt;
         else {
             missions[i].rnk = rnk_cnt;
-            reverse_rnk[rnk_cnt] = missions[i].val;
         }
+        reverse_rnk[rnk_cnt] = missions[i].val;
     }
-    /**< type==true 代表起点 */
-    /**< 2*i 代表起点 */
+
     for(int i = 1; i <= mission_num; i++) {
         brk_missions[i * 2].pos = missions[i].start;
-        brk_missions[i * 2].type = true;
+        brk_missions[i * 2].type = 1;
         brk_missions[i * 2].rnk = missions[i].rnk;
         brk_missions[i * 2 + 1].pos = missions[i].finish;
-        brk_missions[i * 2 + 1].type = false;
+        brk_missions[i * 2 + 1].type = -1;
         brk_missions[i * 2 + 1].rnk = missions[i].rnk;
     }
+    sort(brk_missions+2,brk_missions+2+2*mission_num);
 }
 
 
@@ -56,6 +60,7 @@ int a[MAXN], t[MAXN];
 int times[MAXN];
 int T[MAXN], lson[M], rson[M], c[M];
 int seg_sum[M], seg_num[M];
+long long seg_real[M];
 int build(int l, int r) {
     int root = tot++;
     seg_sum[root] = 0;
@@ -67,11 +72,12 @@ int build(int l, int r) {
     }
     return root;
 }
-int update(int root, int pos) {
+int update(int root, int pos, int val) {
     int newroot = tot++, tmp = newroot;
-    seg_sum[newroot] = seg_sum[root] + pos;
-    seg_num[newroot] = seg_num[root] + 1;
-    int l = 1, r = max_page;
+    seg_sum[newroot] = seg_sum[root] + pos * val;
+    seg_num[newroot] = seg_num[root] + val;
+    seg_real[newroot] = seg_real[root] + reverse_rnk[pos] * val;
+    int l = 1, r = m;
     while(l < r) {
         int mid = (l + r) >> 1;
         if(pos <= mid) {
@@ -87,54 +93,59 @@ int update(int root, int pos) {
             root = rson[root];
             l = mid + 1;
         }
-        seg_sum[newroot] = seg_sum[root] + pos;
-        seg_num[newroot] = seg_num[root] + 1;
+        seg_sum[newroot] = seg_sum[root] + pos * val;
+        seg_num[newroot] = seg_num[root] + val;
+        seg_real[newroot] = seg_real[root] + reverse_rnk[pos] * val;
     }
     return tmp;
 }
-void query(int left_root, int right_root, int k) {
-    if(seg_sum[left_root] - seg_sum[right_root] < k) {
-        cout << "Poor QLW" << endl;
-        return;
+int query(int root, int k) {
+    if(seg_num[root] < k) {
+        return  seg_real[root];
     }
-    int l = 1, r = m, times = 0;
+    int l = 1, r = m;
+    long long res = 0;
     while(l < r) {
         int mid = (l + r) >> 1;
-        if(seg_sum[rson[left_root]] - seg_sum[rson[right_root]] >= k) {
-            l = mid + 1;
-            left_root = rson[left_root];
-            right_root = rson[right_root];
-        } else {
+        if(seg_num[lson[root]] >= k) {
             r = mid;
-            times += seg_num[rson[left_root]] - seg_num[rson[right_root]];
-            k -= seg_sum[rson[left_root]] - seg_sum[rson[right_root]];
-            left_root = lson[left_root];
-            right_root = lson[right_root];
+            root = lson[root];
+        } else {
+            res += seg_real[lson[root]];
+            root = rson[root];
+            k -= seg_num[lson[root]];
+            l = mid + 1;
         }
     }
-    if(k % r == 0)
-        cout << times + k / r << endl;
-    else
-        cout << times + k / r + 1 << endl;
+    if(l==r&&k!=0)  res+=reverse_rnk[l]*k;
+    return res;
 }
-void _copy(int x,int y){
-    T[x]=T[y];
-    lson[x]=lson[y];
-    rson[x]=rson[y];
-    seg_sum[x]=seg_sum[y];
-    seg_num[x]=seg_num[y];
-
+void _copy(int x, int y) {
+    lson[x] = lson[y];
+    rson[x] = rson[y];
+    seg_sum[x] = seg_sum[y];
+    seg_num[x] = seg_num[y];
 }
 
 void work1() {
-    n = C;
-    m = rnk_cnt;
-    T[n + 1] = build(1, m);
-    for(int i = n; i >= 1; i--) {
-        T[i] = update(T[i + 1], buf1[i]);
+    n = m = rnk_cnt;
+
+    T[0] = build(1, n);
+
+    int cur_mission = 2;
+    for(int i = 1; i <= time_num; i++) {
+        _copy(i, i - 1);
+        while(brk_missions[cur_mission].pos == i){
+            update(T[i], brk_missions[cur_mission].rnk,brk_missions[cur_mission].type);
+            cur_mission++;
+        }
     }
-    for(int i = 1; i <= que_num; i++) {
-        query(T[questions[i].start_y], T[questions[i].end_y + 1], questions[i].min_page);
+
+    int X, A, B, C, res = 1, K;
+    for(int i = 1; i <= time_num; i++) {
+        cin >> X >> A >> B >> C;
+        K = 1 + (A * res + B) % C;
+        cout << (res = query(T[X], K)) << endl;
     }
 }
 
