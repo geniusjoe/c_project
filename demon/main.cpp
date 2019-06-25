@@ -97,7 +97,7 @@ int update(int root, int pos, int val) {
     }
     return tmp;
 }
-int query(int root, int k) {
+long long query(int root, int k) {
     if(seg_num[root] <= k) {
         return  seg_real[root];
     }
@@ -142,7 +142,8 @@ void work1() {
         }
     }
 
-    int X, A, B, C, res = 1, K;
+    int X, A, B, C;
+    long long res=1,K;
     for(int i = 1; i <= time_num; i++) {
         cin >> X >> A >> B >> C;
         K = 1 + (A * res + B) % C;
