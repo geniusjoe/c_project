@@ -1,5 +1,5 @@
 #include<bits/stdc++.h>
-#define loc
+#define local
 #define debu
 using namespace std;
 
@@ -12,7 +12,7 @@ const int M = MAXN * 40;
 struct Edge {
     int to, next;
 } edge[MAXN * 2];
-int head[MAXN], tot;
+int head[MAXN], TOT;
 int top[MAXN];
 int fa[MAXN];
 int deep[MAXN];
@@ -23,17 +23,19 @@ int son[MAXN];
 int pos;
 
 /**< Ö÷Ï¯Ê÷ */
-int n, q, m, tot;
+int n, q, m,tot;
 int a[MAXN], t[MAXN];
 int times[MAXN];
 int T[M], lson[M], rson[M], c[M];
 int seg_sum[M], seg_max[M];
+int city_num, event_num;
+int raw_city[100000 + 5][2];
 
 /**< Ê÷Á´ÆÊ·Ö */
 void addedge(int u, int v) {
-    edge[tot].to = v;
-    edge[tot].next = head[u];
-    head[u] = tot++;
+    edge[TOT].to = v;
+    edge[TOT].next = head[u];
+    head[u] = TOT++;
 }
 void dfs1(int u, int pre, int d) {
     deep[u] = d;
@@ -62,7 +64,7 @@ void getpos(int u, int sp) {
             getpos(v, v);
     }
 }
-void build(int l, int r) {
+int build(int l, int r) {
     int root = tot++;
     seg_sum[root] = 0;
     seg_max[root] = 0;
@@ -75,21 +77,21 @@ void build(int l, int r) {
 }
 void push_up(int i) {
     seg_max[i] = max(seg_max[lson[i]], seg_max[rson[i]]);
-    seg_sum[i] = seg_sum[lson[i]] + seg_sum[rson[i]]);
+    seg_sum[i] = seg_sum[lson[i]] + seg_sum[rson[i]];
 }
-void update(int l, int r, int root, int pos, int val) {
+int update(int l, int r, int root, int pos, int val) {
     int newroot = ++tot;
     int mid = (l + r) >> 1;
     if(l == r) {
-        seg_sum[i] = val;
-        seg_max[i] = val;
-        return;
+        seg_sum[newroot] = val;
+        seg_max[newroot] = val;
+        return newroot;
     }
     if(pos <= mid) {
-        lson[newroot] = update(l, mid, lson[root], k, val);
+        lson[newroot] = update(l, mid, lson[root], pos, val);
         rson[newroot] = rson[root];
     } else {
-        rson[newroot] = update(mid + 1, r, rson[root], k, val);
+        rson[newroot] = update(mid + 1, r, rson[root], pos, val);
         lson[newroot] = lson[root];
     }
     push_up(newroot);
@@ -97,11 +99,13 @@ void update(int l, int r, int root, int pos, int val) {
 }
 
 int query(int l, int r, int x, int y, int root, int type) { /**< type==0 ´ú±í×î´óÖµ£¬ type==1 ´ú±íÇóºÍ */
-    if(l == x && r == y)
+    if(l == x && r == y) {
         if(type == 0)
             return seg_max[root];
         else
             return seg_sum[root];
+    }
+
     int mid = (l + r) >> 1;
     if(mid >= y)
         return query(l, mid, x, y, lson[root], type);
@@ -113,8 +117,6 @@ int query(int l, int r, int x, int y, int root, int type) { /**< type==0 ´ú±í×î´
         if(type == 1)
             return query(l, mid, x, y, lson[root], type) + query(mid + 1, r, x, y, rson[root], type);
     }
-
-
 }
 int find(int u, int v, int type) {  /**< type==0 ´ú±í×î´óÖµ£¬ type==1 ´ú±íÇóºÍ */
     int f1 = top[u], f2 = top[v];
@@ -136,17 +138,15 @@ int find(int u, int v, int type) {  /**< type==0 ´ú±í×î´óÖµ£¬ type==1 ´ú±íÇóºÍ *
     if(deep[u] > deep[v])
         swap(u, v);
     if(type == 0)
-        return max(tmp, query(0, pos - 1, p[son[u]], p[v], T[raw_city[u][0]], type));
+        return max(tmp, query(0, pos - 1, p[u], p[v], T[raw_city[u][0]], type));
     else
-        return tmp + query(0, pos - 1, p[son[u]], p[v], T[raw_city[u][0]], type)
-    }
-int e[MAXN]
+        return tmp + query(0, pos - 1, p[u], p[v], T[raw_city[u][0]], type);
+}
+int e[MAXN];
 
-int city_num, event_num;
-int raw_city[100000 + 5][2];
+
 void init() {
-
-    tot = 0;
+    TOT=tot = 0;
     memset(head, -1, sizeof(head));
     pos = 0;
     memset(son, -1, sizeof(son));
@@ -165,46 +165,37 @@ void init() {
     }
     dfs1(1, 0, 0);
     getpos(1, 1);
-    /**< ½¨Á¢Ïß¶ÎÊ÷ */
-    build(0, pos - 1);
-    T[0] = segTree[0];
+    T[0] = build(0, pos - 1);
+
     for(int i = 1; i <= MAXN; i++ ) {
         T[i] = T[0];
     }
     for(int i = 1; i <= city_num; i++) {
-        T[raw_city[1]] = update(0, pos - 1, T[raw_city[i][1]], p[i], raw_city[i][0]);
+        T[raw_city[i][1]] = update(0, pos - 1, T[raw_city[i][1]], p[i], raw_city[i][0]);
     }
 }
 
 
 void work1() {
-    for(int i = 1; i < event_num; i++) {
-        char tmp1, tmp2;
+    for(int i = 1; i <= event_num; i++) {
+        char tmp, tmp1, tmp2;
         int city1, city2;
-        cin >> tmp;
-        cin >> tmp >> tmp1 >> tmp2 >> city1 >> city2;
-        if(tmp1 == 'Q' && tmp2 == 'S'){
-            cout<<find(city1, city2,1)<<endl;
+        cin >> tmp1 >> tmp2 >> city1 >> city2;
+        if(tmp1 == 'Q' && tmp2 == 'S') {
+            cout << find(city1, city2, 1) << endl;
             continue;
-        }
-        else if(tmp1 == 'Q' && tmp2 == 'M'){
-            cout<<find(city1, city2,0)<<endl;
+        } else if(tmp1 == 'Q' && tmp2 == 'M') {
+            cout << find(city1, city2, 0) << endl;
             continue;
-        }
-        else if(tmp1 == 'Q' && tmp2 == 'M'){
-            cout<<find(city1, city2,0)<<endl;
+        } else if(tmp1 == 'C' && tmp2 == 'C') {
+            update(0, pos - 1, T[raw_city[city1][1]], p[city1], -raw_city[city1][0]);
+            raw_city[city1][1] = city2;
+            update(0, pos - 1, T[raw_city[city1][1]], p[city1], raw_city[city1][0]);
             continue;
-        }
-        else if(tmp1 == 'C' && tmp2 == 'C'){
-            update(0,pos-1,T[raw_city[city1][1]],p[city1],-raw_city[city1][0]);
-            raw_city[city1][1]=city2;
-            update(0,pos-1,T[raw_city[city1][1]],p[city1],raw_city[city1][0]);
-            continue;
-        }
-        else if(tmp1 == 'C' && tmp2 == 'W'){
-            update(0,pos-1,T[raw_city[city1][1]],p[city1],-raw_city[city1][0]);
-            raw_city[city1][0]=city2;
-            update(0,pos-1,T[raw_city[city1][1]],p[city1],raw_city[city1][0]);
+        } else if(tmp1 == 'C' && tmp2 == 'W') {
+            update(0, pos - 1, T[raw_city[city1][1]], p[city1], -raw_city[city1][0]);
+            raw_city[city1][0] = city2;
+            update(0, pos - 1, T[raw_city[city1][1]], p[city1], raw_city[city1][0]);
             continue;
         }
     }
