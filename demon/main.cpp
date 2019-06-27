@@ -6,7 +6,10 @@ using namespace std;
 #define MAXM    500000+5
 
 const int MAXN = 500005;
+const int M = MAXN * 40;
 
+
+/**< 树链剖分 */
 struct Edge {
     int to, next;
 } edge[MAXN * 2];
@@ -19,6 +22,15 @@ int p[MAXN];
 int fp[MAXN];
 int son[MAXN];
 int pos;
+
+/**< 主席树 */
+int n, q, m, tot;
+int a[MAXN], t[MAXN];
+int times[MAXN];
+int T[MAXN], lson[M], rson[M], c[M];
+int seg_sum[M], seg_max[M];
+
+/**< 树链剖分 */
 void addedge(int u, int v) {
     edge[tot].to = v;
     edge[tot].next = head[u];
@@ -51,129 +63,79 @@ void getpos(int u, int sp) {
             getpos(v, v);
     }
 }
-struct Node{
-    int l,r;
-    int Max;
-}segTree[MAXN*3];
-void build(int i,int l,int r){
-    segTree[i].l=l;
-    segTree[i].r=r;
-    segTree[i].Max=0;
-    if(l==r) return;
-    int mid=(l+r)>>1;
-    build(i<<1,l,mid);
-    build((i<<1)|1,mid+1,r);
+void build(int l, int r) {
+    int root = tot++;
+    seg_sum[root] = 0;
+    seg_max[root] = 0;
+    if(l != r) {
+        int mid = (l + r) >> 1;
+        lson[root] = build(l, mid);
+        rson[root] = build(mid + 1, r);
+    }
+    return root;
 }
-void push_up(int i){
-    segTree[i].Max=max(segTree[i<<1].Max,segTree[(i<<1)|1].Max);
+void push_up(int i) {
+    seg_max[i] = max(seg_max[lson[i]], seg_max[rson[i]]);
+    seg_sum[i] = seg_sum[lson[i]] + seg_sum[rson[i]]);
 }
-void update(int i,int k,int val){
-    if(segTree[i].l==k&&segTree[i].r==k){
-        segTree[i].Max=val;
+void update(int l, int r, int root, int pos, int val) {
+    int newroot = ++tot, tmp = newroot;
+    int mid = (l + r) >> 1;
+    if(l == r) {
+        seg_sum[i] = val;
+        seg_max[i] = val;
         return;
     }
-    int mid=(segTree[i].l+segTree[i].r)/2;
-    if(k<=mid)  update(i<<1,k,val);
-    else    update((i<<1)|1,k,val);
-    push_up(i);
-}
-int query(int i,int l,int r){
-    if(segTree[i].l==l&&segTree[i].r==r)
-        return segTree[i].Max;
-    int mid=(segTree[i].l+segTree[i].r)/2;
-    if(r<=mid)  return query(i<<1,l,r);
-    else if(l>mid)  return query((i<<1)|1,l,r);
-    else return max(query(i<<1,l,mid),query((i<<1)|1,mid+1,r));
-}
-int find(int u,int v){
-    int f1=top[u],f2=top[v];
-    int tmp=0;
-    while(f1!=f2){
-        if(deep[f1]<deep[f2]){
-            swap(f1,f2);
-            swap(u,v);
-        }
-        tmp=max(tmp,query(1,p[f1],p[u]));
-        u=fa[f1];f1=top[u];
+    if(pos <= mid) {
+        lson[newroot] = update(l, mid, lson[root], k, val);
+        rson[newroot] = rson[root];
+    } else {
+        rson[newroot] = update(mid + 1, r, rson[root], k, val);
+        lson[newroot] = lson[root];
     }
-    if(u==v) return tmp;
-    if(deep[u]>deep[v]) swap(u,v);
-    return max(tmp,query(1,p[son[u]],p[v]));
+
+    push_up(newroot);
+    return newroot;
+}
+
+
+int query(int i, int l, int r) {
+    if(segTree[i].l == l && segTree[i].r == r)
+        return segTree[i].Max;
+    int mid = (segTree[i].l + segTree[i].r) / 2;
+    if(r <= mid)
+        return query(i << 1, l, r);
+    else if(l > mid)
+        return query((i << 1) | 1, l, r);
+    else
+        return max(query(i << 1, l, mid), query((i << 1) | 1, mid + 1, r));
+}
+int find(int u, int v) {
+    int f1 = top[u], f2 = top[v];
+    int tmp = 0;
+    while(f1 != f2) {
+        if(deep[f1] < deep[f2]) {
+            swap(f1, f2);
+            swap(u, v);
+        }
+        tmp = max(tmp, query(1, p[f1], p[u]));
+        u = fa[f1];
+        f1 = top[u];
+    }
+    if(u == v)
+        return tmp;
+    if(deep[u] > deep[v])
+        swap(u, v);
+    return max(tmp, query(1, p[son[u]], p[v]));
 }
 int e[MAXN]
 
-
-int lowbit(int x){
-    return x&(-x);
-}
-int c[MAXN],;
-int n;
-int sum(int i){
-    int s=0;
-    while(i>0){
-        s+=c[i];
-        i-=lowbit(i);
-    }
-    return s;
-}
-void add(int i,int val){
-    while(i<=n){
-        c[i]+=val;
-        i+=lowbit(i);
-    }
-}
-void Change(int u,int v,int val){
-    int f1=top[u],f2=top[v];
-    int tmp=0;
-    while(f1!=f2){
-        if(deep[f1]<deep[f2]){
-            swap(f1,f2);
-            swap(u,v);
-        }
-        add(p[f1],val);
-        add(p[u]+1,-val);
-        u=fa[f1];
-        f1=top[u];
-    }
-    if(deep[u]>deep[v]) swap(u,v);
-    add(p[u],val);
-    add(p[v]+1,-val);
-}
-int a[MAXN];
-
-int city_num,event_num;
-int raw_city[100000+5][2];
-void init() {
-
-    tot = 0;
-    memset(head, -1, sizeof(head));
-    pos = 0;
-    memset(son, -1, sizeof(son));
-
-    cin >> city_num>>event_num;
-
-
-    for(int i=1;i<=city_num;i++){
-        cin>>raw_city[i][0]>>raw_city[i][1];
-    }
-    for(int i=1;i<=city_num-1;i++){
-        int u,v;
-        cin>>u>>v;
-        addedge(u,v);
-        addedge(v,u);
-    }
-    dfs1(1,0,0);
-    getpos(1,1);
-    memset()
-}
-
-
+/**< 主席树 */
 int n, q, m, tot;
 int a[MAXN], t[MAXN];
 int times[MAXN];
 int T[MAXN], lson[M], rson[M], c[M];
 int seg_sum[M], seg_num[M];
-long long seg_real[M];
 int build(int l, int r) {
     int root = tot++;
     seg_sum[root] = 0;
@@ -241,6 +203,37 @@ void _copy(int x, int y) {
     seg_num[x] = seg_num[y];
     seg_real[x] = seg_real[y];
 }
+
+
+int city_num, event_num;
+int raw_city[100000 + 5][2];
+void init() {
+
+    tot = 0;
+    memset(head, -1, sizeof(head));
+    pos = 0;
+    memset(son, -1, sizeof(son));
+
+    cin >> city_num >> event_num;
+
+
+    for(int i = 1; i <= city_num; i++) {
+        cin >> raw_city[i][0] >> raw_city[i][1];
+    }
+    for(int i = 1; i <= city_num - 1; i++) {
+        int u, v;
+        cin >> u >> v;
+        addedge(u, v);
+        addedge(v, u);
+    }
+    dfs1(1, 0, 0);
+    getpos(1, 1);
+    /**< 建立线段树 */
+    build(1, 1, pos - 1);
+    T[0] = segTree[0];
+    for(int i = 1; i <= )
+    }
+
 
 void work1() {
     n = m = rnk_cnt;
