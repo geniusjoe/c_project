@@ -6,6 +6,12 @@ using namespace std;
 #define MAXM     500000+5
 #define INF 0x3f3f3f3f
 
+char tmplate[65][250];
+char buf[1000010];
+int hash[1000010], tot = 0;
+int res[1000010];
+int T, n;
+
 struct Trie {
     int next[1000010][26], fail[1000010], end[1000010];
     int root, L;
@@ -19,7 +25,7 @@ struct Trie {
         L = 0;
         root = newnode();
     }
-    void insert(char buf[],int order) {
+    void insert(char buf[], int order) {
         int len = strlen(buf);
         int now = root;
         for(int i = 0; i < len; i++) {
@@ -54,34 +60,29 @@ struct Trie {
     int query(char buf[]) {
         int len = strlen(buf);
         int now = root;
-        int res = 0;
         for(int i = 0; i < len; i++) {
             now = next[now][buf[i] - 'a'];
             int temp = now;
             while( temp != root ) {
-                //res += end[temp];
-                //end[temp] = 0;
                 hash[end[temp]]++;
                 temp = fail[temp];
             }
         }
         int cnt = -1, max = -INF;
-        int res[1000010];
         for(int i = 1; i <= n; i++) {
             if(hash[i] == max)
                 res[++cnt] = i;
-            if(hash[i] > max)    {
-                max=hash[i];
+            else if(hash[i] > max)    {
+                max = hash[i];
                 cnt = 0;
                 res[cnt] = i;
             } else
                 continue;
         }
-        cout<<cnt+1<<endl;
-        for(int i=0;i<=cnt;i++){
-            printf("%s\n",tmplate[res[i]]);
+        cout << cnt + 1 << endl;
+        for(int i = 0; i <= cnt; i++) {
+            printf("%s\n", tmplate[res[i]]);
         }
-
     }
     void debug() {
         for(int i = 0; i < L; i++) {
@@ -93,10 +94,7 @@ struct Trie {
         }
     }
 };
-char tmplate[65][250];
-char buf[1000010];
-int hash[1000010], tot = 0;
-int res[1000010];
+
 Trie ac;
 
 int main() {
@@ -106,12 +104,12 @@ int main() {
     freopen("tertdata.out", "w+", stdout);
 #endif // local
 
-    int T, int n;
+
     while(scanf("%d", &n) && n != 0) {
         ac.init();
-        for(int i =1; i <= n; i++) {
+        for(int i = 1; i <= n; i++) {
             scanf("%s", tmplate[i]);
-            ac.insert(tmplate[i],i);
+            ac.insert(tmplate[i], i);
         }
         ac.build();
         scanf("%s", buf);
