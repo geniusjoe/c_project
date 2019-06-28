@@ -88,7 +88,7 @@ void kmp_pre(char x[], int m, int next[]) {
         next[++i] = ++j;
     }
 }
-int next[10010];
+int next[100010];
 int KMP_Count(char x[], int m, char y[], int n) {
     int i, j;
     int ans = 0;
@@ -107,12 +107,18 @@ int KMP_Count(char x[], int m, char y[], int n) {
     return ans;
 }
 
+char x[1000010], y[1000010];
+int n;
+
 int main() {
-    int T;
-    int n;
-    scanf("%d", &T);
-    while( T-- ) {
-        scanf("%d", &n);
+
+    scanf("%d", &n);
+    if(n == 1) {
+        scanf("%s", x);
+        scanf("%s", y);
+        printf("%d\n",KMP_Count(x,strlen(x),y,strlen(y)));
+    }
+    else {
         ac.init();
         for(int i = 0; i < n; i++) {
             scanf("%s", buf);
@@ -124,3 +130,4 @@ int main() {
     }
     return 0;
 }
+
