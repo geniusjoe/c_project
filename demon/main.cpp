@@ -3,7 +3,7 @@
 #define debu
 using namespace std;
 
-#define MAXM    500000+5
+#define MAXM     500000+5
 
 const int MAXN = 500025;
 const int M = MAXN * 40;
