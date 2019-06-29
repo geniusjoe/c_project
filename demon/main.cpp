@@ -8,8 +8,7 @@ using namespace std;
 
 char tmplate[250][2500];
 char buf[1000010];
-int hash[1000010], tot = 0;
-int res[1000010];
+int tot = 0, res = 0;
 int T, n;
 
 struct Trie {
@@ -24,19 +23,22 @@ struct Trie {
     void init() {
         L = 0;
         root = newnode();
-        memset(hash,0,sizeof(hash));
-        memset(res,0,sizeof(res));
+        res = 0;
     }
     void insert(char buf[], int order) {
         int len = strlen(buf);
         int now = root;
         for(int i = 0; i < len; i++) {
-            if(next[now][buf[i] - 'a'] == -1)
+            if(next[now][buf[i] - 'a'] == -1) {
                 next[now][buf[i] - 'a'] = newnode();
-            now = next[now][buf[i] - 'a'];
+            } else {
+                res++;
+                now = next[now][buf[i] - 'a'];
+            }
         }
-        end[now] = order;
+        end[now]++;
     }
+    /*
     void build() {
         queue<int>Q;
         fail[root] = root;
@@ -59,6 +61,8 @@ struct Trie {
                 }
         }
     }
+    */
+    /*
     int query(char buf[]) {
         int len = strlen(buf);
         int now = root;
@@ -86,6 +90,7 @@ struct Trie {
             printf("%s\n", tmplate[res[i]]);
         }
     }
+    */
     void debug() {
         for(int i = 0; i < L; i++) {
             printf("id = %3d,fail = %3d,end = %3d,chi = [", i, fail[i],
@@ -106,16 +111,21 @@ int main() {
     freopen("testdata.out", "w+", stdout);
 #endif // local
 
-
-    while(scanf("%d", &n) && n != 0) {
+    int T;
+    scanf("%d", &T);
+    for(int k = 1; k <= T; k++) {
+        cin >> n;
         ac.init();
         for(int i = 1; i <= n; i++) {
             scanf("%s", tmplate[i]);
             ac.insert(tmplate[i], i);
         }
-        ac.build();
-        scanf("%s", buf);
-        ac.query(buf);
+        cout << "Case #" << k << ": " << res << endl;
+
+        //ac.build();
+        //scanf("%s", buf);
+        //ac.query(buf);
+
     }
     return 0;
 }
