@@ -1,20 +1,103 @@
 #include<bits/stdc++.h>
-#define loca
+#define local
 #define debu
 using namespace std;
 
-const int MAXN = 10000;
+#define MAXM     500000+5
+#define INF 0x3f3f3f3f
 
-char buf[1000005];
-int buf1[1000005];
+char tmplate[250][2500];
+char buf[1000010];
+int hash[1000010], tot = 0;
+int res[1000010];
+int T, n;
 
-char alphabet[] = {
-    'A',
-    'A', 'B', 'C', 'D', 'E', 'F', 'G',
-    'H', 'I', 'J', 'K', 'L', 'M', 'N',
-    'O', 'P', 'Q', 'R', 'S', 'T', 'U',
-    'V', 'W', 'X', 'Y', 'Z'
+struct Trie {
+    int next[1000010][26], fail[1000010], end[1000010];
+    int root, L;
+    int newnode() {
+        for(int i = 0; i < 26; i++)
+            next[L][i] = -1;
+        end[L++] = 0;
+        return L - 1;
+    }
+    void init() {
+        L = 0;
+        root = newnode();
+        memset(hash,0,sizeof(hash));
+        memset(res,0,sizeof(res));
+    }
+    void insert(char buf[], int order) {
+        int len = strlen(buf);
+        int now = root;
+        for(int i = 0; i < len; i++) {
+            if(next[now][buf[i] - 'a'] == -1)
+                next[now][buf[i] - 'a'] = newnode();
+            now = next[now][buf[i] - 'a'];
+        }
+        end[now] = order;
+    }
+    void build() {
+        queue<int>Q;
+        fail[root] = root;
+        for(int i = 0; i < 26; i++)
+            if(next[root][i] == -1)
+                next[root][i] = root;
+            else {
+                fail[next[root][i]] = root;
+                Q.push(next[root][i]);
+            }
+        while( !Q.empty() ) {
+            int now = Q.front();
+            Q.pop();
+            for(int i = 0; i < 26; i++)
+                if(next[now][i] == -1)
+                    next[now][i] = next[fail[now]][i];
+                else {
+                    fail[next[now][i]] = next[fail[now]][i];
+                    Q.push(next[now][i]);
+                }
+        }
+    }
+    int query(char buf[]) {
+        int len = strlen(buf);
+        int now = root;
+        for(int i = 0; i < len; i++) {
+            now = next[now][buf[i] - 'a'];
+            int temp = now;
+            while( temp != root ) {
+                hash[end[temp]]++;
+                temp = fail[temp];
+            }
+        }
+        int cnt = -1, max = -INF;
+        for(int i = 1; i <= n; i++) {
+            if(hash[i] == max)
+                res[++cnt] = i;
+            else if(hash[i] > max)    {
+                max = hash[i];
+                cnt = 0;
+                res[cnt] = i;
+            } else
+                continue;
+        }
+        cout << max << endl;
+        for(int i = 0; i <= cnt; i++) {
+            printf("%s\n", tmplate[res[i]]);
+        }
+    }
+    void debug() {
+        for(int i = 0; i < L; i++) {
+            printf("id = %3d,fail = %3d,end = %3d,chi = [", i, fail[i],
+                   end[i]);
+            for(int j = 0; j < 26; j++)
+                printf("%2d", next[i][j]);
+            printf("]\n");
+        }
+    }
 };
+
+Trie ac;
 
 int main() {
 
@@ -23,98 +106,17 @@ int main() {
     freopen("testdata.out", "w+", stdout);
 #endif // local
 
-    //ios::sync_with_stdio(false);
 
-    int T;
-    cin >> T;
-    while(T--) {
+    while(scanf("%d", &n) && n != 0) {
+        ac.init();
+        for(int i = 1; i <= n; i++) {
+            scanf("%s", tmplate[i]);
+            ac.insert(tmplate[i], i);
+        }
+        ac.build();
         scanf("%s", buf);
-        bool flg1 = false, flg2 = false;
-        int type = 2;
-        int len = strlen(buf);
-
-        for(int i = 0; i < len; i++) {
-            if(buf[i] >= '0' && buf[i] <= '9') {
-                if(flg1 == false)
-                    flg1 = true;
-                if(flg2 == true)
-                    type = 1;
-            } else {
-                if(flg1 == true)
-                    flg2 = true;
-            }
-        }
-
-        if(type == 1) {
-            int c_pos = 0;
-            for(int i = 0; i < len; i++) {
-                if(buf[i] == 'C') {
-                    c_pos = i;
-                    break;
-                }
-            }
-
-            int raw_ext = 0, col_ext = 0;
-
-            for(int i = 1; i < c_pos; i++) {
-                raw_ext = raw_ext * 10 + buf[i] - '0';
-            }
-            for(int i = c_pos + 1; i < len; i++) {
-                col_ext = col_ext * 10 + buf[i] - '0';
-            }
-
-            int cnt = 0;
-            /*
-                        if(col_ext == 702) {
-                            cout<<"ZZ";
-                        }
-                        else if(col_ext == 18278) {
-                            cout<<"ZZZ";
-                        }
-                        else if(col_ext==475254){
-                            cout<<"ZZZZ";
-                        }
-                        else {*/
-            while(col_ext > 26) {
-                int tmp = col_ext % 26;
-                if(tmp == 0) {
-                    col_ext = (col_ext - 26) / 26;
-                    buf1[++cnt] = 26;
-                } else {
-                    col_ext = col_ext / 26;
-                    buf1[++cnt] = tmp;
-                }
-            }
-
-            cout << alphabet[col_ext];
-            for(int i = cnt; i >= 1; i--) {
-                cout << alphabet[buf1[i]];
-            }
-
-            cout << raw_ext << endl;
-            continue;
-        }
-
-        else if(type == 2) {
-            int second_pos = 0;
-            for(int i = 0; i < len; i++) {
-                if(buf[i] >= '0' && buf[i] <= '9') {
-                    second_pos = i;
-                    break;
-                }
-            }
-
-            int col_num = 0, raw_num = 0;
-
-            for(int i = 0; i < second_pos; i++) {
-                col_num = col_num * 26 + (buf[i] - 'A') + 1;
-            }
-
-            for(int i = second_pos; i < len; i++) {
-                raw_num = raw_num * 10 + buf[i] - '0';
-            }
-
-            cout << "R" << raw_num << "C" << col_num << endl;
-        }
+        ac.query(buf);
     }
+    return 0;
+}
 
