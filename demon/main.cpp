@@ -3,55 +3,47 @@
 #define debu
 using namespace std;
 
-#define MAXM     500000+5
-#define INF 0x3f3f3f3f
-
-char tmplate[250][2500];
-char buf[1000010];
-int tot = 0, res = 0;
-int T, n;
-
-int nxt[9000010][26], fail[6000010], End[1000010];
-
-int root, L;
-int newnode() {
-    for(int i = 0; i < 26; i++)
-        nxt[L][i] = -1;
-    End[L++] = 0;
-    return L - 1;
-}
-void init() {
-    L = 0;
-    root = newnode();
-    res = 0;
-}
-void insert(char buf[], int order) {
-    int len = strlen(buf);
-    int now = root, counter = 0;
-    res++;
-    for(int i = 0; i < len; i++) {
-        if(nxt[now][buf[i] - 'a'] == -1) {
-            nxt[now][buf[i] - 'a'] = newnode();
-        } else {
-            counter++;
-            res++;
+const int MAXN = 10000;
+int prime[MAXN + 1];
+void getPrime() {
+    memset(prime, 0, sizeof(prime));
+    for(int i = 2; i <= MAXN; i++) {
+        if(!prime[i])
+            prime[++prime[0]] = i;
+        for(int j = 1; j <= prime[0] && prime[j] <= MAXN / i; j++) {
+            prime[prime[j]*i] = 1;
+            if(i % prime[j] == 0)
+                break;
         }
-        now = nxt[now][buf[i] - 'a'];
     }
-    if(counter == len)
-        res--;
-    End[now]++;
 }
 
-void debug() {
-    for(int i = 0; i < L; i++) {
-        printf("id = %3d,fail = %3d,End = %3d,chi = [", i, fail[i],
-               End[i]);
-        for(int j = 0; j < 26; j++)
-            printf("%2d", nxt[i][j]);
-        printf("]\n");
+long long factor[100][2];
+int fatCnt;
+int getFactors(long long x) {
+    fatCnt  = 0;
+    long long tmp = x;
+    for(int i = 1; prime[i] <= tmp / prime[i]; i++) {
+        factor[fatCnt][1] = 0;
+        if(tmp % prime[i] == 0) {
+            factor[fatCnt][0] = prime[i];
+            while(tmp % prime[i] == 0) {
+                factor[fatCnt][1]++;
+                tmp /= prime[i];
+            }
+            fatCnt++;
+        }
     }
+    if(tmp != 1) {
+        factor[fatCnt][0] = tmp;
+        factor[fatCnt++][1] = 1;
+    }
+    return fatCnt;
 }
+
+int buf[10001000];
+
+
 
 int main() {
 
@@ -60,16 +52,37 @@ int main() {
     freopen("testdata.out", "w+", stdout);
 #endif // local
 
-    int T;
-    scanf("%d", &T);
-    for(int k = 1; k <= T; k++) {
-        cin >> n;
-        init();
-        for(int i = 1; i <= n; i++) {
-            scanf("%s", buf);
-            insert(buf, i);
-        }
-        cout << "Case #" << k << ": " << res << endl;
+    //ios::sync_with_stdio(false);
+
+    getPrime();
+    for(int i = 1; i <= 10000010; i++) {
+        buf[i] = getFactors(i);
     }
-    return 0;
+
+
+    getPrime();
+    int T;
+    cin >> T;
+
+    #ifdef debug
+    int tmp=0;
+    for(int i=1;i<=10000000;i++)
+        tmp=max(tmp,buf[i]);
+    #endif // debug
+
+    for(int k = 1; k <= T; k++) {
+        int A, B, K;
+        int counter = 0;
+        cin >> A >> B >> K;
+        if(K>8) {
+            cout << "Case #" << k << ": " << 0 << endl;
+            continue;
+        }
+        for(int i = A; i <= B; i++) {
+            if(buf[i] == K)
+                counter++;
+        }
+        cout << "Case #" << k << ": " << counter << endl;
+    }
+
 }
