@@ -3,92 +3,51 @@
 #define debu
 using namespace std;
 
-#define MAXM     500000+5
-#define INF 0x3f3f3f3f
+const int MAXN = 50010;
+const int MAXM = 50010;
+struct Query {
+    int L, R, id;
+} node[MAXM];
 
-char buf[1000010];
-int hash[1000010], tot = 0;
-int res[1000010];
-bool vis[1000010], ins[1000010], flag;
-int T, n;
-
-struct Trie {
-    int next[10000100][2], fail[10000100], end[10000100];
-    int root, L;
-    int newnode() {
-        for(int i = 0; i < 26; i++)
-            next[L][i] = -1;
-        end[L++] = 0;
-        return L - 1;
-    }
-    void init() {
-        L = 0;
-        root = newnode();
-        memset(hash, 0, sizeof(hash));
-        memset(res, 0, sizeof(res));
-    }
-    void insert(char buf[]) {
-        int len = strlen(buf);
-        int now = root;
-        for(int i = 0; i < len; i++) {
-            if(next[now][buf[i] - '0'] == -1)
-                next[now][buf[i] - '0'] = newnode();
-            now = next[now][buf[i] - '0'];
+int a[MAXN];
+int num[MAXN];
+int n, m, k, unit;
+int ans[MAXN];
+bool cmp(Query a, Query b) {
+    if(a.L / unit != b.L / unit)
+        return a.L / unit < b.L / unit;
+    else
+        return a.R < b.R;
+}
+void work() {
+    long long temp = 0;
+    memset(num, 0, sizeof(num));
+    int L = 1;
+    int R = 0;
+    for(int i = 1; i <= m; i++) {
+        while(R < node[i].R) {
+            R++;
+            temp += (long long )  2 * num[a[R]] + 1;
+            num[a[R]]++;
         }
-        end[now] = 1;
-    }
-    void build() {
-        queue<int>Q;
-        fail[root] = root;
-        for(int i = 0; i < 2; i++)
-            if(next[root][i] == -1)
-                next[root][i] = root;
-            else {
-                fail[next[root][i]] = root;
-                Q.push(next[root][i]);
-            }
-        while( !Q.empty() ) {
-            int now = Q.front();
-            Q.pop();
-            for(int i = 0; i < 2; i++)
-                if(next[now][i] == -1)
-                    next[now][i] = next[fail[now]][i];
-                else {
-                    fail[next[now][i]] = next[fail[now]][i];
-                    if(end[next[now][i]] == 0)
-                        end[next[now][i]] = end[next[fail[now]][i]];
-                    Q.push(next[now][i]);
-                }
+        while(R > node[i].R) {
+            num[a[R]]--;
+            temp -= (long long )  2 * num[a[R]] + 1;
+            R--;
         }
-    }
-
-    inline void dfs(int x) {
-        if(ins[x]) {
-            printf("TAK\n");
-            exit(0);
+        while(L < node[i].L) {
+            num[a[L]]--;
+            temp -= (long long )  2 * num[a[L]] + 1;
+            L++;
         }
-        if(vis[x] || end[x])
-            return;
-        vis[x] = ins[x] = 1;
-        if(next[x][0])
-            dfs(next[x][0]);
-        if(next[x][1])
-            dfs(next[x][1]);
-        ins[x] = 0;
-    }
-
-    void debug() {
-        for(int i = 0; i < L; i++) {
-            printf("id = %3d,fail = %3d,end = %3d,chi = [", i, fail[i],
-                   end[i]);
-            for(int j = 0; j < 2; j++)
-                printf("%2d", next[i][j]);
-            printf("]\n");
+        while(L > node[i].L) {
+            L--;
+            temp += (long long )  2*num[a[L]]+1;
+            num[a[L]]++;
         }
+        ans[node[i].id] = temp;
     }
-};
-
-Trie ac;
+}
 
 int main() {
 
@@ -97,22 +56,17 @@ int main() {
     freopen("testdata.out", "w+", stdout);
 #endif // local
 
-
-    scanf("%d", &n);
-    ac.init();
-    for(int i = 1; i <= n; i++) {
-        scanf("%s", buf);
-        ac.insert(buf);
+    cin >> n >> m >> k;
+    for(int i = 1; i <= n; i++)
+        cin >> a[i];
+    for(int i = 1; i <= m; i++) {
+        node[i].id = i;
+        cin>>node[i].L>>node[i].R;
     }
-    ac.build();
-    //ac.debug();
-    ac.dfs(0);
-
-    if(flag == true)
-        cout << "TAK" << endl;
-    else
-        cout << "NIE" << endl;
-
+    unit = (int)  sqrt(n);
+    sort(node+1, node+1 + m, cmp);
+    work();
+    for(int i=1;i<=m;i++)
+        cout<<ans[i]<<endl;
     return 0;
 }
-
