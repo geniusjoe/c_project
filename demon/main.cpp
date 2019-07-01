@@ -1,5 +1,5 @@
 #include<bits/stdc++.h>
-#define local
+#define loc
 #define debu
 using namespace std;
 
@@ -8,8 +8,8 @@ using namespace std;
 const int MAXN = 500025;
 const int M = MAXN * 50;
 
-/**< Ê÷Á´ÆÊ·Ö */
 struct Edge {
+/**< Ê÷Á´ÆÊ·Ö */
     int to, next;
 } edge[MAXN * 2];
 int head[MAXN], TOT;
@@ -29,7 +29,7 @@ int times[MAXN];
 int T[M], lson[M], rson[M], c[M];
 int seg_sum[M], seg_max[M];
 int city_num, event_num;
-int raw_city[200000 + 5];
+int raw_city[MAXN];
 
 /**< Ê÷Á´ÆÊ·Ö */
 void addedge(int u, int v) {
@@ -120,25 +120,25 @@ int query(int l, int r, int x, int y, int root, int type) { /**< type==0 ´ú±í×î´
 }
 int find(int u, int v, int type, int k) { /**< type==0 ´ú±í×î´óÖµ£¬ type==1 ´ú±íÇóºÍ */
     int f1 = top[u], f2 = top[v];
-    int tmp = 0;
+    int tmp0 = 0,tmp1=-100000;
     while(f1 != f2) {
         if(deep[f1] < deep[f2]) {
             swap(f1, f2);
             swap(u, v);
         }
         if(type == 0)
-            tmp = max(tmp, query(0, pos - 1, p[f1], p[u], T[0], type));
+            tmp1 = max(tmp1, query(0, pos - 1, p[f1], p[u], T[0], type));
         else
-            tmp += query(0, pos - 1, p[f1], p[u], T[0], type);
+            tmp0 += query(0, pos - 1, p[f1], p[u], T[0], type);
         u = fa[f1];
         f1 = top[u];
     }
     if(deep[u] > deep[v])
         swap(u, v);
     if(type == 0)
-        return max(tmp, query(0, pos - 1, p[u], p[v], T[0], type));
+        return max(tmp1, query(0, pos - 1, p[u], p[v], T[0], type));
     else
-        return tmp + query(0, pos - 1, p[u], p[v], T[0], type);
+        return tmp0 + query(0, pos - 1, p[u], p[v], T[0], type);
 }
 int e[MAXN];
 
@@ -166,8 +166,7 @@ void init() {
     T[0] = build(0, pos - 1);
 
     for(int i=1;i<=city_num;i++)
-        T[0]=update(0,pos-1,T[0],i,raw_city[i]);
-
+        T[0]=update(0,pos-1,T[0],p[i],raw_city[i]);
 
     cin>>event_num;
 
@@ -192,7 +191,6 @@ void work1() {
             continue;
         }
     }
-
 }
 
 int main() {
