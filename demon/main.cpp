@@ -64,6 +64,90 @@ void getpos(int u, int sp) {
             getpos(v, v);
     }
 }
+
+
+using namespace std;
+long long n,m; /**< n个数,m个操作,以model为模 */
+long long a[MAXN],ans[MAXN<<2];
+long long add[MAXN<<2]; /**< add 代表加的add,mul代表乘的add */
+long long add_num; /**< 每个操作的操作数 */
+long long opt_type;
+inline long long lchild(long long x)
+/**<  每个树节点的编号*/
+{
+    return x<<1;
+}
+inline long long rchild(long long x) {
+    return x<<1|1;
+}
+inline void push_up(long long p) {
+    ans[p]=(ans[lchild(p)]+ans[rchild(p)]);
+}
+
+/**< 由顶向下建立线段树 */
+/**< 左右均为闭区间 */
+void build(long long p,long long l,long long r) {
+    add[p]=0;
+    if(l==r) {
+        ans[p]=a[l];
+        return ;
+    }
+    long long mid=(l+r)>>1;
+    build(lchild(p),l,mid);
+    build(rchild(p),mid+1,r);
+    push_up(p);
+}
+inline void f(long long p,long long l,long long r,
+              long long cur_add) {
+
+    add[p]+=cur_add;
+    ans[p]=ans[p]+ cur_add*(r-l+1);
+}
+inline void push_down(long long p,long long l,long long r) {
+    long long mid=(l+r)>>1;
+    f(lchild(p),l,mid,add[p]);
+    f(rchild(p),mid+1,r,add[p]);
+    add[p]=0;
+}
+/**< 区间赋值操作 */
+/**< 区间内元素增加的值 */
+inline void update(long long nl,long long nr,   /**< 目标边界 */
+                   long long l,long long r,long long p /**< 当前边界和节点 */
+                  ) {
+    if(opt_type==2&&nl<=l&&r<=nr) {
+        ans[p]=(ans[p]+ add_num *(r-l+1))%model;
+        add[p]=(add[p]+ add_num )%model;
+        return ;
+    }
+    if(opt_type==1&&nl<=l&&r<=nr) {
+        ans[p]=(ans[p]* mul_num )%model;
+        add[p]=(add[p]* mul_num )%model;
+        mul[p]=(mul[p]* mul_num )%model;
+        return ;
+    }
+    push_down(p,l,r);
+    long long mid=(l+r)>>1;
+    if(nl<=mid)
+        update(nl,nr,l,mid,lchild(p));
+    if(nr>mid)
+        update(nl,nr,mid+1,r,rchild(p));
+    push_up(p);
+}
+/**< 区间查询操作 */
+long long query(long long q_x,long long q_y,long long l,long long r,long long p) {
+    long long res=0;
+    if(q_x<=l&&r<=q_y)
+        return ans[p]%model;
+    long long mid=(l+r)>>1;
+    push_down(p,l,r);
+    if(q_x<=mid)
+        res+=query(q_x,q_y,l,mid,lchild(p));
+    if(q_y>mid)
+        res+=query(q_x,q_y,mid+1,r,rchild(p));
+    return res%model;
+}
+
+
 int build(int l, int r) {
     int root = tot++;
     seg_sum[root] = 0;
