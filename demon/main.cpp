@@ -82,6 +82,8 @@ inline void f(long long p, long long l, long long r,
               long long cor) {
     if(cor > 0) {
         add[p] = cor;
+        l_cor[p]=cor;
+        r_cor[p]=cor;
         ans[p] = 1;
     }
 }
@@ -125,6 +127,10 @@ long long query(long long q_x, long long q_y, long long l, long long r, long lon
         res += query(q_x, q_y, l, mid, lchild(p),left_color,right_color);
     if(q_y > mid)
         res += query(q_x, q_y, mid + 1, r, rchild(p),left_color,right_color);
+    if(q_x<=mid&&q_y>mid){
+        if(r_cor[lchild(p)]==l_cor[rchild(p)])
+            res--;
+    }
     return res;
 }
 int find(int u, int v, int type, int cor) { /**< 0 表示求和,1表示替换 */
@@ -150,9 +156,10 @@ int find(int u, int v, int type, int cor) { /**< 0 表示求和,1表示替换 */
         u = fa[f1];
         f1 = top[u];
     }
-    if(deep[u] > deep[v])
+    if(deep[u] > deep[v]){
         swap(u, v);
         swap(last_u,last_v);
+    }
     if(type == 0) {
         int tmp1,tmp2;
         tmp0 += query(p[u], p[v], 0, pos - 1, 1,tmp1,tmp2);
