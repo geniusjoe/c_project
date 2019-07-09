@@ -53,7 +53,7 @@ void getpos(int u, int sp) {
     p[u] = pos++;
     fp[p[u]] = u;
     if(son[u] == -1) {
-        bottom[u] = u;
+        bottom[p[u]] = pos - 1;
         return ;
     }
 
@@ -64,7 +64,7 @@ void getpos(int u, int sp) {
             getpos(v, v);
     }
 
-    bottom[u] = pos - 1;
+    bottom[p[u]] = pos - 1;
 }
 
 inline long long lchild(long long x)
@@ -139,7 +139,7 @@ void find(int u, int v, int type) {     /**< type==0 表示安装,type==1 表示卸载 *
     if(type == 1) {
         u = bottom[p[v]];
         cout << query( p[v], u, 0, pos - 1, 1) << endl;
-        update(p[v], u, 0, pos - 1, 1, 0);
+        update(p[v], u, 0, pos - 1, 1, 2);
         return ;
     }
     int f1 = top[u], f2 = top[v];
