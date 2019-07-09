@@ -112,28 +112,37 @@ inline void update(long long nl, long long nr,  /**< 目标边界 */
     push_up(p);
 }
 /**< 区间查询操作 */
-long long query(long long q_x, long long q_y, long long l, long long r, long long p) {
+long long query(long long q_x, long long q_y, long long l, long long r, long long p, int &left_color,int & right_color) {
     long long res = 0;
-    if(q_x <= l && r <= q_y)
+    if(q_x <= l && r <= q_y){
+        if(q_x==l)  left_color=l_cor[p];
+        if(q_y==r)  right_color=r_cor[p];
         return ans[p];
+    }
     long long mid = (l + r) >> 1;
     push_down(p, l, r);
     if(q_x <= mid)
-        res += query(q_x, q_y, l, mid, lchild(p));
+        res += query(q_x, q_y, l, mid, lchild(p),left_color,right_color);
     if(q_y > mid)
-        res += query(q_x, q_y, mid + 1, r, rchild(p));
+        res += query(q_x, q_y, mid + 1, r, rchild(p),left_color,right_color);
     return res;
 }
 int find(int u, int v, int type, int cor) { /**< 0 表示求和,1表示替换 */
     int f1 = top[u], f2 = top[v];
     int tmp0 = 0;
+    int u_lc=-1,u_rc=-1;
+    int last_u=-2,last_v=-2;
     while(f1 != f2) {
         if(deep[f1] < deep[f2]) {
             swap(f1, f2);
             swap(u, v);
+            swap(last_u,last_v);
         }
         if(type == 0) {
-            tmp0 += query( p[f1], p[u], 0, pos - 1, 1);
+            tmp0 += query( p[f1], p[u], 0, pos - 1, 1,u_lc,u_rc);
+            if(last_u==u_rc)
+                tmp0--;
+            last_u=u_lc;
         } else {
             update(p[f1], p[u], 0, pos - 1, 1, cor);
         }
@@ -143,8 +152,13 @@ int find(int u, int v, int type, int cor) { /**< 0 表示求和,1表示替换 */
     }
     if(deep[u] > deep[v])
         swap(u, v);
+        swap(last_u,last_v);
     if(type == 0) {
-        return tmp0 + query(p[u], p[v], 0, pos - 1, 1);
+        int tmp1,tmp2;
+        tmp0 += query(p[u], p[v], 0, pos - 1, 1,tmp1,tmp2);
+        if(last_u==tmp1)    tmp0--;
+        if(last_v==tmp2)    tmp0--;
+        return tmp0;
     } else {
         update(p[u], p[v], 0, pos - 1, 1, cor);
     }
@@ -172,7 +186,7 @@ void init() {
     dfs1(1, 0, 0);
     getpos(1, 1);
 
-    for(int i = 1; i <= n; i++) {
+    for(int i = 0; i < n; i++) {
         update(i, i, 0, n - 1, 1, raw_cor[fp[i]]);
     }
 }
