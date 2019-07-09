@@ -20,6 +20,7 @@ int num[MAXN];
 int p[MAXN];
 int fp[MAXN];
 int son[MAXN];
+int bottom[MAXN];
 int pos;
 
 int n, q, m, tot;
@@ -51,14 +52,19 @@ void getpos(int u, int sp) {
     top[u] = sp;
     p[u] = pos++;
     fp[p[u]] = u;
-    if(son[u] == -1)
+    if(son[u] == -1) {
+        bottom[u] = u;
         return ;
+    }
+
     getpos(son[u], sp);
     for(int i = head[u]; i != -1; i = edge[i].next) {
         int v = edge[i].to;
         if(v != son[u] && v != fa[u])
             getpos(v, v);
     }
+
+    bottom[u] = pos - 1;
 }
 
 inline long long lchild(long long x)
@@ -70,22 +76,21 @@ inline long long rchild(long long x) {
 }
 inline void push_up(long long p) {
     ans[p] = (ans[lchild(p)] + ans[rchild(p)]);
-    l_cor[p] = l_cor[lchild(p)];
-    r_cor[p] = r_cor[rchild(p)];
     add[p] = 0;
-    if(r_cor[lchild(p)] == l_cor[rchild(p)])
-        ans[p]--;
 }
 
 
 inline void f(long long p, long long l, long long r,
               long long cor) {
-    if(cor > 0) {
+    if(cor == 1) {      /**< 1代表安装，2代表卸载 */
         add[p] = cor;
-        l_cor[p]=cor;
-        r_cor[p]=cor;
-        ans[p] = 1;
+        ans[p] = r - l + 1;
     }
+    if(cor == 2) {
+        add[p] = cor;
+        ans[p] = 0;
+    }
+
 }
 inline void push_down(long long p, long long l, long long r) {
     long long mid = (l + r) >> 1;
@@ -93,16 +98,17 @@ inline void push_down(long long p, long long l, long long r) {
     f(rchild(p), mid + 1, r, add[p]);
     add[p] = 0;
 }
-/**< 区间赋值操作 */
-/**< 区间内元素增加的值 */
-inline void update(long long nl, long long nr,  /**< 目标边界 */
-                   long long l, long long r, long long p, int cor /**< 当前边界和节点 */
+
+inline void update(long long nl, long long nr,
+                   long long l, long long r, int p, int cor
                   ) {
     if(nl <= l && r <= nr) {
-        ans[p] = 1;
+        if(cor == 1)
+            ans[p] = r - l + 1;
+        else if(cor == 2)
+            ans[p] = 0;
+
         add[p] = cor;
-        l_cor[p] = cor;
-        r_cor[p] = cor;
         return ;
     }
     push_down(p, l, r);
@@ -112,63 +118,52 @@ inline void update(long long nl, long long nr,  /**< 目标边界 */
     if(nr > mid)
         update(nl, nr, mid + 1, r, rchild(p), cor);
     push_up(p);
+
 }
 /**< 区间查询操作 */
-long long query(long long q_x, long long q_y, long long l, long long r, long long p, int &left_color,int & right_color) {
+long long query(long long q_x, long long q_y, long long l, long long r, long long p) {
     long long res = 0;
-    if(q_x <= l && r <= q_y){
-        if(q_x==l)  left_color=l_cor[p];
-        if(q_y==r)  right_color=r_cor[p];
+    if(q_x <= l && r <= q_y) {
         return ans[p];
     }
     long long mid = (l + r) >> 1;
     push_down(p, l, r);
     if(q_x <= mid)
-        res += query(q_x, q_y, l, mid, lchild(p),left_color,right_color);
+        res += query(q_x, q_y, l, mid, lchild(p));
     if(q_y > mid)
-        res += query(q_x, q_y, mid + 1, r, rchild(p),left_color,right_color);
-    if(q_x<=mid&&q_y>mid){
-        if(r_cor[lchild(p)]==l_cor[rchild(p)])
-            res--;
-    }
+        res += query(q_x, q_y, mid + 1, r, rchild(p));
+
     return res;
 }
-int find(int u, int v, int type, int cor) { /**< 0 表示求和,1表示替换 */
+void find(int u, int v, int type) {     /**< type==0 表示安装,type==1 表示卸载 */
+    if(type == 1) {
+        u = bottom[p[v]];
+        cout << query( p[v], u, 0, pos - 1, 1) << endl;
+        update(p[v], u, 0, pos - 1, 1, 0);
+        return ;
+    }
     int f1 = top[u], f2 = top[v];
     int tmp0 = 0;
-    int u_lc=-1,u_rc=-1;
-    int last_u=-2,last_v=-2;
     while(f1 != f2) {
         if(deep[f1] < deep[f2]) {
             swap(f1, f2);
             swap(u, v);
-            swap(last_u,last_v);
         }
-        if(type == 0) {
-            tmp0 += query( p[f1], p[u], 0, pos - 1, 1,u_lc,u_rc);
-            if(last_u==u_rc)
-                tmp0--;
-            last_u=u_lc;
-        } else {
-            update(p[f1], p[u], 0, pos - 1, 1, cor);
-        }
+        tmp0 += p[u] - p[f1] + 1 - query( p[f1], p[u], 0, pos - 1, 1);
+        update(p[f1], p[u], 0, pos - 1, 1, 1);
 
         u = fa[f1];
         f1 = top[u];
     }
-    if(deep[u] > deep[v]){
+    if(deep[u] > deep[v]) {
         swap(u, v);
-        swap(last_u,last_v);
     }
-    if(type == 0) {
-        int tmp1,tmp2;
-        tmp0 += query(p[u], p[v], 0, pos - 1, 1,tmp1,tmp2);
-        if(last_u==tmp1)    tmp0--;
-        if(last_v==tmp2)    tmp0--;
-        return tmp0;
-    } else {
-        update(p[u], p[v], 0, pos - 1, 1, cor);
-    }
+
+    tmp0 += p[v] - p[u] + 1 - query(p[u], p[v], 0, pos - 1, 1);
+    update(p[u], p[v], 0, pos - 1, 1, 1);
+
+    cout << tmp0 << endl;
+    return ;
 
 }
 void init() {
@@ -177,40 +172,32 @@ void init() {
     pos = 0;
     memset(son, -1, sizeof(son));
 
-    cin >> n >> m;
-
-    for(int i = 1; i <= n; i++) {
-        cin >> raw_cor[i];
-    }
+    cin >> n ;
 
     for(int i = 1; i <= n - 1; i++) {
-        int u, v;
-        cin >> u >> v;
-        addedge(u, v);
-        addedge(v, u);
+        int u;
+        cin >> u;
+        addedge(u + 1, i + 1);
+        addedge(i + 1, u + 1);
     }
 
     dfs1(1, 0, 0);
     getpos(1, 1);
 
-    for(int i = 0; i < n; i++) {
-        update(i, i, 0, n - 1, 1, raw_cor[fp[i]]);
-    }
 }
 
 
 void work1() {
+    cin >> m;
     for(int i = 1; i <= m; i++) {
-        char op;
-        int tmp0, tmp1, tmp2;
-        cin >> op;
-        if(op == 'Q') {
-            cin >> tmp0 >> tmp1;
-            cout << find(tmp0, tmp1, 0, 0) << endl;
+        char op[15];
+        int buf;
+        scanf("%s%d", op, &buf);
+        if(op[0] == 'i') {
+            find(1, buf + 1, 0);
             continue;
         } else {
-            cin >> tmp0 >> tmp1 >> tmp2;
-            find(tmp0, tmp1, 1, tmp2);
+            find(1, buf + 1, 1);
             continue;
         }
     }
