@@ -26,7 +26,6 @@ int pos;
 int n, q, m, tot;
 long long add[MAXN << 2], ans[MAXN << 2];
 int a[MAXN], t[MAXN], raw_cor[MAXN];
-int l_cor[M], r_cor[M];
 
 /**< 树链剖分 */
 void addedge(int u, int v) {
@@ -75,21 +74,16 @@ inline long long rchild(long long x) {
     return x << 1 | 1;
 }
 inline void push_up(long long p) {
-    ans[p] = (ans[lchild(p)] + ans[rchild(p)]);
+    ans[p] = ans[lchild(p)] + ans[rchild(p)];
     add[p] = 0;
 }
 
 
 inline void f(long long p, long long l, long long r,
               long long cor) {
-    if(cor == 1) {      /**< 1代表安装，2代表卸载 */
-        add[p] = cor;
-        ans[p] = r - l + 1;
-    }
-    if(cor == 2) {
-        add[p] = cor;
-        ans[p] = 0;
-    }
+    /**< 1代表安装，2代表卸载 */
+    add[p] += cor;
+    ans[p] += (r - l + 1) * cor;
 
 }
 inline void push_down(long long p, long long l, long long r) {
@@ -103,12 +97,8 @@ inline void update(long long nl, long long nr,
                    long long l, long long r, int p, int cor
                   ) {
     if(nl <= l && r <= nr) {
-        if(cor == 1)
-            ans[p] = r - l + 1;
-        else if(cor == 2)
-            ans[p] = 0;
-
-        add[p] = cor;
+        ans[p] += (r - l + 1) * cor;
+        add[p] += cor;
         return ;
     }
     push_down(p, l, r);
@@ -135,11 +125,10 @@ long long query(long long q_x, long long q_y, long long l, long long r, long lon
 
     return res;
 }
-void find(int u, int v, int type) {     /**< type==0 表示安装,type==1 表示卸载 */
+void find(int u, int v, int type, int cor) {    /**< type==0 表示安装,type==1 表示卸载 */
     if(type == 1) {
         u = bottom[p[v]];
-        cout << query( p[v], u, 0, pos - 1, 1) << endl;
-        update(p[v], u, 0, pos - 1, 1, 2);
+        update(p[v], u, 0, pos - 1, 1, cor);
         return ;
     }
     int f1 = top[u], f2 = top[v];
@@ -149,9 +138,7 @@ void find(int u, int v, int type) {     /**< type==0 表示安装,type==1 表示卸载 *
             swap(f1, f2);
             swap(u, v);
         }
-        tmp0 += p[u] - p[f1] + 1 - query( p[f1], p[u], 0, pos - 1, 1);
-        update(p[f1], p[u], 0, pos - 1, 1, 1);
-
+        tmp0 +=query( p[f1], p[u], 0, pos - 1, 1);
         u = fa[f1];
         f1 = top[u];
     }
@@ -159,12 +146,10 @@ void find(int u, int v, int type) {     /**< type==0 表示安装,type==1 表示卸载 *
         swap(u, v);
     }
 
-    tmp0 += p[v] - p[u] + 1 - query(p[u], p[v], 0, pos - 1, 1);
-    update(p[u], p[v], 0, pos - 1, 1, 1);
+    tmp0 +=query(p[u], p[v], 0, pos - 1, 1);
 
     cout << tmp0 << endl;
     return ;
-
 }
 void init() {
     TOT = tot = 0;
@@ -172,32 +157,43 @@ void init() {
     pos = 0;
     memset(son, -1, sizeof(son));
 
-    cin >> n ;
+    cin >> n >> m;
+    for(int i = 1; i <= n; i++)
+        cin >> raw_cor[i];
 
     for(int i = 1; i <= n - 1; i++) {
-        int u;
-        cin >> u;
-        addedge(u + 1, i + 1);
-        addedge(i + 1, u + 1);
+        int u, v;
+        cin >> u >> v;
+        addedge(u, v);
+        addedge(v, u);
     }
 
     dfs1(1, 0, 0);
     getpos(1, 1);
 
+    for(int i = 1; i <= n; i++) {
+        update(p[i], p[i], 0, pos - 1, 1, raw_cor[i]);
+    }
+
 }
 
 
 void work1() {
-    cin >> m;
     for(int i = 1; i <= m; i++) {
-        char op[15];
-        int buf;
-        scanf("%s%d", op, &buf);
-        if(op[0] == 'i') {
-            find(1, buf + 1, 0);
+        int op;
+        int buf, cur_cor;
+        scanf("%d%d", &op, &buf);
+        if(op == 1) {
+            cin >> cur_cor;
+            update(p[buf], p[buf], 0, pos - 1, 1,cur_cor);
             continue;
-        } else {
-            find(1, buf + 1, 1);
+        } else if(op == 2) {
+            cin >> cur_cor;
+            find(1, buf, 1,cur_cor);
+            continue;
+        }
+        else {
+            find(1, buf, 2,0);
             continue;
         }
     }
