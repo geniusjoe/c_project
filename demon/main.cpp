@@ -3,7 +3,7 @@
 #define debu
 using namespace std;
 
-const int MAXN = 1000100;
+const int MAXN = 100010;
 const int M = MAXN * 30;
 int n, q,m, tot;
 int a[MAXN], t[MAXN];
@@ -45,6 +45,7 @@ void init() {
     sort(times + 1, times + 1 + tme_cnt);
 
     m = unique(times + 1, times + 1 + tme_cnt)−times−1;
+
 }
 
 int build(int l, int r) {
@@ -112,10 +113,17 @@ int main() {
         init();
         int cnt1=1;
 
-        T[n + 1] = build(1, 1000000+5);
+        T[0] = build(1, 1000000+5);
 
-        for(int i = 0; i <=m; i++) {
-            if(times[i].date)
+        for(int i = 1; i <=m; i++) {
+            T[i]=T[i-1];
+            while(hash(times[cnt1].date)==i){
+                if(times[cnt1].type==1)
+                    update(T[i],times[cnt1].val,1);
+                else if(times[cnt1].type==2)
+                    update(T[i],times[cnt1].val,-1);
+                cnt1++;
+            }
         }
 
 
