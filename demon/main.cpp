@@ -9,7 +9,7 @@ int n,q,m0,m1,tot;
 int a[MAXN], t[MAXN];
 int T[MAXN], lson[M], rson[M], c[M];
 int q_cnt,e_cnt,time_cnt,val_cnt;
-int time[MAXN],val[MAXN];
+int time[MAXN][2],val[MAXN];
 
 struct event {
     int start,finish,val;
@@ -19,13 +19,6 @@ struct que {
     int q_time,k;
 } ques[MAXN];
 
-
-void Init_hash() {
-    for(int i = 1; i <= n; i++)
-        t[i] = a[i];
-    sort(t+1,t+1+n);
-    m = unique(t+1,t+1+n)−t−1;
-}
 
 void init() {
     scanf("%d",&q_num);
@@ -127,6 +120,10 @@ int main() {
     scanf("%d",&T);
     while(T--) {
         init();
+        for(int i=1;i<=time_cnt;i++){
+
+        }
+
 
         while(scanf("%d%d",&n,&q) == 2) {
             tot = 0;
