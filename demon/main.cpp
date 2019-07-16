@@ -1,5 +1,5 @@
 #include<bits/stdc++.h>
-#define loca
+#define local
 #define debu
 using namespace std;
 
@@ -86,6 +86,8 @@ int update(int root, int pos, int val) {
 }
 int query(int left_root, int right_root, int k) {
     int l = 1, r = m;
+    if(c[left_root]-c[right_root]<k)
+        return -1;
     while( l < r) {
         int mid = (l + r) >> 1;
         if(c[lson[left_root]]−c[lson[right_root]] >= k ) {
@@ -110,6 +112,8 @@ int main() {
     int T;
     scanf("%d", &T);
     while(T--) {
+        tot=0;
+
         init();
         int cnt1=1;
 
@@ -127,22 +131,11 @@ int main() {
         }
 
 
-
-            tot = 0;
-            for(int i = 1; i <= n; i++)
-                scanf("%d", &a[i]);
-            Init_hash();
-            T[n + 1] = build(1, m);
-            for(int i = n; i ; i−−) {
-                int pos = hash(a[i]);
-                T[i] = update(T[i + 1], pos, 1);
-            }
-            while(q−−) {
-                int l, r, k;
-                scanf("%d%d%d", &l, &r, &k);
-                printf("%d\n", t[query(T[l], T[r + 1], k)]);
-            }
+        for(int i=1;i<=q_cnt;i++){
+            int num=hash(ques[i].q_time);
+            cout<<query(T[num],T[num-1],ques[i].k)<<endl;
         }
+
     }
 
 
