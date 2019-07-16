@@ -3,21 +3,20 @@
 #define debu
 using namespace std;
 
-const int MAXN = 100010;
-const int M = MAXN * 30;
+const int MAXN = 200010;
+const int M = MAXN * 80;
 int n, q,m, tot;
 int a[MAXN], t[MAXN];
 int lson[M], rson[M], c[M];
 int T[MAXN],tme_buf[MAXN];
 
 int q_cnt, tme_cnt;
-struct timing{
+struct timing {
     int type,date,val;
-    bool operator <(timing time1)
-    {
+    bool operator <(timing time1) {
         return this->date<time1.date;
     }
-}times[MAXN];
+} times[MAXN];
 
 struct que {
     int q_time, k;
@@ -48,12 +47,12 @@ void init() {
             times[++tme_cnt].date = cur_time;
             times[tme_cnt].type = 3;
         }
-
-        sort(times + 1, times + 1 + tme_cnt);
-        for(int i=1;i<=tme_cnt;i++)
-            tme_buf[i]=times[i].date;
-        m = unique(tme_buf+1,tme_buf+1+tme_cnt)-tme_buf-1;
     }
+    sort(times + 1, times + 1 + tme_cnt);
+    for(int i=1; i<=tme_cnt; i++)
+        tme_buf[i]=times[i].date;
+    m = unique(tme_buf+1,tme_buf+1+tme_cnt)-tme_buf-1;
+
 }
 
 int build(int l, int r) {
@@ -120,7 +119,7 @@ int main() {
 
     int k;
     cin>>k;
-    for(int ii=1;ii<=k;ii++) {
+    for(int ii=1; ii<=k; ii++) {
         cout<<"Case "<<ii<<":"<<endl;
         tot=0;
         init();
