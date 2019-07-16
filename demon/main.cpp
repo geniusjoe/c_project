@@ -10,6 +10,18 @@ int a[MAXN], t[MAXN];
 int lson[M], rson[M], c[M];
 int T[MAXN],tme_buf[MAXN];
 
+template<class T>
+inline bool scand_d(T&ret){
+    char c;int sgn;
+    if(c=getchar(),c==EOF)  return 0;
+    while(c!='-'&&(c<'0'||c>'9'))   c=getchar();
+    sgn=(c=='-')?-1:1;
+    ret=(c=='-')?0:(c-'0');
+    while(c=getchar(),c>='0'&&c<='9')   ret=ret*10+(c-'0');
+    ret*=sgn;
+    return 1;
+}
+
 int q_cnt, tme_cnt;
 struct timing {
     int type,date,val;
@@ -22,17 +34,16 @@ struct que {
     int q_time, k;
 } ques[MAXN];
 
-
 void init() {
     int cur_num;
     tme_cnt=q_cnt=0;
-    cin>>cur_num;
+    scand_d(cur_num);
     for(int i=1; i<=cur_num; i++) {
         int cur_type;
-        cin>>cur_type;
+        scand_d(cur_type);
         if(cur_type == 1) {
             int start, finish, val;
-            cin>>start>>val>>finish;
+            scand_d(start),scand_d(val),scand_d(finish);
             times[++tme_cnt].date = start;
             times[tme_cnt].type = 1;
             times[tme_cnt].val = val;
@@ -41,7 +52,7 @@ void init() {
             times[tme_cnt].val = val;
         } else {
             int cur_time, cur_k;
-            cin>>cur_time>>cur_k;
+            scand_d(cur_time),scand_d(cur_k);
             ques[++q_cnt].q_time = cur_time;
             ques[q_cnt].k = cur_k;
             times[++tme_cnt].date = cur_time;
@@ -118,7 +129,7 @@ int main() {
 
 
     int k;
-    cin>>k;
+    scand_d(k);
     for(int ii=1; ii<=k; ii++) {
         cout<<"Case "<<ii<<":"<<endl;
         tot=0;
