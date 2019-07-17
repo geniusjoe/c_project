@@ -31,6 +31,8 @@ int n,q,m,tot;
 int a[MAXN], t[MAXN];
 int T[MAXN], lson[M], rson[M],c[M];
 int S[MAXN];
+int max_val;
+
 struct Query {
     int kind;
     int l,r,k;
@@ -38,10 +40,10 @@ struct Query {
 
 void Init_hash(int k) {
     sort(t,t+k);
-    m = unique(t,t+k) - t;
+    n = unique(t,t+k) - t;
 }
 int Hash(int x) {
-    return lower_bound(t,t+m,x)-t;
+    return lower_bound(t,t+m,x)-t+1;
 }
 
 int build(int l,int r) {
@@ -56,7 +58,7 @@ int build(int l,int r) {
 }
 int Insert(int root,int pos,int val) {
     int newroot = tot++, tmp = newroot;
-    int l = 0, r = m-1;
+    int l = 1, r = max_val;
     c[newroot] = c[root] + val;
     while(l < r) {
         int mid = (l+r)>>1;
@@ -95,34 +97,22 @@ int sum(int x) {
     }
     return ret;
 }
-int Query(int left,int right,int k) {
-    int left_root = T[left-1];
-    int right_root = T[right];
-    int l = 0, r = m-1;
-    for(int i = left-1; i; i -= lowbit(i))
-        use[i] = S[i];
+int Query(int right,int k) {
+    int l = 1, r = max_val;
     for(int i = right; i ; i -= lowbit(i))
         use[i] = S[i];
     while(l < r) {
         int mid = (l+r)/2;
-        int tmp = sum(right) - sum(left-1) + c[lson[right_root]] -c[lson[left_root]];
+        int tmp = sum(right) ;
         if(tmp >= k) {
             r = mid;
-            for(int i = left-1; i ; i -= lowbit(i))
-                use[i] = lson[use[i]];
             for(int i = right; i; i -= lowbit(i))
                 use[i] = lson[use[i]];
-            left_root = lson[left_root];
-            right_root = lson[right_root];
         } else {
             l = mid+1;
             k -= tmp;
-            for(int i = left-1; i; i -= lowbit(i))
-                use[i] = rson[use[i]];
             for(int i = right; i ; i -= lowbit(i))
                 use[i] = rson[use[i]];
-            left_root = rson[left_root];
-            right_root = rson[right_root];
         }
     }
     return l;
@@ -134,35 +124,50 @@ void Modify(int x,int p,int d) {
     }
 }
 int main() {
+
+#ifdef local
+    freopen("testdata.in","r+",stdin);
+    freopen("testdata.out","w+",stdout);
+#endif // local
+
     int Tcase;
-    scanf("%d",&Tcase);
-    for(int k=1;k<=Tcase;k++) {
+    scand_d(Tcase);
+    for(int k=1; k<=Tcase; k++) {
         printf("Case ");
         out(k);
         printf(":\n");
         scand_d(q);
+        int type;
         for(int i = 0; i < q; i++) {
-            scanf("%s",op);
-            if(op[0] == '1') {
+            scand_d(type);
+            if(type==1) {
                 query[i].kind = 1;
-                scanf("%d%d%d",&query[i].l,&query[i].k,&query[i].r);
+                scand_d(query[i].l),scand_d(query[i].k),scand_d(query[i].r);
+                query[i].r++;
                 t[m++]=query[i].l;
                 t[m++]=query[i].r;
+                max_val=max(query[i].k,max_val);
             } else {
                 query[i].kind = 2;
-                scanf("%d%d",&query[i].l,&query[i].k);
+                scand_d(query[i].l),scand_d(query[i].k);
                 t[m++] = query[i].l;
+                max_val=max(query[i].k,max_val);
             }
         }
         Init_hash(m);
-        T[0] = build(0,m-1);
+        T[0] = build(1,max_val);
+
+        for(int i = 1;i <= n;i++)
+            S[i] = T[0];
+
         for(int i = 0; i < q; i++) {
-            if(query[i].kind == 2)
-                printf("%d\n",t[Query(query[i].l,query[i].r,query[i].k)]);
-            else {
-                Modify(query[i].l,hash(a[query[i].l]),-1);
-                Modify(query[i].l,hash(query[i].r),1);
-                a[query[i].l] = query[i].r;
+            if(query[i].kind == 2) {
+                int cur_res=Query(Hash(query[i].l),query[i].k);
+                out(cur_res);
+                printf("\n");
+            } else {
+                Modify(Hash(query[i].l),query[i].k,1);
+                Modify(Hash(query[i].r),query[i].k,-1);
             }
         }
     }
