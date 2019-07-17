@@ -1,5 +1,5 @@
 #include<bits/stdc++.h>
-#define loca
+#define local
 #define debu
 using namespace std;
 
@@ -27,16 +27,20 @@ inline void out(int x) {
 
 const int MAXN = 200100;
 const int M = 15600010;
-int n, q, m, tot;
-int a[MAXN], t[MAXN];
-int T[M], lson[M], rson[M], c[M];
-int S[MAXN];
+int n, q, m, tot, num_tme;
+int a[MAXN], t[MAXN], T[MAXN];
+int lson[M], rson[M], c[M];
 int max_val;
 
 struct Query {
-    int kind;
-    int l, r, k;
-} query[10010];
+    int kind, date, val;
+    bool operator<(Query query1) {
+        if(this->date != query1.date)
+            return this->date < query1.date;
+        else
+            return this->kind > query1.kind;
+    }
+} query[100100];
 
 void Init_hash(int k) {
     sort(t, t + k);
@@ -56,75 +60,38 @@ int build(int l, int r) {
     }
     return root;
 }
-int Insert(int root, int pos, int val) {
-    int newroot = tot++, tmp = newroot;
+void Insert(int root, int pos, int val) {
     int l = 1, r = max_val;
-    c[newroot] = c[root] + val;
+    c[root] += val;
     while(l < r) {
         int mid = (l + r) >> 1;
         if(pos <= mid) {
-            lson[newroot] = tot++;
-            rson[newroot] = rson[root];
-            newroot = lson[newroot];
             root = lson[root];
             r = mid;
         } else {
-            rson[newroot] = tot++;
-            lson[newroot] = lson[root];
-            newroot = rson[newroot];
             root = rson[root];
             l = mid + 1;
         }
-        c[newroot] = c[root] + val;
-    }
-    return tmp;
-}
-int lowbit(int x) {
-    return x & (-x);
-}
-int use[MAXN];
-void add(int x, int pos, int val) {
-    while(x <= n) {
-        S[x] = Insert(S[x], pos, val);
-        x += lowbit(x);
+        c[root] += val;
     }
 }
-int sum(int x) {
-    int ret = 0;
-    while(x > 0) {
-        ret += c[lson[use[x]]];
-        x -= lowbit(x);
-    }
-    return ret;
-}
-int Query(int right, int k) {
-    int l = 1, r = max_val, m_val=0;
-    for(int i = right; i ; i -= lowbit(i)) {
-        use[i] = S[i];
-        m_val+=c[use[i]];
-    }
-    if(m_val<k) return -1;
+int Query(int root, int k) {
+    int l = 1, r = max_val;
+    if(c[root] < k)
+        return -1;
     while(l < r) {
         int mid = (l + r) / 2;
-        int tmp = sum(right) ;
+        int tmp = c[root] ;
         if(tmp >= k) {
             r = mid;
-            for(int i = right; i; i -= lowbit(i))
-                use[i] = lson[use[i]];
+            root = lson[root];
         } else {
             l = mid + 1;
             k -= tmp;
-            for(int i = right; i ; i -= lowbit(i))
-                use[i] = rson[use[i]];
+            root = rson[root];
         }
     }
     return l;
-}
-void Modify(int x, int p, int d) {
-    while(x <= n) {
-        S[x] = Insert(S[x], p, d);
-        x += lowbit(x);
-    }
 }
 int main() {
 
@@ -136,7 +103,7 @@ int main() {
     int Tcase;
     scand_d(Tcase);
     for(int k = 1; k <= Tcase; k++) {
-        tot=0,m=0;
+        tot = 0, m = 0;
         printf("Case ");
         out(k);
         printf(":\n");
@@ -145,38 +112,36 @@ int main() {
         for(int i = 0; i < q; i++) {
             scand_d(type);
             if(type == 1) {
-                query[i].kind = 1;
-                scand_d(query[i].l), scand_d(query[i].k), scand_d(query[i].r);
-                query[i].r++;
-                t[m++] = query[i].l;
-                t[m++] = query[i].r;
-                max_val = max(query[i].k, max_val);
+                int cur_start, cur_end, cur_val;
+                scand_d(cur_start), scand_d(cur_end), scand_d(cur_val);
+                query[++m].date = cur_start, query[m].kind = 3, query[m].val = cur_val;
+                query[++m].date = cur_end + 1, query[m].kind = 2, query[m].val = cur_val;
+                //t[++num_tme] = cur_start, t[++num_tme] = cur_end;
+                max_val = max(cur_val, max_val);
             } else {
-                query[i].kind = 2;
-                scand_d(query[i].l), scand_d(query[i].k);
-                t[m++] = query[i].l;
-                max_val = max(query[i].k, max_val);
+                query[++m].kind = 1;
+                scand_d(query[m].date), scand_d(query[m].val);
+                max_val = max(max_val, query[m].val);
+                //t[++num_tme] = query[m].date;
             }
         }
-        Init_hash(m);
+        //Init_hash(num_tme);
         T[0] = build(1, max_val);
+        sort(query + 1, query + 1 + m);
 
-        for(int i = 1; i <= n; i++)
-            S[i] = T[0];
-
-        for(int i = 0; i < q; i++) {
-            if(query[i].kind == 2) {
-                int cur_res = Query(Hash(query[i].l), query[i].k);
-                if(cur_res<0)
-                {
+        for(int i = 1; i <= m; i++) {
+            if(query[i].kind == 3) {
+                Insert(T[0], query[i].val, 1);
+            } else if(query[i].kind == 2) {
+                Insert(T[0], query[i].val, -1);
+            } else {
+                int cur_res = Query(T[0], query[i].val);
+                if(cur_res < 0) {
                     putchar('-');
-                    cur_res=abs(cur_res);
+                    cur_res = abs(cur_res);
                 }
                 out(cur_res);
                 printf("\n");
-            } else {
-                Modify(Hash(query[i].l), query[i].k, 1);
-                Modify(Hash(query[i].r), query[i].k, -1);
             }
         }
     }
