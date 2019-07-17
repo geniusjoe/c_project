@@ -1,5 +1,5 @@
 #include<bits/stdc++.h>
-#define local
+#define loca
 #define debu
 using namespace std;
 
@@ -25,11 +25,11 @@ inline void out(int x) {
     putchar(x % 10 + '0');
 }
 
-const int MAXN = 60010;
-const int M = 2500010;
+const int MAXN = 200100;
+const int M = 15600010;
 int n, q, m, tot;
 int a[MAXN], t[MAXN];
-int T[MAXN], lson[M], rson[M], c[M];
+int T[M], lson[M], rson[M], c[M];
 int S[MAXN];
 int max_val;
 
