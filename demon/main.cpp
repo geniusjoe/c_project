@@ -25,29 +25,28 @@ inline void out(int x) {
     putchar(x % 10 + '0');
 }
 
-const int MAXN = 200100;
-const int M = 15600010;
+const int M = 400100;
 int n, q, m, tot, num_tme;
-int a[MAXN], t[MAXN], T[MAXN];
-int lson[M], rson[M], c[M];
-int max_val;
+int a[M], t[M], T[M];
+int lson[M], rson[M], c[M],ans[M];
+int x,x0,n_ans;
 
 struct Query {
-    int kind, date, val;
+    int kind, date, val,id;
     bool operator<(Query query1) {
         if(this->date != query1.date)
             return this->date < query1.date;
         else
-            return this->kind > query1.kind;
+            return this->kind < query1.kind;
     }
-} query[100100];
+} query[M];
 
 void Init_hash(int k) {
-    sort(t, t + k);
-    n = unique(t, t + k) - t;
+    sort(t+1, t+1 + k);
+    x0 = unique(t+1, t+1 + k) - (t+1);
 }
 int Hash(int x) {
-    return lower_bound(t, t + m, x) - t + 1;
+    return lower_bound(t+1, t+1 + x0, x) - t;
 }
 
 int build(int l, int r) {
@@ -61,7 +60,7 @@ int build(int l, int r) {
     return root;
 }
 void Insert(int root, int pos, int val) {
-    int l = 1, r = max_val;
+    int l = 1, r = x0;
     c[root] += val;
     while(l < r) {
         int mid = (l + r) >> 1;
@@ -76,12 +75,12 @@ void Insert(int root, int pos, int val) {
     }
 }
 int Query(int root, int k) {
-    int l = 1, r = max_val;
+    int l = 1, r = x0;
     if(c[root] < k)
         return -1;
     while(l < r) {
         int mid = (l + r) / 2;
-        int tmp = c[root] ;
+        int tmp = c[lson[root]] ;
         if(tmp >= k) {
             r = mid;
             root = lson[root];
@@ -103,7 +102,7 @@ int main() {
     int Tcase;
     scand_d(Tcase);
     for(int k = 1; k <= Tcase; k++) {
-        tot = 0, m = 0;
+        tot = 0, m = 0,x=0,n_ans=0;
         printf("Case ");
         out(k);
         printf(":\n");
@@ -113,34 +112,36 @@ int main() {
             scand_d(type);
             if(type == 1) {
                 int cur_start, cur_end, cur_val;
-                scand_d(cur_start), scand_d(cur_end), scand_d(cur_val);
-                query[++m].date = cur_start, query[m].kind = 3, query[m].val = cur_val;
+                scand_d(cur_start), scand_d(cur_val), scand_d(cur_end);
+                query[++m].date = cur_start, query[m].kind = 1, query[m].val = cur_val;
                 query[++m].date = cur_end + 1, query[m].kind = 2, query[m].val = cur_val;
-                //t[++num_tme] = cur_start, t[++num_tme] = cur_end;
-                max_val = max(cur_val, max_val);
+                t[++x]=cur_val;
             } else {
-                query[++m].kind = 1;
+                query[++m].kind = 3;
+                query[m].id=++n_ans;
                 scand_d(query[m].date), scand_d(query[m].val);
-                max_val = max(max_val, query[m].val);
-                //t[++num_tme] = query[m].date;
             }
         }
-        //Init_hash(num_tme);
-        T[0] = build(1, max_val);
+        Init_hash(x);
+        T[0] = build(1, x0);
         sort(query + 1, query + 1 + m);
 
         for(int i = 1; i <= m; i++) {
-            if(query[i].kind == 3) {
-                Insert(T[0], query[i].val, 1);
+            if(query[i].kind == 1) {
+                Insert(T[0], Hash(query[i].val), 1);
             } else if(query[i].kind == 2) {
-                Insert(T[0], query[i].val, -1);
+                Insert(T[0], Hash(query[i].val), -1);
             } else {
-                int cur_res = Query(T[0], query[i].val);
-                if(cur_res < 0) {
-                    putchar('-');
-                    cur_res = abs(cur_res);
-                }
-                out(cur_res);
+                int cur_res = Query(T[0], Hash(query[i].val));
+                ans[query[i].id]=cur_res;
+            }
+        }
+
+        for(int i=1; i<=n_ans; i++) {
+            if(ans[i] < 0) {
+                printf("-1\n");
+            } else {
+                out(t[ans[i]]);
                 printf("\n");
             }
         }
