@@ -1,5 +1,5 @@
 #include<bits/stdc++.h>
-#define local
+#define loc
 #define debu
 using namespace std;
 
@@ -132,7 +132,7 @@ int main() {
             } else if(query[i].kind == 2) {
                 Insert(T[0], Hash(query[i].val), -1);
             } else {
-                int cur_res = Query(T[0], Hash(query[i].val));
+                int cur_res = Query(T[0], query[i].val);
                 ans[query[i].id]=cur_res;
             }
         }
