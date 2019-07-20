@@ -12,9 +12,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="92e3634a-fc50-483d-92e0-aa1fa5d533b2" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/in.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/in.txt" beforeDir="false" afterPath="$PROJECT_DIR$/testdata.in" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/main.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../demon.layout" beforeDir="false" afterPath="$PROJECT_DIR$/../demon.layout" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../main.cpp" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/cmake-build-debug/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -41,15 +43,10 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/main.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="120">
-              <caret line="8" column="15" lean-forward="true" selection-start-line="8" selection-start-column="15" selection-end-line="8" selection-end-column="15" />
+            <state relative-caret-position="315">
+              <caret line="21" column="8" selection-start-line="21" selection-start-column="8" selection-end-line="21" selection-end-column="8" />
             </state>
           </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/in.txt">
-          <provider selected="true" editor-type-id="text-editor" />
         </entry>
       </file>
     </leaf>
@@ -65,8 +62,8 @@
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="779" />
-    <option name="y" value="209" />
+    <option name="x" value="73" />
+    <option name="y" value="214" />
     <option name="width" value="1433" />
     <option name="height" value="833" />
   </component>
@@ -95,7 +92,7 @@
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
-    <property name="settings.editor.selected.configurable" value="CPPToolchains" />
+    <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -126,19 +123,19 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1563614216210</updated>
-      <workItem from="1563614217303" duration="2184000" />
+      <workItem from="1563614217303" duration="2985000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="2184000" />
+    <option name="totallyTimeSpent" value="2985000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="779" y="209" width="1433" height="833" extended-state="0" />
+    <frame x="73" y="214" width="1433" height="833" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Favorites" side_tool="true" />
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.24399126" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.24399126" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Database Changes" />
       <window_info anchor="bottom" id="Version Control" />
@@ -148,7 +145,7 @@
       <window_info anchor="bottom" id="CMake" weight="0.40452617" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.32904148" />
+      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.32904148" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.3995381" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -170,7 +167,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/in.txt">
+    <entry file="file://$PROJECT_DIR$/testdata.in">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
     <entry file="file://C:/Program Files (x86)/CodeBlocks/MinGW/lib/gcc/mingw32/5.1.0/include/c++/bits/stl_algobase.h">
@@ -180,10 +177,13 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/testdata.out">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
     <entry file="file://$PROJECT_DIR$/main.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="120">
-          <caret line="8" column="15" lean-forward="true" selection-start-line="8" selection-start-column="15" selection-end-line="8" selection-end-column="15" />
+        <state relative-caret-position="315">
+          <caret line="21" column="8" selection-start-line="21" selection-start-column="8" selection-end-line="21" selection-end-column="8" />
         </state>
       </provider>
     </entry>

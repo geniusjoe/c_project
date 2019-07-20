@@ -1,40 +1,42 @@
 #include<bits/stdc++.h>
 using namespace std;
-typedef long long ll;
-const int maxn = 30;
-ll a[maxn][maxn], n, ans,m;
-int vis[maxn];
-void dfs(int x,int t,ll sum)
-{
-    vis[x] = 1;
-    if (x != 0)
-    {
-        for (int i = 1; i <= n; ++i)
-        {
-            if (vis[i]) sum -= a[i][x];
-            else sum += a[i][x];
-        }
+
+#define local
+
+const int maxn=1000;
+
+int buf[maxn][maxn];
+int n;
+long long ans;
+
+
+void dfs(int x,int t,long long Sum) {
+    if(x==n){
+        ans=max(ans,Sum);
+        return ;
     }
-    if (t == n/2) { ans = max(ans, sum); return; }
-    for (int i = x + 1; i <= n; ++i)
-    {
-        if (n - i >= n/2 - t - 1)
-        {
-            dfs(i, t + 1, sum);
-            vis[i] = 0;
-        }
+    if(t<n){
+
     }
+    if(n-x>t){
+        
+    }
+
 }
+
 int main()
 {
-    scanf("%d", &n);
-    n*=2;
-    for (int i = 1; i <= n; ++i)
-    {
-        for (int j = 1; j <= n; ++j)
-            scanf("%lld", &a[i][j]);
+#ifdef local
+    freopen("testdata.in","r+",stdin);
+    freopen("testdata.out","w+",stdout);
+    #endif
+
+    ios::sync_with_stdio(false);
+    cin>>n;
+    for(int i=1;i<=n;i++){
+        for(int j=1;j<=n;j++){
+            cin>>buf[i][j];
+        }
     }
-    ans = 0;
-    dfs(0, 0, 0);
-    printf("%lld\n", ans);
+    dfs(1,1,ans);
 }
