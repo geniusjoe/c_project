@@ -2,21 +2,61 @@
 
 using namespace std;
 
-#define local
+#define loca
+#define debu
 
-const int maxn = 100000 + 5;
-bool vis[28 + 5];
+const long long MOD = 1e9 + 7;
 
-int buf1[maxn], buf2[maxn];
-int n, c;
-long long ans;
-int odd_cnt, even_cnt;
-int odd_len, even_len;
+const long long maxn = 1e6;
 
-struct clr {
-    int l, r;
-    int i;
-} odd[maxn], even[maxn];
+int n;
+long long buf1[maxn + 5], buf2[maxn + 5], buf3[maxn + 5];
+long long res[maxn + 5];
+
+void exgcd(const int a, const int b, int &g, int &x, int &y) {
+    if (!b) g = a, x = 1, y = 0;
+    else exgcd(b, a % b, g, y, x), y -= x * (a / b);
+}
+
+inline long long inv(const int num) {
+    int g, x, y;
+    exgcd(num, MOD, g, x, y);
+    return ((x % MOD) + MOD) % MOD;
+}
+
+void init() {
+
+    buf1[1] = 1;
+    for (long long i = 2; i <= maxn; i++) {
+        buf1[i] = (buf1[i - 1] + inv(i)) % MOD;
+    }
+
+    for (long long i = 1; i <= maxn; i++) {
+        buf2[i] = inv(3) * buf1[i] % MOD * i % MOD * (i + 1) % MOD * (2 * i + 1) % MOD;
+    }
+
+    buf3[1] = 2;
+    for (long long i = 2; i <= maxn; i++) {
+        buf3[i] = (buf3[i - 1] + 2 * i * i % MOD * buf1[i] % MOD) % MOD;
+    }
+
+    for (long long i = 1; i <= maxn; i++) {
+        res[i] = (buf2[i] - buf3[i] + i) * (inv(i) * inv(i) % MOD) % MOD;
+        if (res[i] < 0) res[i] += MOD;
+    }
+
+#ifdef debug
+    for(int i=1;i<=maxn;i++){
+        if(buf2[i]<0){
+            cout<<i<<endl;
+        }
+        if(buf3[i]<0){
+            cout<<i<<endl;
+        }
+    }
+
+#endif
+}
 
 int main() {
 #ifdef local
@@ -26,34 +66,11 @@ int main() {
 
     ios::sync_with_stdio(false);
 
-    cin >> n >> c;
+    init();
 
-    for (int i = 1; i <= n; i++) {
-        if (i % 2 == 1) cin >> buf1[++odd_cnt];
-        else cin >> buf2[++even_cnt];
-    }
-
-    int odd_head = 1, even_head = 1;
-    for (int i = 1; i <= odd_cnt; i++) {
-        if (buf1[i] == buf1[odd_head]) continue;
-        else {
-            odd[++odd_len].i = buf1[odd_head];
-            odd[odd_len].l = 2 * odd_head - 1;
-            odd[odd_len].r = 2 * i - 1;
-        }
-    }
-    for (int i = 1; i <= even_cnt; i++) {
-        if (buf2[i] == buf2[even_cnt]) continue;
-        else {
-            even[++even_len].i = buf2[even_head];
-            even[even_len].l = 2 * even_head;
-            even[even_len].r = 2 * i;
-        }
+    while (scanf("%d", &n) != EOF) {
+        cout << res[n] << endl;
     }
 
-    int odd_ptr=1,even_ptr=1;
-    while(odd_ptr<=odd_len&&even_ptr<=even_len){
-        if(odd[odd_ptr].i)
-    }
 
 }
