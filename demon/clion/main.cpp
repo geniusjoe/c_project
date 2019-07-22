@@ -2,48 +2,13 @@
 
 using namespace std;
 
+const int MOD = 1e9 + 7;
+
 #define loca
 #define debu
 
-const long long MOD = 1e9 + 7;
-
-const long long maxn = 1e6;
-
-int n;
-long long buf1[maxn + 5], buf2[maxn + 5], buf3[maxn + 5];
-long long res[maxn + 5];
-
-void exgcd(const int a, const int b, int &g, int &x, int &y) {
-    if (!b) g = a, x = 1, y = 0;
-    else exgcd(b, a % b, g, y, x), y -= x * (a / b);
-}
-
-inline long long inv(const int num) {
-    int g, x, y;
-    exgcd(num, MOD, g, x, y);
-    return (long long) ((x % MOD) + MOD) % MOD;
-}
-
-void init() {
-
-    buf1[1] = 1;
-    for (long long i = 2; i <= maxn; i++) {
-        buf1[i] = (buf1[i - 1] + inv(i)) % MOD;
-    }
-
-    for (long long i = 1; i <= maxn; i++) {
-        buf2[i] = buf1[i] % MOD * i % MOD * (i + 1) % MOD;
-    }
-
-    buf3[1] = 2;
-    for (long long i = 2; i <= maxn; i++) {
-        buf3[i] = (buf3[i - 1] + 2 * i * buf1[i] % MOD) % MOD;
-    }
-
-    for (long long i = 1; i <= maxn; i++) {
-        res[i] = (buf2[i] - buf3[i] + i + MOD) % MOD * (inv(i) * inv(i) % MOD) % MOD;
-    }
-}
+long long dp[2000 + 5][2000 + 5];
+int n, m;
 
 int main() {
 #ifdef local
@@ -51,12 +16,37 @@ int main() {
     freopen("testdata.out", "w+", stdout);
 #endif
 
-    ios::sync_with_stdio(false);
+//    ios::sync_with_stdio(false);
 
-    init();
+    while (~scanf("%d%d", &n, &m)) {
+        if (n == 0 && m == 0) {
+            printf("1\n");
+            continue;
+        }
 
-    while (scanf("%d", &n) ==1) {
-        cout << res[n] << endl;
+        for (int i = 0; i <= n + m; i++) {
+            for (int j = 0; j <= n + m; j++)
+                dp[i][j] = 0;
+        }
+
+//        i为A的个数，j为B的个数
+
+        for (int i = 1; i <= n; i++) dp[i][0] = 1;
+        for (int j = 1; j <= m; j++) dp[0][j] = 1;
+
+//      先取AB中的A，此时串必然满足题设
+//      再取BA中的A，此时B必然要先出现.
+        for (int i = 1; i <= n + m; i++) {
+            for (int j = 1; j <= m + n; j++) {
+                if (i <= n + j)
+                    dp[i][j] += dp[i - 1][j] % MOD;
+                if (j <= m + i)
+                    dp[i][j] += dp[i][j - 1] % MOD;
+                dp[i][j] %= MOD;
+            }
+        }
+
+        cout << dp[m + n][m + n] << endl;
     }
 
 
