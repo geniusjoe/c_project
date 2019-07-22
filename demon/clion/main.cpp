@@ -43,6 +43,7 @@ void init() {
     for (long long i = 1; i <= maxn; i++) {
         res[i] = (buf2[i] - buf3[i] + i + MOD) % MOD * (inv(i) * inv(i) % MOD) % MOD;
     }
+
 }
 
 int main() {
@@ -55,7 +56,7 @@ int main() {
 
     init();
 
-    while (scanf("%d", &n) != EOF) {
+    while (scanf("%d", &n) ==1) {
         cout << res[n] << endl;
     }
 

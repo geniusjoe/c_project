@@ -39,10 +39,10 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/main.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="165">
-              <caret line="11" column="6" lean-forward="true" selection-start-line="11" selection-start-column="6" selection-end-line="11" selection-end-column="6" />
+            <state relative-caret-position="315">
+              <caret line="39" column="20" lean-forward="true" selection-start-line="39" selection-start-column="20" selection-end-line="39" selection-end-column="20" />
               <folding>
-                <element signature="e#1287#1366#0" expanded="true" />
+                <element signature="e#1094#1173#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -68,7 +68,7 @@
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="7">
+  <component name="ProjectFrameBounds" extendedState="6">
     <option name="x" value="240" />
     <option name="y" value="130" />
     <option name="width" value="1440" />
@@ -145,15 +145,15 @@
       <workItem from="1563673635778" duration="9322000" />
       <workItem from="1563722258629" duration="8638000" />
       <workItem from="1563731172248" duration="2302000" />
-      <workItem from="1563758270184" duration="629000" />
+      <workItem from="1563758270184" duration="4065000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="23876000" />
+    <option name="totallyTimeSpent" value="27312000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1936" height="1056" extended-state="7" />
+    <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.28997868" />
@@ -161,8 +161,8 @@
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.32779455" />
-      <window_info active="true" anchor="bottom" id="Debug" order="3" visible="true" weight="0.27006507" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.3275488" />
+      <window_info active="true" anchor="bottom" id="Debug" order="3" visible="true" weight="0.4143167" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
@@ -186,26 +186,24 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/main.cpp</url>
-          <line>44</line>
-          <option name="timeStamp" value="12" />
+          <line>59</line>
+          <option name="timeStamp" value="16" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
     <watches-manager>
       <configuration name="CMakeRunConfiguration">
-        <watch expression="n" language="ObjectiveC" />
-        <watch expression="inv(4)" language="ObjectiveC" />
-        <watch expression="buf1" language="ObjectiveC" />
-        <watch expression="buf2" language="ObjectiveC" />
-        <watch expression="buf3" language="ObjectiveC" />
         <watch expression="res" language="ObjectiveC" />
-        <watch expression="(buf2[3]-buf3[3]+3)%MOD" language="ObjectiveC" />
-        <watch expression="23*inv(24)%MOD" language="ObjectiveC" />
       </configuration>
     </watches-manager>
   </component>
   <component name="debuggerHistoryManager">
     <expressions id="watch">
+      <expression>
+        <expression-string>res</expression-string>
+        <language-id>ObjectiveC</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
       <expression>
         <expression-string>i</expression-string>
         <language-id>ObjectiveC</language-id>
@@ -242,26 +240,13 @@
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>res</expression-string>
-        <language-id>ObjectiveC</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
         <expression-string>16*inv(27)%MOD</expression-string>
-        <language-id>ObjectiveC</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>16*inv(27)%MODS</expression-string>
         <language-id>ObjectiveC</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/cmake-build-debug/testdata.in">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
     <entry file="file://$PROJECT_DIR$/cmake-build-debug/testdata.out">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
@@ -279,12 +264,15 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/cmake-build-debug/testdata.in">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
     <entry file="file://$PROJECT_DIR$/main.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="165">
-          <caret line="11" column="6" lean-forward="true" selection-start-line="11" selection-start-column="6" selection-end-line="11" selection-end-column="6" />
+        <state relative-caret-position="315">
+          <caret line="39" column="20" lean-forward="true" selection-start-line="39" selection-start-column="20" selection-end-line="39" selection-end-column="20" />
           <folding>
-            <element signature="e#1287#1366#0" expanded="true" />
+            <element signature="e#1094#1173#0" expanded="true" />
           </folding>
         </state>
       </provider>
