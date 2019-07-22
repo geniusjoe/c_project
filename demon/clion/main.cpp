@@ -21,7 +21,7 @@ void exgcd(const int a, const int b, int &g, int &x, int &y) {
 inline long long inv(const int num) {
     int g, x, y;
     exgcd(num, MOD, g, x, y);
-    return ((x % MOD) + MOD) % MOD;
+    return (long long) ((x % MOD) + MOD) % MOD;
 }
 
 void init() {
@@ -41,21 +41,8 @@ void init() {
     }
 
     for (long long i = 1; i <= maxn; i++) {
-        res[i] = (buf2[i] - buf3[i] + i) * (inv(i) * inv(i) % MOD) % MOD;
-        if (res[i] < 0) res[i] += MOD;
+        res[i] = (buf2[i] - buf3[i] + i + MOD) % MOD * (inv(i) * inv(i) % MOD) % MOD;
     }
-
-#ifdef debug
-    for(int i=1;i<=maxn;i++){
-        if(buf2[i]<0){
-            cout<<i<<endl;
-        }
-        if(buf3[i]<0){
-            cout<<i<<endl;
-        }
-    }
-
-#endif
 }
 
 int main() {
