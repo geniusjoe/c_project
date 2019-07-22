@@ -32,18 +32,17 @@ void init() {
     }
 
     for (long long i = 1; i <= maxn; i++) {
-        buf2[i] = inv(3) * buf1[i] % MOD * i % MOD * (i + 1) % MOD * (2 * i + 1) % MOD;
+        buf2[i] = buf1[i] % MOD * i % MOD * (i + 1) % MOD;
     }
 
     buf3[1] = 2;
     for (long long i = 2; i <= maxn; i++) {
-        buf3[i] = (buf3[i - 1] + 2 * i * i % MOD * buf1[i] % MOD) % MOD;
+        buf3[i] = (buf3[i - 1] + 2 * i * buf1[i] % MOD) % MOD;
     }
 
     for (long long i = 1; i <= maxn; i++) {
         res[i] = (buf2[i] - buf3[i] + i + MOD) % MOD * (inv(i) * inv(i) % MOD) % MOD;
     }
-
 }
 
 int main() {
