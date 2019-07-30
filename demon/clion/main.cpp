@@ -1,5 +1,9 @@
 #include <bits/stdc++.h>
 
+#define local
+const int INF = 0x3f3f3f3f;
+using namespace std;
+
 #define setbit(x, y) x|=(1ll<<y)
 
 #define clrbit(x, y) x&=~(1ll<<y)
@@ -8,30 +12,38 @@
 
 #define getbit(x, y) ((x) >> (y)&1ll)
 
+long long T, N, M;
+const int MAXN = 500;
 
-#define local
+long long buf[MAXN + 5][MAXN + 5], CMAX[MAXN + 5], CMIN[MAXN + 5], res;
 
-using namespace std;
+long long maxq[MAXN + 10], minq[MAXN + 10];
 
-long long T, counter, len, mod, pos;
-long long buf, raw, res1, res2;
-bool all_one, all_two;
+// 1为下标开始
+long long mono_q(const long long cmax[], const long long cmin[], const long long m) {
+    long long maxhead = 0, maxtail = 0, minhead = 0, mintail = 0;
+    long long l = 1;
+    long long len = 0;
+    for (int i = 1; i <= N; i++) {
+        while (maxhead < maxtail && cmax[i] > cmax[maxq[maxtail - 1]]) maxtail--;
+        maxq[maxtail++] = i;
+        while (minhead < mintail && cmin[i] < cmin[minq[mintail - 1]]) mintail--;
+        minq[mintail++] = i;
 
-// 查找二进制下第一个1的位置
-int get_pos(long long buf, int start) {
-    int res = -1;
-    for (int i = start; i <= len; i += 2) {
-        if (getbit(buf, i - 1)) {
-            res = i;
-            break;
+        while (minhead < mintail && maxhead < maxtail && cmax[maxq[maxhead]] - cmin[minq[minhead]] > m) {
+            l = min(maxq[maxhead], minq[minhead]) + 1;  //跳到l + 1
+            while (minhead < mintail && minq[minhead] < l) minhead++;
+            while (maxhead < maxtail && maxq[maxhead] < l) maxhead++;
         }
+
+        len = max(len, i - l + 1);
     }
-    return res;
+    return len;
 }
 
 
 int main() {
-//    ios::sync_with_stdio(false);
+    ios::sync_with_stdio(false);
 
 #ifdef  local
     freopen("testdata.in", "r+", stdin);
@@ -39,126 +51,27 @@ int main() {
 #endif
 
     cin >> T;
-//    scanf("%d",&T);
     while (T--) {
-        counter = 1;
-        len = 0;
-        cin >> raw;
-//        scanf("%lld",&raw);
-#ifdef local
-        cout << raw << "\t";
-#endif
-        res2 = mod = 0;
-        res1 = buf = raw;
-        all_one = all_two = true;
-//        得到数字的长度
-        while (buf) {
-            if (buf & 1) {
-                mod += counter;
-                if (counter == 1) all_two = false;
-                else all_one = false;
+        cin >> N >> M;
+        res = 0;
+        for (int i = 1; i <= N; i++)
+            for (int j = 1; j <= N; j++)
+                cin >> buf[i][j];
+
+        for (int i = 1; i <= N; i++) {
+            for (int j = 1; j <= N; j++) {
+                CMAX[j] = 0;
+                CMIN[j] = INF;
             }
-            if (counter == 1) counter = 2;
-            else counter = 1;
-            buf >>= 1;
-            len++;
-        }
-        buf = raw;
-
-//        如果当前数能被3整除
-        if (mod % 3 == 0) {
-            cout << 1 << " " << raw << endl;
-            continue;
-        }
-
-//        如果有1也有2存在
-        if (!all_one && !all_two) {
-//            模1取出一个1
-            if (mod % 3 == 1) {
-                pos = get_pos(buf, 1);
-                clrbit(res1, (pos - 1));
-                setbit(res2, (pos - 1));
-
-                pos = get_pos(buf, 2);
-                setbit(res2, (pos - 1));
-
-                assert(res1 % 3 == 0 && res2 % 3 == 0);
-                assert(res1 | res2 == raw);
-
-//            模2取出一个2
-            } else if (mod % 3 == 2) {
-                pos = get_pos(buf, 2);
-
-                clrbit(res1, (pos - 1));
-                setbit(res2, (pos - 1));
-
-                pos = get_pos(buf, 1);
-                setbit(res2, (pos - 1));
-            }
-
-//            如果为全1的数字
-        } else if (all_one) {
-//            模1取出1个1
-            if (mod % 3 == 1) {
-                pos = get_pos(buf, 1);
-                clrbit(res1, (pos - 1));
-                setbit(res2, (pos - 1));
-
-                pos = get_pos(buf, pos + 2);
-                setbit(res2, (pos - 1));
-
-                pos = get_pos(buf, pos + 2);
-                setbit(res2, (pos - 1));
-
-//                模2取出2个1
-            } else if (mod % 3 == 2) {
-                pos = get_pos(buf, 1);
-                clrbit(res1, (pos - 1));
-                setbit(res2, (pos - 1));
-
-                pos = get_pos(buf, pos + 2);
-                clrbit(res1, (pos - 1));
-                setbit(res2, (pos - 1));
-
-                pos = get_pos(buf, pos + 2);
-                setbit(res2, (pos - 1));
-            }
-
-//             如果为全2的数组
-        } else {
-//            如果模1取出2个2
-            if (mod % 3 == 1) {
-                int pos = get_pos(buf, 2);
-                clrbit(res1, (pos - 1));
-                setbit(res2, (pos - 1));
-
-                pos = get_pos(buf, pos + 2);
-                clrbit(res1, (pos - 1));
-                setbit(res2, (pos - 1));
-
-                pos = get_pos(buf, pos + 2);
-                setbit(res2, (pos - 1));
-
-//              如果模2取出1个2
-            } else if (mod % 3 == 2) {
-                int pos = get_pos(buf, 2);
-                clrbit(res1, (pos - 1));
-                setbit(res2, (pos - 1));
-
-                pos = get_pos(buf, pos + 2);
-                setbit(res2, (pos - 1));
-
-                pos = get_pos(buf, pos + 2);
-                setbit(res2, (pos - 1));
-
+            for (int j = i; j <= N; j++) {
+                for (int k = 1; k <= N; k++) {
+                    CMAX[k] = max(CMAX[k], buf[j][k]);
+                    CMIN[k] = min(CMIN[k], buf[j][k]);
+                }
+                res = max(res, mono_q(CMAX, CMIN, M) * (j - i + 1));
             }
         }
-
-//        assert(res1%3==0&&res2%3==0);
-//        assert(res1|res2==raw);
-
-        cout << 2 << " " << res2 << " " << res1 << endl;
-
+        cout << res << endl;
     }
 
     return 0;
