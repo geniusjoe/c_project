@@ -9,9 +9,10 @@ sys.stdout = open("testdata.in", "w")
 
 
 def main():
-    print(100)
-    for i in range(1,1000):
-        print(i)
+    print(500000)
+
+    for i in range(500000):
+        print(random.randint(1,1e18))
 
 
 if __name__ == "__main__":
