@@ -7,9 +7,24 @@ using namespace std;
 const int MAXN = 500010;
 
 long long buf[MAXN];
-map<int, int> mp;
 
 long long n, m, pg;
+
+template<class T>
+inline bool scan_d(T &ret) {
+    char c;
+    int sgn;
+    if (c = getchar(), c == EOF)
+        return 0;
+    while (c != '-' && (c < '0' || c > '9'))
+        c = getchar();
+    sgn = (c == '-') ? -1 : 1;
+    ret = (c == '-') ? 0 : (c - '0');
+    while (c = getchar(), c >= '0' && c <= '9')
+        ret = ret * 10 + (c - '0');
+    ret *= sgn;
+    return 1;
+}
 
 int main() {
 
@@ -20,39 +35,20 @@ int main() {
 
     //ios::sync_with_stdio(false);
 
-    cin >> n;
-    for (int i = 1; i <= n; i++) {
-        cin >> buf[i];
-        mp[buf[i]]++;
-    }
+    scan_d(n), scan_d(m), scan_d(pg);
 
-    bool win = true;
-    if (mp[0] >= 2) win = false;
-    for (auto it:mp) {
-        if (it.second >= 3) win = false;
-    }
-    int cnt = 0;
-    for (auto it:mp) {
-        if (it.second >= 2) cnt++;
-    }
-    if (cnt >= 2) win = false;
+    for (long long i = 1; i <= m; i++)
+        scan_d(buf[i]);
 
-    for (auto it:mp) {
-        if (it.second >= 2 && mp[it.first - 1] >= 1) {
-            win = false;
-            break;
+    long long sum = 0, t = 1, r = 0, res = 0;
+    while (t <= m) {
+        r = (buf[t] - sum + pg - 1) / pg * pg + sum;
+        while (t <= m && buf[t] <= r) {
+            t++;
+            sum++;
         }
+        res++;
     }
-    if (!win) {
-        cout << "cslnb" << endl;
-        return 0;
-    }
-    long long sm = 0;
-    for (int i = 1; i <= n; i++) sm += buf[i];
-    if ((sm - n * (n - 1) / 2) % 2 == 1)
-        cout << "sjfnb" << endl;
-    else
-        cout << "cslnb" << endl;
+    cout << res << endl;
     return 0;
-
 }
