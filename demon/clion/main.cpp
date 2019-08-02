@@ -1,12 +1,15 @@
 #include<bits/stdc++.h>
+
 #define loca
 #define debu
 using namespace std;
 
-const int MAXN=500010;
+const int MAXN = 500010;
 
-int buf[4];
+long long buf[MAXN];
+map<int, int> mp;
 
+long long n, m, pg;
 
 int main() {
 
@@ -17,54 +20,39 @@ int main() {
 
     //ios::sync_with_stdio(false);
 
-    string a,b,c;
-    cin>>a>>b>>c;
+    cin >> n;
+    for (int i = 1; i <= n; i++) {
+        cin >> buf[i];
+        mp[buf[i]]++;
+    }
 
-    int a_val,b_val,c_val;
+    bool win = true;
+    if (mp[0] >= 2) win = false;
+    for (auto it:mp) {
+        if (it.second >= 3) win = false;
+    }
+    int cnt = 0;
+    for (auto it:mp) {
+        if (it.second >= 2) cnt++;
+    }
+    if (cnt >= 2) win = false;
 
-    a_val=b_val=c_val=0;
-
-    if(a[1]=='s')   a_val+=100;
-    else if(a[1]=='m')  a_val+=200;
-    else if(a[1]=='p')  a_val+=300;
-
-    a_val+=a[0]-'0';
-
-    buf[1]=a_val;
-
-
-    if(b[1]=='s')   b_val+=100;
-    else if(b[1]=='m')  b_val+=200;
-    else if(b[1]=='p')  b_val+=300;
-
-    b_val+=b[0]-'0';
-
-    buf[2]=b_val;
-
-
-    if(c[1]=='s')   c_val+=100;
-    else if(c[1]=='m')  c_val+=200;
-    else if(c[1]=='p')  c_val+=300;
-
-    c_val+=c[0]-'0';
-
-    buf[3]=c_val;
-
-    sort(buf+1,buf+1+3);
-
-    if((buf[3]-buf[2]==1&&buf[2]-buf[1]==1&&buf[3]-buf[1]==2)
-       ||(buf[1]==buf[2]&&buf[2]==buf[3]))
-        cout<<0<<endl;
-    else if(buf[3]-buf[2]==1||
-            buf[2]-buf[1]==1||
-            buf[3]-buf[1]==2||
-            buf[2]-buf[1]==2||
-            buf[3]-buf[2]==2||
-            buf[2]==buf[1]
-            ||buf[2]==buf[3]
-            ||buf[1]==buf[3])
-        cout<<1<<endl;
+    for (auto it:mp) {
+        if (it.second >= 2 && mp[it.first - 1] >= 1) {
+            win = false;
+            break;
+        }
+    }
+    if (!win) {
+        cout << "cslnb" << endl;
+        return 0;
+    }
+    long long sm = 0;
+    for (int i = 1; i <= n; i++) sm += buf[i];
+    if ((sm - n * (n - 1) / 2) % 2 == 1)
+        cout << "sjfnb" << endl;
     else
-        cout<<2<<endl;
+        cout << "cslnb" << endl;
+    return 0;
 
 }
