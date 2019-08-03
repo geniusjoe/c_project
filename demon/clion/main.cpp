@@ -4,27 +4,13 @@
 #define debu
 using namespace std;
 
-const int MAXN = 500010;
+const int MAXN = 500005;
+const int INF = 0x3f3f3f3f;
 
-long long buf[MAXN];
+char s[105], t[105], p[105];
+int hsh1[26 + 5], hsh2[26 + 5];
 
-long long n, m, pg;
-
-template<class T>
-inline bool scan_d(T &ret) {
-    char c;
-    int sgn;
-    if (c = getchar(), c == EOF)
-        return 0;
-    while (c != '-' && (c < '0' || c > '9'))
-        c = getchar();
-    sgn = (c == '-') ? -1 : 1;
-    ret = (c == '-') ? 0 : (c - '0');
-    while (c = getchar(), c >= '0' && c <= '9')
-        ret = ret * 10 + (c - '0');
-    ret *= sgn;
-    return 1;
-}
+long long n, m, T, k;
 
 int main() {
 
@@ -35,20 +21,28 @@ int main() {
 
     //ios::sync_with_stdio(false);
 
-    scan_d(n), scan_d(m), scan_d(pg);
-
-    for (long long i = 1; i <= m; i++)
-        scan_d(buf[i]);
-
-    long long sum = 0, t = 1, r = 0, res = 0;
-    while (t <= m) {
-        r = (buf[t] - sum + pg - 1) / pg * pg + sum;
-        while (t <= m && buf[t] <= r) {
-            t++;
-            sum++;
-        }
-        res++;
+    cin >> n >> m >> k;
+    if (n % 2 == 0) {
+        cout << "Marsel" << endl;
+        return 0;
     }
-    cout << res << endl;
+    bool flag = false;
+    for (int i = 1; i * i <= m; i++) {
+        if (m % i == 0) {
+            if (m / i >= k && i > 1) {
+                flag = true;
+                break;
+            } else if (i >= k && m / i > 1) {
+                flag = true;
+                break;
+            }
+        }
+    }
+    if (flag)
+        cout << "Timur" << endl;
+    else
+        cout << "Marsel" << endl;
+
+
     return 0;
 }
