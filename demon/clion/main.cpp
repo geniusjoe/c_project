@@ -4,14 +4,13 @@
 #define debu
 using namespace std;
 
-const int MAXN = 300005;
+const int MAXN = 400005;
 const int INF = 0x3f3f3f3f;
 const long long LINF = 0x3f3f3f3f3f3f3f3f;
 const long long MOD = 998244353;
 
-long long n, T, m, k;
-long long buf[MAXN];
-long long dp[MAXN][15];
+long long n, q, upd;
+long long buf[MAXN], qry[MAXN], tme[MAXN];
 
 int main() {
 
@@ -26,22 +25,29 @@ int main() {
 #endif
 
     ios::sync_with_stdio(false);
+    cin >> n;
+    upd=1;
+    fill_n(tme + 1, n, 1);
 
-    cin >> n >> m >> k;
     for (int i = 1; i <= n; i++) cin >> buf[i];
-    for (int i = 0; i <= n; i++)
-        for (int j = 0; j <= m; j++)
-            dp[i][j] = -1e10;
-    long long res = 0;
-    for (int i = 1; i <= n; i++) {
-        for (int j = 1; j <= m; j++) {
-            if (j == 1) dp[i][j] = max(dp[i - 1][m] + buf[i] - k, buf[i] - k);
-            else
-                dp[i][j] = dp[i - 1][j - 1] + buf[i];
-            res = max(res, dp[i][j]);
+    cin >> q;
+    for (int i = 1; i <= q; i++) {
+        int u, v, w;
+        cin >> u;
+        if (u == 1) {
+            cin >> v;
+            cin >> buf[v];
+            tme[v] = upd;
+        } else {
+            cin >> qry[upd];
+            ++upd;
         }
     }
-    cout << res << endl;
+    for (int i = upd - 1; i >= 1; i--) qry[i] = max(qry[i + 1], qry[i]);
+
+    for (int i = 1; i <= n; i++)
+        cout << max(buf[i], qry[tme[i]]) << " ";
+    cout << endl;
 
 
 #ifdef local
