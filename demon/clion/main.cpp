@@ -10,18 +10,17 @@ const long long LINF = 0x3f3f3f3f3f3f3f3f;
 const long long MOD = 1000000007;
 
 long long n, m;
-long long pre_sum[MAXN], dp[MAXN], buf[MAXN];
+bool graph[105][105];
+bool vis[105];
 
-struct bus {
-    int strt, end;
-
-    bool operator<(bus bus1) {
-        if (this->end == bus1.end)
-            return this->strt < bus1.strt;
-        else
-            return this->end < bus1.end;
+void dfs(int u) {
+    vis[u] = true;
+    for (int i = 1; i <= n; i++) {
+        if (vis[i] || !graph[u][i]) continue;
+        dfs(i);
     }
-} buses[MAXN];
+}
+
 
 int main() {
 
@@ -38,24 +37,29 @@ int main() {
 //    ios::sync_with_stdio(false);
 //    cin >> T;
     cin >> n >> m;
-    for (int i = 1; i <= m; i++) {
-        cin >> buses[i].strt >> buses[i].end;
-        buf[i] = buses[i].end;
+    if (n != m) {
+        cout << "NO" << endl;
+        return 0;
     }
-    sort(buses + 1, buses + 1 + m), sort(buf + 1, buf + 1 + m);
     for (int i = 1; i <= m; i++) {
-        if (buses[i].strt == 0) dp[i] += 1;
-        int l = lower_bound(buf + 1, buf + 1 + m, buses[i].strt) - buf;
-        int r = lower_bound(buf + 1, buf + 1 + m, buses[i].end) - buf;
-        if (buses[r].end == buses[i].end) r--;
-        if (r >= l)
-            dp[i] = (dp[i] + pre_sum[r] - pre_sum[l - 1] + MOD) % MOD;
-        pre_sum[i] = (pre_sum[i - 1] + dp[i]) % MOD;
+        int u, v;
+        cin >> u >> v;
+        graph[u][v] = graph[v][u] = true;
     }
-    long long res = 0;
-    for (int i = 1; i <= m; i++) if (buses[i].end == n) res += dp[i];
-    res %= MOD;
-    cout << res << endl;
+    dfs(1);
+    bool flg = true;
+    for (int i = 1; i <= n; i++) {
+        if (!vis[i]) {
+            flg = false;
+            break;
+        }
+    }
+    if (!flg)
+        cout << "NO" << endl;
+    else
+        cout << "FHTAGN!" << endl;
+    return 0;
+
 
 #ifndef ONLINE_JUDGE
     auto end_time = clock();
