@@ -4,15 +4,24 @@
 #define debu
 using namespace std;
 
-const int MAXN = 2000025;
+const int MAXN = 100025;
 const int INF = 0x3f3f3f3f;
 const long long LINF = 0x3f3f3f3f3f3f3f3f;
-const long long MOD = 998244353;
+const long long MOD = 1000000007;
 
 long long n, m;
-char str[MAXN];
-int res[10 + 5][10 + 5];
-int buf[10 + 5][10 + 5][10 + 5];
+long long pre_sum[MAXN], dp[MAXN], buf[MAXN];
+
+struct bus {
+    int strt, end;
+
+    bool operator<(bus bus1) {
+        if (this->end == bus1.end)
+            return this->strt < bus1.strt;
+        else
+            return this->end < bus1.end;
+    }
+} buses[MAXN];
 
 int main() {
 
@@ -28,44 +37,25 @@ int main() {
 
 //    ios::sync_with_stdio(false);
 //    cin >> T;
-
-    scanf("%s", str);
-    for (int i = 0; i <= 9; i++)
-        for (int j = 0; j <= 9; j++) {
-            for (int k = 0; k <= 9; k++) buf[i][j][k] = INF;
-            for (int k = 0; k <= 10; k++) {
-                for (int l = 0; l <= 10; l++) {
-                    if(k==0&&l==0)  continue;
-                    int cur = (i * k + j * l) % 10;
-                    buf[i][j][cur] = min(buf[i][j][cur], k + l);
-                }
-            }
-        }
-
-    for (int i = 0; i <= 9; i++) {
-        for (int j = 0; j <= 9; j++) {
-            bool flg = true;
-            int cur_res = 0;
-            for (int k = 1; k < strlen(str); k++) {
-                int cur = str[k] - str[k - 1];
-                if (cur < 0) cur += 10;
-                if (buf[i][j][cur] == INF) {
-                    flg = false;
-                    break;
-                } else {
-                    if (buf[i][j][cur] >= 2)
-                        cur_res += buf[i][j][cur]-1;
-                }
-            }
-            if (!flg)
-                res[i][j] = -1;
-            else
-                res[i][j] = cur_res;
-            printf("%d ", res[i][j]);
-        }
-        printf("\n");
+    cin >> n >> m;
+    for (int i = 1; i <= m; i++) {
+        cin >> buses[i].strt >> buses[i].end;
+        buf[i] = buses[i].end;
     }
-
+    sort(buses + 1, buses + 1 + m), sort(buf + 1, buf + 1 + m);
+    for (int i = 1; i <= m; i++) {
+        if (buses[i].strt == 0) dp[i] += 1;
+        int l = lower_bound(buf + 1, buf + 1 + m, buses[i].strt) - buf;
+        int r = lower_bound(buf + 1, buf + 1 + m, buses[i].end) - buf;
+        if (buses[r].end == buses[i].end) r--;
+        if (r >= l)
+            dp[i] = (dp[i] + pre_sum[r] - pre_sum[l - 1] + MOD) % MOD;
+        pre_sum[i] = (pre_sum[i - 1] + dp[i]) % MOD;
+    }
+    long long res = 0;
+    for (int i = 1; i <= m; i++) if (buses[i].end == n) res += dp[i];
+    res %= MOD;
+    cout << res << endl;
 
 #ifndef ONLINE_JUDGE
     auto end_time = clock();
