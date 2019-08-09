@@ -4,21 +4,28 @@
 #define debu
 using namespace std;
 
-const int MAXN = 100025;
+const int MAXN = 200025;
 const int INF = 0x3f3f3f3f;
 const long long LINF = 0x3f3f3f3f3f3f3f3f;
 const long long MOD = 1000000007;
 
-long long n, m;
-bool graph[105][105];
-bool vis[105];
+long long n, m, T, M;
+map<long, long> nm;
 
-void dfs(int u) {
-    vis[u] = true;
-    for (int i = 1; i <= n; i++) {
-        if (vis[i] || !graph[u][i]) continue;
-        dfs(i);
+struct ele {
+    long long id, val;
+
+    bool operator<(ele ele1) {
+        return this->val < ele1.val;
     }
+} eles[MAXN];
+
+bool is_ok(int m) {
+
+    if (nm[m] == n - 2)
+        return true;
+
+    return false;
 }
 
 
@@ -34,31 +41,53 @@ int main() {
     cerr << setprecision(3) << fixed;
 #endif
 
-//    ios::sync_with_stdio(false);
-//    cin >> T;
-    cin >> n >> m;
-    if (n != m) {
-        cout << "NO" << endl;
-        return 0;
-    }
-    for (int i = 1; i <= m; i++) {
-        int u, v;
-        cin >> u >> v;
-        graph[u][v] = graph[v][u] = true;
-    }
-    dfs(1);
-    bool flg = true;
+    ios::sync_with_stdio(false);
+    cin >> n;
+
     for (int i = 1; i <= n; i++) {
-        if (!vis[i]) {
-            flg = false;
-            break;
-        }
+        eles[i].id = i;
+        cin >> eles[i].val;
     }
-    if (!flg)
-        cout << "NO" << endl;
-    else
-        cout << "FHTAGN!" << endl;
-    return 0;
+
+    if (n <= 3) {
+        cout << 1 << endl;
+    } else {
+        sort(eles + 1, eles + 1 + n);
+        for (int i = 2; i <= n; i++)
+            nm[eles[i].val - eles[i - 1].val]++;
+
+        bool flg = false;
+        nm[eles[2].val - eles[1].val]--;
+        if (!flg && is_ok(eles[3].val - eles[2].val)) {
+            cout << eles[1].id << endl;
+            flg = true;
+        }
+        nm[eles[2].val - eles[1].val]++;
+
+        nm[eles[n].val - eles[n - 1].val]--;
+        if (!flg && is_ok(eles[2].val - eles[1].val)) {
+            cout << eles[n].id << endl;
+            flg = true;
+        }
+        nm[eles[n].val - eles[n - 1].val]++;
+
+        for (int i = 2; i <= n - 1; i++) {
+            nm[eles[i].val - eles[i - 1].val]--;
+            nm[eles[i + 1].val - eles[i].val]--;
+            nm[eles[i + 1].val - eles[i - 1].val]++;
+            if (!flg && is_ok(eles[i + 1].val - eles[i - 1].val)) {
+                flg = true;
+                cout << eles[i].id << endl;
+                break;
+            }
+            nm[eles[i].val - eles[i - 1].val]++;
+            nm[eles[i + 1].val - eles[i].val]++;
+            nm[eles[i + 1].val - eles[i - 1].val]--;
+        }
+
+        if (!flg)
+            cout << "-1" << endl;
+    }
 
 
 #ifndef ONLINE_JUDGE
