@@ -4,15 +4,36 @@
 #define debu
 using namespace std;
 
-const int MAXN = 1005;
+const int MAXN = 2750331;
 const int INF = 0x3f3f3f3f;
 const long long LINF = 0x3f3f3f3f3f3f3f3f;
 const long long MOD = 1000000007;
 
 long long n, m, T, M;
-long long x, y, z;
-char buf[MAXN][MAXN];
-long long dp[MAXN][MAXN], sm[MAXN][MAXN];
+long long buf[MAXN];
+long long cnt[MAXN];
+vector<int> res;
+
+
+int lst[MAXN]; //如果数字是合数,为其除去本身最大的因数,如果是质数,为其本身
+int num[MAXN]; //如果数字是质数,求出质数的序号
+
+void sieve() {
+    for (int i = 0; i < MAXN; i++) lst[i] = i;
+    for (int i = 2; i < MAXN; ++i) {
+        if (lst[i] != i) {
+            lst[i] = i / lst[i];
+            continue;
+        }
+        for (long long j = i * 1ll * i; j < MAXN; j += i)
+            lst[j] = min(lst[j], i);
+    }
+    int cur = 0;
+    for (int i = 2; i < MAXN; ++i)
+        if (lst[i] == i)
+            num[i] = ++cur;
+}
+
 
 int main() {
 
@@ -27,32 +48,33 @@ int main() {
 #endif
 
 //    ios::sync_with_stdio(false);
-//    cin>>n>>m;
-    scanf("%d%d", &n, &m);
-    for (int i = 1; i <= n; i++) scanf("%s", buf[i] + 1);
+//    cin >> n>>m;
 
-    for (int i = 1; i <= n; i++)
-        for (int j = 1; j <= m; j++) {
-            if (buf[i][j] == buf[i - 1][j]) dp[i][j] = dp[i - 1][j] + 1;
-            else dp[i][j] = 1;
-        }
+    sieve();
 
-    long long res = 0;
-    for (int i = 3; i <= n; i++) {
-        for (int j = 1; j <= m; j++) {
-            long long k = dp[i][j];
-            if (dp[i][j] != dp[i - k][j] || dp[i - 2 * k][j] < k)
-                continue;
-            sm[i][j] = 1;
-            if (dp[i][j - 1] == k && dp[i - k][j - 1] == k && dp[i - 2 * k][j - 1] >= k
-                && buf[i][j] == buf[i][j - 1] && buf[i - k][j] == buf[i - k][j - 1] &&
-                buf[i - 2 * k][j] == buf[i - 2 * k][j-1]) {
-                sm[i][j] += sm[i][j - 1];
+    cin >> n;
+    for (int i = 1; i <= 2 * n; i++) {
+        cin >> buf[i];
+        cnt[buf[i]]++;
+    }
+
+    for (int i = MAXN - 1; i >= 1; i--) {
+        while (cnt[i] > 0) {
+            if (lst[i] != i) {
+                cnt[lst[i]]--;
+                res.push_back(i);
+            } else {
+                cnt[num[i]]--;
+                res.push_back(num[i]);
             }
-            res += sm[i][j];
+            cnt[i]--;
         }
     }
-     cout << res << endl;
+
+    for (auto it:res) {
+        cout << it << " ";
+    }
+    cout << endl;
 
 #ifndef ONLINE_JUDGE
     auto end_time = clock();
