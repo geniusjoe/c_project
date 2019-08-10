@@ -4,30 +4,15 @@
 #define debu
 using namespace std;
 
-const int MAXN = 200025;
+const int MAXN = 1005;
 const int INF = 0x3f3f3f3f;
 const long long LINF = 0x3f3f3f3f3f3f3f3f;
 const long long MOD = 1000000007;
 
 long long n, m, T, M;
-map<long, long> nm;
-
-struct ele {
-    long long id, val;
-
-    bool operator<(ele ele1) {
-        return this->val < ele1.val;
-    }
-} eles[MAXN];
-
-bool is_ok(int m) {
-
-    if (nm[m] == n - 2)
-        return true;
-
-    return false;
-}
-
+long long x, y, z;
+char buf[MAXN][MAXN];
+long long dp[MAXN][MAXN], sm[MAXN][MAXN];
 
 int main() {
 
@@ -41,54 +26,33 @@ int main() {
     cerr << setprecision(3) << fixed;
 #endif
 
-    ios::sync_with_stdio(false);
-    cin >> n;
+//    ios::sync_with_stdio(false);
+//    cin>>n>>m;
+    scanf("%d%d", &n, &m);
+    for (int i = 1; i <= n; i++) scanf("%s", buf[i] + 1);
 
-    for (int i = 1; i <= n; i++) {
-        eles[i].id = i;
-        cin >> eles[i].val;
-    }
-
-    if (n <= 3) {
-        cout << 1 << endl;
-    } else {
-        sort(eles + 1, eles + 1 + n);
-        for (int i = 2; i <= n; i++)
-            nm[eles[i].val - eles[i - 1].val]++;
-
-        bool flg = false;
-        nm[eles[2].val - eles[1].val]--;
-        if (!flg && is_ok(eles[3].val - eles[2].val)) {
-            cout << eles[1].id << endl;
-            flg = true;
+    for (int i = 1; i <= n; i++)
+        for (int j = 1; j <= m; j++) {
+            if (buf[i][j] == buf[i - 1][j]) dp[i][j] = dp[i - 1][j] + 1;
+            else dp[i][j] = 1;
         }
-        nm[eles[2].val - eles[1].val]++;
 
-        nm[eles[n].val - eles[n - 1].val]--;
-        if (!flg && is_ok(eles[2].val - eles[1].val)) {
-            cout << eles[n].id << endl;
-            flg = true;
-        }
-        nm[eles[n].val - eles[n - 1].val]++;
-
-        for (int i = 2; i <= n - 1; i++) {
-            nm[eles[i].val - eles[i - 1].val]--;
-            nm[eles[i + 1].val - eles[i].val]--;
-            nm[eles[i + 1].val - eles[i - 1].val]++;
-            if (!flg && is_ok(eles[i + 1].val - eles[i - 1].val)) {
-                flg = true;
-                cout << eles[i].id << endl;
-                break;
+    long long res = 0;
+    for (int i = 3; i <= n; i++) {
+        for (int j = 1; j <= m; j++) {
+            long long k = dp[i][j];
+            if (dp[i][j] != dp[i - k][j] || dp[i - 2 * k][j] < k)
+                continue;
+            sm[i][j] = 1;
+            if (dp[i][j - 1] == k && dp[i - k][j - 1] == k && dp[i - 2 * k][j - 1] >= k
+                && buf[i][j] == buf[i][j - 1] && buf[i - k][j] == buf[i - k][j - 1] &&
+                buf[i - 2 * k][j] == buf[i - 2 * k][j-1]) {
+                sm[i][j] += sm[i][j - 1];
             }
-            nm[eles[i].val - eles[i - 1].val]++;
-            nm[eles[i + 1].val - eles[i].val]++;
-            nm[eles[i + 1].val - eles[i - 1].val]--;
+            res += sm[i][j];
         }
-
-        if (!flg)
-            cout << "-1" << endl;
     }
-
+     cout << res << endl;
 
 #ifndef ONLINE_JUDGE
     auto end_time = clock();
