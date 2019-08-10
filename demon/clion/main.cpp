@@ -14,27 +14,6 @@ long long buf[MAXN];
 long long cnt[MAXN];
 vector<int> res;
 
-
-int lst[MAXN]; //如果数字是合数,为其除去本身最大的因数,如果是质数,为其本身
-int num[MAXN]; //如果数字是质数,求出质数的序号
-
-void sieve() {
-    for (int i = 0; i < MAXN; i++) lst[i] = i;
-    for (int i = 2; i < MAXN; ++i) {
-        if (lst[i] != i) {
-            lst[i] = i / lst[i];
-            continue;
-        }
-        for (long long j = i * 1ll * i; j < MAXN; j += i)
-            lst[j] = min(lst[j], i);
-    }
-    int cur = 0;
-    for (int i = 2; i < MAXN; ++i)
-        if (lst[i] == i)
-            num[i] = ++cur;
-}
-
-
 int main() {
 
 #ifndef ONLINE_JUDGE
@@ -49,32 +28,21 @@ int main() {
 
 //    ios::sync_with_stdio(false);
 //    cin >> n>>m;
+    cin >> T;
+    while (T--) {
+        cin >> n;
 
-    sieve();
-
-    cin >> n;
-    for (int i = 1; i <= 2 * n; i++) {
-        cin >> buf[i];
-        cnt[buf[i]]++;
+        long long len = 1;
+        while (len * (len - 1) / 2 <= n)
+            len++;
+        len--;
+        long long svn_nm = n - len * (len - 1) / 2;
+        cout << "133";
+        for (int i = 1; i <= svn_nm; i++) cout << "7";
+        for (int i = 1; i <= len - 2; i++) cout << "3";
+        cout << "7" << endl;
     }
 
-    for (int i = MAXN - 1; i >= 1; i--) {
-        while (cnt[i] > 0) {
-            if (lst[i] != i) {
-                cnt[lst[i]]--;
-                res.push_back(i);
-            } else {
-                cnt[num[i]]--;
-                res.push_back(num[i]);
-            }
-            cnt[i]--;
-        }
-    }
-
-    for (auto it:res) {
-        cout << it << " ";
-    }
-    cout << endl;
 
 #ifndef ONLINE_JUDGE
     auto end_time = clock();
