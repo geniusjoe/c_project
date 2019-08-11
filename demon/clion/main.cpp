@@ -4,15 +4,21 @@
 #define debu
 using namespace std;
 
-const int MAXN = 2750331;
+const int MAXN = 300005;
 const int INF = 0x3f3f3f3f;
 const long long LINF = 0x3f3f3f3f3f3f3f3f;
-const long long MOD = 1000000007;
+const long long MOD = 998244353;
+const long long OVER_FLOW = 0xffffffff;
 
 long long n, m, T, M;
 long long buf[MAXN];
-long long cnt[MAXN];
-vector<int> res;
+long long pre_sum[MAXN];
+
+struct qry {
+    long long tme, val;
+} qrys[MAXN];
+
+vector<qry> v;
 
 int main() {
 
@@ -26,23 +32,20 @@ int main() {
     cerr << setprecision(3) << fixed;
 #endif
 
-//    ios::sync_with_stdio(false);
-//    cin >> n>>m;
-    cin >> T;
-    while (T--) {
-        cin >> n;
+    ios::sync_with_stdio(false);
+    long long T, k, x = -1;
+//    scanf("%I64d", &T);
 
-        long long len = 1;
-        while (len * (len - 1) / 2 <= n)
-            len++;
-        len--;
-        long long svn_nm = n - len * (len - 1) / 2;
-        cout << "133";
-        for (int i = 1; i <= svn_nm; i++) cout << "7";
-        for (int i = 1; i <= len - 2; i++) cout << "3";
-        cout << "7" << endl;
-    }
+    cin >> n >> k;
+    for (int i = 1; i <= n; i++) cin >> buf[i];
+    long long res = 0;
 
+    for (int i = n; i >= 1; i--) pre_sum[i] = pre_sum[i + 1] + buf[i];
+    sort(pre_sum+1+1,pre_sum+1+n);
+    res+=pre_sum[1];
+    for(int i=1;i<=k-1;i++) res+=pre_sum[n-i+1];
+
+    cout << res << endl;
 
 #ifndef ONLINE_JUDGE
     auto end_time = clock();
