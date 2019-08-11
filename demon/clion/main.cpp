@@ -4,21 +4,15 @@
 #define debu
 using namespace std;
 
-const int MAXN = 300005;
+const int MAXN = 2050;
 const int INF = 0x3f3f3f3f;
 const long long LINF = 0x3f3f3f3f3f3f3f3f;
 const long long MOD = 998244353;
 const long long OVER_FLOW = 0xffffffff;
 
-long long n, m, T, M;
-long long buf[MAXN];
-long long pre_sum[MAXN];
-
-struct qry {
-    long long tme, val;
-} qrys[MAXN];
-
-vector<qry> v;
+vector<int> b;
+vector<int> res;
+bool vis[500000];
 
 int main() {
 
@@ -33,19 +27,22 @@ int main() {
 #endif
 
     ios::sync_with_stdio(false);
-    long long T, k, x = -1;
-//    scanf("%I64d", &T);
-
-    cin >> n >> k;
-    for (int i = 1; i <= n; i++) cin >> buf[i];
-    long long res = 0;
-
-    for (int i = n; i >= 1; i--) pre_sum[i] = pre_sum[i + 1] + buf[i];
-    sort(pre_sum+1+1,pre_sum+1+n);
-    res+=pre_sum[1];
-    for(int i=1;i<=k-1;i++) res+=pre_sum[n-i+1];
-
-    cout << res << endl;
+    long long n, m, k, x;
+    cin >> n >> x;
+    b.push_back(0);
+    vis[x] = true;
+    for (int i = 1; i < (1ll << n); i++) {
+        if (!vis[i]) {
+            b.push_back(i);
+            vis[i ^ x] = true;
+        } else
+            continue;
+    }
+    cout << b.size() - 1 << endl;
+    for (int i = 1; i < b.size(); i++) {
+        cout << (long long) (b[i] ^ b[i - 1]) << " ";
+    }
+    cout << endl;
 
 #ifndef ONLINE_JUDGE
     auto end_time = clock();
