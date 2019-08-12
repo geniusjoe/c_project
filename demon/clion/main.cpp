@@ -4,15 +4,36 @@
 #define debu
 using namespace std;
 
-const int MAXN = 2050;
+const int MAXN = 300005;
 const int INF = 0x3f3f3f3f;
 const long long LINF = 0x3f3f3f3f3f3f3f3f;
 const long long MOD = 998244353;
 const long long OVER_FLOW = 0xffffffff;
 
-vector<int> b;
-vector<int> res;
-bool vis[500000];
+long long raw[MAXN];
+long long buf[MAXN];
+long long n, m;
+bool vis[MAXN];
+
+bool ok(long long x) {
+    for (int i = 1; i <= n; i++)
+        buf[i] = raw[i];
+    for (int i = 1; i <= n; i++) {
+        if (buf[i] == buf[i - 1]) {
+            continue;
+        } else if (buf[i] > buf[i - 1]) {
+            if (buf[i] + x >= buf[i - 1] + m) {
+                buf[i] = buf[i - 1];
+            } else continue;
+        } else if (buf[i] < buf[i - 1]) {
+            if (buf[i] + x >= buf[i - 1]) {
+                buf[i] = buf[i - 1];
+            } else return false;
+        }
+    }
+    return true;
+}
+
 
 int main() {
 
@@ -26,33 +47,6 @@ int main() {
     cerr << setprecision(3) << fixed;
 #endif
 
-    ios::sync_with_stdio(false);
-    long long n, m, k, x;
-    cin >> n >> x;
-    b.push_back(0);
-    vis[x] = true;
-    for (int i = 1; i < (1ll << n); i++) {
-        if (!vis[i]) {
-            b.push_back(i);
-            vis[i ^ x] = true;
-        } else
-            continue;
-    }
-    cout << b.size() - 1 << endl;
-    for (int i = 1; i < b.size(); i++) {
-        cout << (long long) (b[i] ^ b[i - 1]) << " ";
-    }
-    cout << endl;
-
-#ifndef ONLINE_JUDGE
-    auto end_time = clock();
-    cerr << "Execution time: " << (end_time - start_time) * (int) 1e3 / CLOCKS_PER_SEC << " ms\n";
-#endif
-
-    return 0;
-
-}
-
 /*
 写代码时请注意：
     1.是否要开Long Long？数组边界处理好了么？
@@ -63,3 +57,29 @@ int main() {
     1.最大值和最小值问题可不可以用二分答案？
     2.有没有贪心策略？否则能不能dp？
 */
+
+    ios::sync_with_stdio(false);
+    cin >> n >> m;
+    for (int i = 1; i <= n; i++) {
+        cin >> raw[i];
+    }
+    long long low = 0, high = m + 10, mid;
+    while (low <= high) {
+        mid = (low + high) >> 1;
+        if (ok(mid))
+            high = mid - 1;
+        else
+            low = mid + 1;
+    }
+    cout << low << endl;
+
+
+#ifndef ONLINE_JUDGE
+    auto end_time = clock();
+    cerr << "Execution time: " << (end_time - start_time) * (int) 1e3 / CLOCKS_PER_SEC << " ms\n";
+#endif
+
+    return 0;
+
+}
+
