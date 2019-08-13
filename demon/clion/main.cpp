@@ -1,39 +1,14 @@
 #include<bits/stdc++.h>
 
-#define loca
-#define debu
 using namespace std;
 
-const int MAXN = 300005;
-const int INF = 0x3f3f3f3f;
+const long long MAXN = 200005;
+const long long INF = 0x3f3f3f3f;
 const long long LINF = 0x3f3f3f3f3f3f3f3f;
 const long long MOD = 998244353;
 const long long OVER_FLOW = 0xffffffff;
 
-long long raw[MAXN];
-long long buf[MAXN];
-long long n, m;
-bool vis[MAXN];
-
-bool ok(long long x) {
-    for (int i = 1; i <= n; i++)
-        buf[i] = raw[i];
-    for (int i = 1; i <= n; i++) {
-        if (buf[i] == buf[i - 1]) {
-            continue;
-        } else if (buf[i] > buf[i - 1]) {
-            if (buf[i] + x >= buf[i - 1] + m) {
-                buf[i] = buf[i - 1];
-            } else continue;
-        } else if (buf[i] < buf[i - 1]) {
-            if (buf[i] + x >= buf[i - 1]) {
-                buf[i] = buf[i - 1];
-            } else return false;
-        }
-    }
-    return true;
-}
-
+long long a[MAXN], b[MAXN];
 
 int main() {
 
@@ -52,26 +27,29 @@ int main() {
     1.是否要开Long Long？数组边界处理好了么？
     2.实数精度有没有处理？
     3.特殊情况处理好了么？
-    4.做一些总比不做好。
+    4.做一些总比不做好.
+    5.排序之前不能取模.
 思考提醒：
     1.最大值和最小值问题可不可以用二分答案？
     2.有没有贪心策略？否则能不能dp？
 */
 
-    ios::sync_with_stdio(false);
-    cin >> n >> m;
-    for (int i = 1; i <= n; i++) {
-        cin >> raw[i];
+//    ios::sync_with_stdio(false);
+
+//    cin >> n;
+    long long n, T;
+    cin >> n;
+    for (long long i = 1; i <= n; i++) cin >> a[i];
+    for (long long i = 1; i <= n; i++) cin >> b[i];
+    for (long long i = 1; i <= n; i++) a[i] = a[i] * i * (n - i + 1);
+    sort(a + 1, a + 1 + n);
+    sort(b + 1, b + 1 + n);
+    long long res = 0;
+    for (long long i = 1; i <= n; i++) {
+        res += a[i] % MOD * b[n - i + 1] % MOD;
+        res %= MOD;
     }
-    long long low = 0, high = m + 10, mid;
-    while (low <= high) {
-        mid = (low + high) >> 1;
-        if (ok(mid))
-            high = mid - 1;
-        else
-            low = mid + 1;
-    }
-    cout << low << endl;
+    cout << res << endl;
 
 
 #ifndef ONLINE_JUDGE

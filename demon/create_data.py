@@ -5,9 +5,25 @@ import numpy as np
 import collections
 
 # sys.stdin = open("testdata.in", "r")
-# sys.stdout = open("testdata.in", "w")
+sys.stdout = open("testdata.in", "w")
 
-print(10)
+res = []
 for i in range(10):
-    print(random.randint(0, 9), end="")
-print("\n")
+    j = random.randint(1, 10000000000000)
+    cur_fct = []
+    for k in range(1, 10000000):
+        if k * k > j:
+            break
+        elif j % k == 0:
+            cur_fct.append(k)
+            if j / k != k:
+                cur_fct.append(j / k)
+    if len(cur_fct) > 2:
+        res.append(j)
+        cur_fct.sort()
+        print(len(cur_fct) - 2)
+        for e in cur_fct[1:-1]:
+            print(int(e), end=" ")
+        print("")
+
+print(res)
