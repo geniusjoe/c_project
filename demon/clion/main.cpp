@@ -1,30 +1,26 @@
 #include<bits/stdc++.h>
 
+#define setbit(x, y) x|=(1ll<<y)
+
+#define clrbit(x, y) x&=~(1ll<<y)
+
+#define reversebit(x, y) x^=(1ll<<y)
+
+#define getbit(x, y) ((x) >> (y)&1ll)
+
+
 using namespace std;
 
-const long long MAXN = 400005;
+const long long MAXN = 100;
 const long long INF = 0x3f3f3f3f;
 const long long LINF = 0x3f3f3f3f3f3f3f3f;
 const long long MOD = 998244353;
 const long long OVER_FLOW = 0xffffffff;
 
-long long n, h, m, T, z, k;
+long long n, m;
+long long nm[MAXN];
+vector<long long> v;
 
-struct point {
-    long long x, y;
-} points[MAXN];
-
-map<pair<long long, long long>, set<long long>> mp;
-
-//非递归版
-long long gcd(long long a, long long b) {
-    while (b) {
-        long long t = a % b;
-        a = b;
-        b = t;
-    }
-    return a;
-}
 
 int main() {
 
@@ -52,26 +48,23 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
-    cin >> n;
-    for (long long i = 1; i <= n; i++) {
-        cin >> points[i].x >> points[i].y;
+    long long a, b;
+    cin >> a >> b;
+    if (a < b) swap(a, b);
+    long long tmp = a - b;
+
+    for (long long i = 1; i * i <= tmp; i++) {
+        if (tmp % i == 0) {
+            v.push_back(i);
+            if (i != tmp / i) v.push_back(tmp / i);
+        }
     }
-    long long tot = 0, res = 0;
-    for (long long i = 1; i <= n; i++) {
-        for (long long j = i + 1; j <= n; j++) {
-            long long a = points[j].y - points[i].y;
-            long long b = points[j].x - points[i].x;
-            long long c = points[i].x * points[j].y - points[j].x * points[i].y;
-            long long g = gcd(a, b);
-            a /= g, b /= g, c /= g;
-            if (a < 0 || (a == 0 && b < 0)) {
-                a = -a, b = -b, c = -c;
-            }
-            if (mp[make_pair(a, b)].count(c) == 0) {
-                tot++;
-                mp[make_pair(a, b)].insert(c);
-                res += tot - mp[make_pair(a, b)].size();
-            }
+    long long res = 0, res_cnt = LINF;
+    for (auto it:v) {
+        long long k = (b + it - 1) / it * it - b;
+        if (res_cnt > (a + k) * (b + k) / it) {
+            res_cnt = (a + k) * (b + k) / it;
+            res = k;
         }
     }
     cout << res << endl;
