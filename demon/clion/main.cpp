@@ -9,10 +9,22 @@ const long long MOD = 998244353;
 const long long OVER_FLOW = 0xffffffff;
 
 long long n, h, m, T, z, k;
-long long buf[MAXN];
-long long fst[MAXN], lst[MAXN];
-bool vis[MAXN];
 
+struct point {
+    long long x, y;
+} points[MAXN];
+
+map<pair<long long, long long>, set<long long>> mp;
+
+//非递归版
+long long gcd(long long a, long long b) {
+    while (b) {
+        long long t = a % b;
+        a = b;
+        b = t;
+    }
+    return a;
+}
 
 int main() {
 
@@ -40,32 +52,26 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
-    cin >> n >> k;
-    for (long long i = 1; i <= k; i++) {
-        long long u;
-        cin >> u;
-        if (fst[u] == 0) fst[u] = i;
-        lst[u] = i;
-    }
-    long long res = 0;
+    cin >> n;
     for (long long i = 1; i <= n; i++) {
-        if (lst[i] == 0) {
-#ifndef ONLINE_JUDGE
-            cout << i << "\t" << i << "\n";
-#endif
-            res++;
-        }
-        if (i - 1 >= 1 && (lst[i - 1] <= fst[i] || lst[i] == 0 || lst[i - 1] == 0)) {
-#ifndef ONLINE_JUDGE
-            cout << i << "\t" << i - 1 << "\n";
-#endif
-            res++;
-        }
-        if (i + 1 <= n && (lst[i + 1] <= fst[i] || lst[i] == 0 || lst[i + 1] == 0)) {
-#ifndef ONLINE_JUDGE
-            cout << i << "\t" << i + 1 << "\n";
-#endif
-            res++;
+        cin >> points[i].x >> points[i].y;
+    }
+    long long tot = 0, res = 0;
+    for (long long i = 1; i <= n; i++) {
+        for (long long j = i + 1; j <= n; j++) {
+            long long a = points[j].y - points[i].y;
+            long long b = points[j].x - points[i].x;
+            long long c = points[i].x * points[j].y - points[j].x * points[i].y;
+            long long g = gcd(a, b);
+            a /= g, b /= g, c /= g;
+            if (a < 0 || (a == 0 && b < 0)) {
+                a = -a, b = -b, c = -c;
+            }
+            if (mp[make_pair(a, b)].count(c) == 0) {
+                tot++;
+                mp[make_pair(a, b)].insert(c);
+                res += tot - mp[make_pair(a, b)].size();
+            }
         }
     }
     cout << res << endl;
