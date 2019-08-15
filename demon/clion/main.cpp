@@ -2,13 +2,17 @@
 
 using namespace std;
 
-const long long MAXN = 200005;
+const long long MAXN = 400005;
 const long long INF = 0x3f3f3f3f;
 const long long LINF = 0x3f3f3f3f3f3f3f3f;
 const long long MOD = 998244353;
 const long long OVER_FLOW = 0xffffffff;
 
-long long a[MAXN], b[MAXN];
+long long n, h, m, T, z, k;
+long long buf[MAXN];
+long long fst[MAXN], lst[MAXN];
+bool vis[MAXN];
+
 
 int main() {
 
@@ -32,22 +36,37 @@ int main() {
 思考提醒：
     1.最大值和最小值问题可不可以用二分答案？
     2.有没有贪心策略？否则能不能dp？
+    3.如果规模小的话还能尝试dfs
 */
 
-//    ios::sync_with_stdio(false);
-
-//    cin >> n;
-    long long n, T;
-    cin >> n;
-    for (long long i = 1; i <= n; i++) cin >> a[i];
-    for (long long i = 1; i <= n; i++) cin >> b[i];
-    for (long long i = 1; i <= n; i++) a[i] = a[i] * i * (n - i + 1);
-    sort(a + 1, a + 1 + n);
-    sort(b + 1, b + 1 + n);
+    ios::sync_with_stdio(false);
+    cin >> n >> k;
+    for (long long i = 1; i <= k; i++) {
+        long long u;
+        cin >> u;
+        if (fst[u] == 0) fst[u] = i;
+        lst[u] = i;
+    }
     long long res = 0;
     for (long long i = 1; i <= n; i++) {
-        res += a[i] % MOD * b[n - i + 1] % MOD;
-        res %= MOD;
+        if (lst[i] == 0) {
+#ifndef ONLINE_JUDGE
+            cout << i << "\t" << i << "\n";
+#endif
+            res++;
+        }
+        if (i - 1 >= 1 && (lst[i - 1] <= fst[i] || lst[i] == 0 || lst[i - 1] == 0)) {
+#ifndef ONLINE_JUDGE
+            cout << i << "\t" << i - 1 << "\n";
+#endif
+            res++;
+        }
+        if (i + 1 <= n && (lst[i + 1] <= fst[i] || lst[i] == 0 || lst[i + 1] == 0)) {
+#ifndef ONLINE_JUDGE
+            cout << i << "\t" << i + 1 << "\n";
+#endif
+            res++;
+        }
     }
     cout << res << endl;
 
