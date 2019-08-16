@@ -2,15 +2,14 @@
 
 using namespace std;
 
-const long long MAXN = 300005;
+const long long MAXN = 800;
 const long long INF = 0x3f3f3f3f;
 const long long LINF = 0x3f3f3f3f3f3f3f3f;
 const long long MOD = 998244353;
 const long long OVER_FLOW = 0xffffffff;
 
-long long n, x;
-long long buf[MAXN];
-long long dp[5][MAXN];
+long long n, x, m;
+long long buf[MAXN][MAXN];
 
 
 int main() {
@@ -28,8 +27,7 @@ int main() {
 /*
 写代码时请注意：
     1.是否要开Long Long？数组边界处理好了么？
-    2.实数精度有没有处理？
-    3.特殊情况处理好了么？
+    2.实数精度有
     4.做一些总比不做好.
     5.排序之前不能取模.
 思考提醒：
@@ -38,20 +36,48 @@ int main() {
     3.如果规模小的话还能尝试dfs
 */
 
-    ios::sync_with_stdio(false);
-//    scanf("%I64d", &n);
-    cin >> n >> x;
-    for (long long i = 1; i <= n; i++) cin >> buf[i];
-    long long res = 0;
+//    ios::sync_with_stdio(false);
+    cin >> n >> m;
     for (long long i = 1; i <= n; i++) {
-        dp[1][i] = max(dp[1][i - 1], 0ll) + buf[i];
-        dp[2][i] = max(max(dp[1][i - 1], 0ll), dp[2][i - 1]) + buf[i] * x;
-        dp[3][i] = max(max(dp[2][i - 1], 0ll), dp[3][i - 1]) + buf[i];
+        for (long long j = 1; j <= m; j++) cin >> buf[i][j];
     }
-    for (long long i = 1; i <= n; i++) {
-        res = max(max(max(dp[1][i], dp[2][i]), dp[3][i]), res);
+
+    long long cur = 0;
+    bool flg = false;
+    for (long long i = 1; i <= n; i++) cur ^= buf[i][1];
+    if (!cur) {
+        for (long long i = 1; i <= n; i++) {
+            for (long long j = 2; j <= m; j++) {
+                cur ^= buf[i][1];
+                cur ^= buf[i][j];
+                if (cur) {
+                    cout << "TAK" << endl;
+                    for (long long k = 1; k <= n; k++) {
+                        if (k == i) cout << j << " ";
+                        else cout << "1 ";
+                    }
+                    cout << endl;
+                    flg = true;
+                    break;
+                }
+                cur ^= buf[i][j];
+                cur ^= buf[i][1];
+            }
+            if(flg) break;
+        }
+    } else {
+        flg = true;
+        cout << "TAK" << endl;
+        for (long long i = 1; i <= n; i++) {
+            cout << "1 ";
+        }
+        cout << endl;
     }
-    cout << res << endl;
+
+
+    if (!flg)
+        cout << "NIE" << endl;
+
 
 #ifndef ONLINE_JUDGE
     auto end_time = clock();
