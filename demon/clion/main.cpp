@@ -1,26 +1,44 @@
 #include<bits/stdc++.h>
 
-#define setbit(x, y) x|=(1ll<<y)
-
-#define clrbit(x, y) x&=~(1ll<<y)
-
-#define reversebit(x, y) x^=(1ll<<y)
-
-#define getbit(x, y) ((x) >> (y)&1ll)
-
-
 using namespace std;
 
-const long long MAXN = 100;
+const long long MAXN = 100005;
 const long long INF = 0x3f3f3f3f;
 const long long LINF = 0x3f3f3f3f3f3f3f3f;
 const long long MOD = 998244353;
 const long long OVER_FLOW = 0xffffffff;
 
 long long n, m;
-long long nm[MAXN];
-vector<long long> v;
+long long id[MAXN][30];
+char raw[MAXN];
+char s1[300], s2[300], s3[300];
+long long s1_len, s2_len, s3_len;
+long long dp[300][300][300];
 
+void init() {
+    for (long long i = 1; i <= 26; i++) id[n][i] = n + 1;
+    for (long long i = n - 1; i >= 0; i--) {
+        for (long long j = 1; j <= 26; j++) {
+            id[i][j] = id[i + 1][j];
+        }
+        id[i][raw[i + 1] - 'a' + 1] = i + 1;
+    }
+
+    dp[0][0][0] = 0;
+}
+
+long long add(long long n1, long long n2, long long n3) {
+    for (long long i = n1; i <= s1_len; i++) {
+        for (long long j = n2; j <= s2_len; j++) {
+            for (long long k = n3; k <= s3_len; k++) {
+                dp[i][j][k] = n + 1;
+                if (i > 0 && dp[i - 1][j][k] <= n)dp[i][j][k] = min(dp[i][j][k], id[dp[i - 1][j][k]][s1[i]]);
+                if (j > 0 && dp[i][j - 1][k] <= n)dp[i][j][k] = min(dp[i][j][k], id[dp[i][j - 1][k]][s2[j]]);
+                if (k > 0 && dp[i][j][k - 1] <= n)dp[i][j][k] = min(dp[i][j][k], id[dp[i][j][k - 1]][s3[k]]);
+            }
+        }
+    }
+}
 
 int main() {
 
@@ -48,26 +66,38 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
-    long long a, b;
-    cin >> a >> b;
-    if (a < b) swap(a, b);
-    long long tmp = a - b;
-
-    for (long long i = 1; i * i <= tmp; i++) {
-        if (tmp % i == 0) {
-            v.push_back(i);
-            if (i != tmp / i) v.push_back(tmp / i);
+    scanf("%I64d%I64d", &n, &m);
+    scanf("%s", raw + 1);
+    init();
+    for (long long i = 1; i <= m; i++) {
+        char tmp[10];
+        scanf("%s", tmp);
+        long long u;
+        scanf("%I64d", &u);
+        if (tmp[0] == '+') {
+            scanf("%s", tmp);
+            if (u == 1) {
+                ++s1_len;
+                s1[s1_len] = tmp[0]-'a'+1;
+                add(s1_len, 0, 0);
+            } else if (u == 2) {
+                ++s2_len;
+                s2[s2_len] = tmp[0]-'a'+1;
+                add(0, s2_len, 0);
+            } else if (u == 3) {
+                ++s3_len;
+                s3[s3_len] = tmp[0]-'a'+1;
+                add(0, 0, s3_len);
+            }
+        } else if (tmp[0] == '-') {
+            if (u == 1) s1_len--;
+            else if (u == 2) s2_len--;
+            else if (u == 3) s3_len--;
         }
+        if (dp[s1_len][s2_len][s3_len] < n + 1) {
+            printf("YES\n");
+        } else printf("NO\n");
     }
-    long long res = 0, res_cnt = LINF;
-    for (auto it:v) {
-        long long k = (b + it - 1) / it * it - b;
-        if (res_cnt > (a + k) * (b + k) / it) {
-            res_cnt = (a + k) * (b + k) / it;
-            res = k;
-        }
-    }
-    cout << res << endl;
 
 
 #ifndef ONLINE_JUDGE
