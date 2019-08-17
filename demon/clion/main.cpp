@@ -2,15 +2,35 @@
 
 using namespace std;
 
-const long long MAXN = 800;
+const long long MAXN = 300005;
 const long long INF = 0x3f3f3f3f;
 const long long LINF = 0x3f3f3f3f3f3f3f3f;
 const long long MOD = 998244353;
 const long long OVER_FLOW = 0xffffffff;
 
-long long n, x, m;
-long long buf[MAXN][MAXN];
+long long n, m, k;
 
+bool type[MAXN];
+vector<long long> v[MAXN];
+
+long long dfs(long long p, long long x) {
+    if (v[x].empty()) {
+        k++;
+        return 1;
+    } else if (type[x] == 1) {
+        long long res = LINF;
+        for (auto it:v[x]) {
+            res = min(res, dfs(x, it));
+        }
+        return res;
+    } else if (type[x] == 0) {
+        long long res = 0;
+        for (auto it:v[x]) {
+            res += dfs(x, it);
+        }
+        return res;
+    }
+}
 
 int main() {
 
@@ -36,47 +56,16 @@ int main() {
     3.如果规模小的话还能尝试dfs
 */
 
-//    ios::sync_with_stdio(false);
-    cin >> n >> m;
-    for (long long i = 1; i <= n; i++) {
-        for (long long j = 1; j <= m; j++) cin >> buf[i][j];
+    ios::sync_with_stdio(false);
+    cin >> n;
+    for (long long i = 1; i <= n; i++) cin >> type[i];
+    for (long long i = 2; i <= n; i++) {
+        long long u;
+        cin >> u;
+        v[u].push_back(i);
     }
-
-    long long cur = 0;
-    bool flg = false;
-    for (long long i = 1; i <= n; i++) cur ^= buf[i][1];
-    if (!cur) {
-        for (long long i = 1; i <= n; i++) {
-            for (long long j = 2; j <= m; j++) {
-                cur ^= buf[i][1];
-                cur ^= buf[i][j];
-                if (cur) {
-                    cout << "TAK" << endl;
-                    for (long long k = 1; k <= n; k++) {
-                        if (k == i) cout << j << " ";
-                        else cout << "1 ";
-                    }
-                    cout << endl;
-                    flg = true;
-                    break;
-                }
-                cur ^= buf[i][j];
-                cur ^= buf[i][1];
-            }
-            if(flg) break;
-        }
-    } else {
-        flg = true;
-        cout << "TAK" << endl;
-        for (long long i = 1; i <= n; i++) {
-            cout << "1 ";
-        }
-        cout << endl;
-    }
-
-
-    if (!flg)
-        cout << "NIE" << endl;
+    long long cur = dfs(-1ll, 1ll);
+    cout << k - cur + 1 << endl;
 
 
 #ifndef ONLINE_JUDGE
