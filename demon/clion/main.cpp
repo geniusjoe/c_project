@@ -2,35 +2,15 @@
 
 using namespace std;
 
-const long long MAXN = 300005;
+const long long MAXN = 100005;
 const long long INF = 0x3f3f3f3f;
 const long long LINF = 0x3f3f3f3f3f3f3f3f;
 const long long MOD = 998244353;
 const long long OVER_FLOW = 0xffffffff;
 
-long long n, m, k;
-
-bool type[MAXN];
-vector<long long> v[MAXN];
-
-long long dfs(long long p, long long x) {
-    if (v[x].empty()) {
-        k++;
-        return 1;
-    } else if (type[x] == 1) {
-        long long res = LINF;
-        for (auto it:v[x]) {
-            res = min(res, dfs(x, it));
-        }
-        return res;
-    } else if (type[x] == 0) {
-        long long res = 0;
-        for (auto it:v[x]) {
-            res += dfs(x, it);
-        }
-        return res;
-    }
-}
+long long buf[MAXN];
+long long n, k, a, b, m;
+vector<long long> v;
 
 int main() {
 
@@ -47,7 +27,7 @@ int main() {
 /*
 写代码时请注意：
     1.是否要开Long Long？数组边界处理好了么？
-    2.实数精度有
+    2.实数精度
     4.做一些总比不做好.
     5.排序之前不能取模.
 思考提醒：
@@ -57,15 +37,17 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
-    cin >> n;
-    for (long long i = 1; i <= n; i++) cin >> type[i];
-    for (long long i = 2; i <= n; i++) {
-        long long u;
-        cin >> u;
-        v[u].push_back(i);
+    cin >> n >> k >> a >> b;
+    long long tmp1 = a + b, tmp2 = a - b, tmp3 = -a + b, tmp4 = -a - b;
+    long long mx = 0, mn = LINF;
+    for (auto it : {tmp1, tmp2, tmp3, tmp4}) {
+        for (long long i = 0; i <= n; i++) {
+            if (i * k + it < 0) continue;
+            mx = max(n * k / __gcd(n * k, i * k + it), mx);
+            mn = min(n * k / __gcd(n * k, i * k + it), mn);
+        }
     }
-    long long cur = dfs(-1ll, 1ll);
-    cout << k - cur + 1 << endl;
+    cout << mn << " " << mx << endl;
 
 
 #ifndef ONLINE_JUDGE
