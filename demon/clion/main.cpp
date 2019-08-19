@@ -2,15 +2,25 @@
 
 using namespace std;
 
-const long long MAXN = 100005;
+const long long MAXN = 300005;
 const long long INF = 0x3f3f3f3f;
 const long long LINF = 0x3f3f3f3f3f3f3f3f;
 const long long MOD = 998244353;
 const long long OVER_FLOW = 0xffffffff;
 
-long long buf[MAXN];
-long long n, k, a, b, m;
-vector<long long> v;
+char buf[MAXN];
+long long n, k, a, b, m, T;
+
+struct song {
+    long long len, bty;
+
+    bool operator<(song song1) {
+        return this->bty > song1.bty;
+    }
+} songs[MAXN];
+
+priority_queue<long long, vector<long long>, greater<long long>> q;
+
 
 int main() {
 
@@ -37,17 +47,22 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
-    cin >> n >> k >> a >> b;
-    long long tmp1 = a + b, tmp2 = a - b, tmp3 = -a + b, tmp4 = -a - b;
-    long long mx = 0, mn = LINF;
-    for (auto it : {tmp1, tmp2, tmp3, tmp4}) {
-        for (long long i = 0; i <= n; i++) {
-            if (i * k + it < 0) continue;
-            mx = max(n * k / __gcd(n * k, i * k + it), mx);
-            mn = min(n * k / __gcd(n * k, i * k + it), mn);
-        }
+    cin >> n >> k;
+    for (long long i = 1; i <= n; i++) {
+        cin >> songs[i].len >> songs[i].bty;
     }
-    cout << mn << " " << mx << endl;
+    sort(songs + 1, songs + 1 + n);
+    long long cur_len = 0, res = 0;
+    for (long long i = 1; i <= n; i++) {
+        cur_len += songs[i].len;
+        q.push(songs[i].len);
+        if (q.size() > k) {
+            cur_len -= q.top();
+            q.pop();
+        }
+        res = max(res, cur_len * songs[i].bty);
+    }
+    cout << res << endl;
 
 
 #ifndef ONLINE_JUDGE

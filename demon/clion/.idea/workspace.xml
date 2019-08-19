@@ -114,7 +114,8 @@
       <workItem from="1566064564784" duration="2021000" />
       <workItem from="1566092669974" duration="3615000" />
       <workItem from="1566123883408" duration="8856000" />
-      <workItem from="1566181627964" duration="2315000" />
+      <workItem from="1566181627964" duration="3681000" />
+      <workItem from="1566207266637" duration="4308000" />
     </task>
     <servers />
   </component>
@@ -162,7 +163,6 @@
       <configuration name="CMakeRunConfiguration">
         <watch expression="n " language="ObjectiveC" />
         <watch expression="k " language="ObjectiveC" />
-        <watch expression="type " language="ObjectiveC" />
       </configuration>
     </watches-manager>
   </component>
