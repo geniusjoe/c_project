@@ -2,44 +2,16 @@
 
 using namespace std;
 
-const long long MAXN = 1000;
+const long long MAXN = 5005;
 const long long INF = 0x3f3f3f3f;
 const long long LINF = 0x3f3f3f3f3f3f3f3f;
 const long long MOD = 1e9 + 7;
 const long long OVER_FLOW = 0xffffffff;
 
-long long n, k, m, T, l, r;
-long long a, b, c, d, na, nb, nc, nd;
-string buf[3];
+long long n, q;
+vector<int> v[MAXN];
+int a[MAXN], b[MAXN][MAXN];
 
-bool ok() {
-    return (0 <= a && a <= na && 0 <= b && b <= nb && 0 <= c && c <= nc & 0 <= d && d <= nd
-            && a + b + c + d == n / 2);
-}
-
-void print_ans() {
-    bool flg = false;
-    for (long long i = 0; i < buf[1].size(); i++) {
-        flg = false;
-        if (buf[1][i] == '0' && buf[2][i] == '0' && a) {
-            a--;
-            flg = true;
-        } else if (buf[1][i] == '0' && buf[2][i] == '1' && b) {
-            b--;
-            flg = true;
-        }
-        if (buf[1][i] == '1' && buf[2][i] == '0' && c) {
-            c--;
-            flg = true;
-        }
-        if (buf[1][i] == '1' && buf[2][i] == '1' && d) {
-            d--;
-            flg = true;
-        }
-        if (flg)
-            cout << i + 1 << endl;
-    }
-}
 
 int main() {
 
@@ -62,38 +34,30 @@ int main() {
 思考提醒：
     1.最大值和最小值问题可不可以用二分答案？
     2.有没有贪心策略？否则能不能dp？
-    3.如果规模小的话还能尝试dfs,如果存在等式可以暴力枚举变量
+    3.如果规模小的话还能尝试dfs,如果存在等式.转换关系少可以暴力枚举变量
 */
 
     ios::sync_with_stdio(false);
-    cin >> n;
-    cin >> buf[1], cin >> buf[2];
-    for (long long i = 0; i < buf[1].size(); i++) {
-        if (buf[1][i] == '0' && buf[2][i] == '0') na++;
-        else if (buf[1][i] == '0' && buf[2][i] == '1') nb++;
-        else if (buf[1][i] == '1' && buf[2][i] == '0') nc++;
-        else if (buf[1][i] == '1' && buf[2][i] == '1') nd++;
+    cin >> n >> q;
+    for (long long i = 1; i <= q; i++) {
+        long long l, r;
+        cin >> l >> r;
+        for (long long j = l; j <= r; j++) v[j].push_back(i);
     }
-    bool flg = false;
-    for (long long i = 0; i <= nb; i++) {
-        for (long long j = 0; j <= nc; j++) {
-            b = i, c = j;
-            d = nd + nb - b - c;
-            if (d % 2 == 1) continue;
-            d /= 2;
-            a = n / 2 - b - c - d;
-            if (ok()) {
-                flg = true;
-                print_ans();
-                break;
-            }
+    long long sm = 0;
+    for (long long i = 1; i <= n; i++) {
+        long long m = v[i].size();
+        if (m > 0) sm++;
+        if (m == 1) a[v[i][0]]++;
+        else if (m == 2) b[v[i][0]][v[i][1]]++;
+    }
+    long long res = 0;
+    for (long long i = 1; i <= q; i++) {
+        for (long long j = i + 1; j <= q; j++) {
+            res = max(res, sm - a[i] - a[j] - b[i][j]);
         }
-        if (flg)
-            break;
     }
-    if (!flg) {
-        cout << -1 << endl;
-    }
+    cout << res << endl;
 
 
 #ifndef ONLINE_JUDGE
