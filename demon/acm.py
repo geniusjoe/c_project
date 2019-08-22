@@ -8,4 +8,4 @@ tar=3
 rng=1000000
 buf=[0 for i in range(rng)]
 for i in range(rng):
-    if()
+    if(buf)
