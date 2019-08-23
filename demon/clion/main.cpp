@@ -2,30 +2,26 @@
 
 using namespace std;
 
-const long long MAXN = 5500;
+const long long MAXN = 100050;
 const long long INF = 0x3f3f3f3f;
 const long long LINF = 0x3f3f3f3f3f3f3f3f;
 const long long MOD = 1e9 + 7;
 const long long OVER_FLOW = 0xffffffff;
 
-long long n, q, m, k, T;
-string str;
-bool tmp[MAXN][MAXN];
-int buf[MAXN][MAXN];
-vector<int> v;
+long long n, q, m, k, T, a, b;
+vector<pair<long long, long long>> v, v1, v2;
+long long res[MAXN];
 
-bool ok(int x) {
-    for (long long i = x; i <= n; i += x) {
-        for (long long j = x; j <= n; j += x) {
-            long long u = buf[i][j] - buf[i - x][j] - buf[i][j - x] + buf[i - x][j - x];
-            if (u == x * x || u == 0)
-                continue;
-            else return false;
-        }
+struct point {
+    long long l, r, id;
+
+    bool operator<(point point1) {
+        if (this->l == point1.l)
+            return this->r < point1.r;
+        else
+            return this->l < point1.l;
     }
-    return true;
-}
-
+} points[MAXN];
 
 int main() {
 
@@ -53,46 +49,39 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
-    cin >> n;
-    for (long long i = 1; i <= n; i++) {
-        cin >> str;
-        for (long long j = 0; j < str.size(); j++) {
-            long long cur = 0;
-            if (str[j] >= '0' && str[j] <= '9') {
-                cur = str[j] - '0';
-            } else if (str[j] >= 'A' && str[j] <= 'F') {
-                cur = str[j] - 'A' + 10;
+    cin >> T;
+    while (T--) {
+        cin >> n;
+        for (long long i = 1; i <= n; i++) {
+            cin >> points[i].l >> points[i].r;
+            points[i].id = i;
+        }
+        sort(points + 1, points + 1 + n);
+        long long cur_r = points[1].l, pos = -1;
+        for (long long i = 1; i <= n; i++) {
+            if (points[i].l <= cur_r && points[i].r >= cur_r) {
+                cur_r = points[i].r;
+            } else if (points[i].r > cur_r) {
+                pos = i;
+                break;
             }
-            if (cur / 8 == 1) tmp[i][4 * j + 1] = true;
-            cur %= 8;
-            if (cur / 4 == 1) tmp[i][4 * j + 2] = true;
-            cur %= 4;
-            if (cur / 2 == 1) tmp[i][4 * j + 3] = true;
-            cur %= 2;
-            if (cur / 1 == 1) tmp[i][4 * j + 4] = true;
-            cur %= 1;
         }
-    }
-
-    for (long long i = 1; i <= n; i++) {
-        for (long long j = 1; j <= n; j++) {
-            buf[i][j] = buf[i - 1][j] + buf[i][j - 1] - buf[i - 1][j - 1] + tmp[i][j] ;
+        if (pos != -1) {
+            for (long long i = 1; i <= n; i++) {
+                if (i < pos) {
+                    res[points[i].id] = 1;
+                } else
+                    res[points[i].id] = 2;
+            }
+            for (long long i = 1; i <= n; i++) {
+                cout << res[i] << " ";
+            }
+            cout << endl;
+        } else {
+            cout << -1 << endl;
         }
-    }
 
-    for (long long i = 1; i * i <= n; i++)
-        if (n % i == 0) {
-            v.push_back(i);
-            if (i != n / i) v.push_back(n / i);
-        }
-    sort(v.begin(), v.end());
-
-    int res = 0;
-    for (int i : v) {
-        if (ok(i)) res = i;
-        else continue;
     }
-    cout << res << endl;
 
 
 #ifndef ONLINE_JUDGE
