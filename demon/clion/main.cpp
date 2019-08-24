@@ -5,23 +5,13 @@ using namespace std;
 const long long MAXN = 100050;
 const long long INF = 0x3f3f3f3f;
 const long long LINF = 0x3f3f3f3f3f3f3f3f;
-const long long MOD = 1e9 + 7;
+const long long MOD = 998244353;
 const long long OVER_FLOW = 0xffffffff;
 
 long long n, q, m, k, T, a, b;
-vector<pair<long long, long long>> v, v1, v2;
-long long res[MAXN];
-
-struct point {
-    long long l, r, id;
-
-    bool operator<(point point1) {
-        if (this->l == point1.l)
-            return this->r < point1.r;
-        else
-            return this->l < point1.l;
-    }
-} points[MAXN];
+string str;
+long long buf[MAXN];
+long long nm[5];
 
 int main() {
 
@@ -49,40 +39,16 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
-    cin >> T;
-    while (T--) {
-        cin >> n;
-        for (long long i = 1; i <= n; i++) {
-            cin >> points[i].l >> points[i].r;
-            points[i].id = i;
-        }
-        sort(points + 1, points + 1 + n);
-        long long cur_r = points[1].l, pos = -1;
-        for (long long i = 1; i <= n; i++) {
-            if (points[i].l <= cur_r && points[i].r >= cur_r) {
-                cur_r = points[i].r;
-            } else if (points[i].r > cur_r) {
-                pos = i;
-                break;
-            }
-        }
-        if (pos != -1) {
-            for (long long i = 1; i <= n; i++) {
-                if (i < pos) {
-                    res[points[i].id] = 1;
-                } else
-                    res[points[i].id] = 2;
-            }
-            for (long long i = 1; i <= n; i++) {
-                cout << res[i] << " ";
-            }
-            cout << endl;
-        } else {
-            cout << -1 << endl;
-        }
-
+    cin >> n;
+    cin >> str;
+    for (long long i = 0; i < n; i++) cin >> buf[i];
+    for (long long i = 0; i < str.size(); i++) {
+        if (str[i] == 'h') nm[1] += buf[i];
+        else if (str[i] == 'a') nm[2] = min(nm[1], nm[2] + buf[i]);
+        else if (str[i] == 'r') nm[3] = min(nm[2], nm[3] + buf[i]);
+        else if (str[i] == 'd') nm[4] = min(nm[3], nm[4] + buf[i]);
     }
-
+    cout << nm[4] << endl;
 
 #ifndef ONLINE_JUDGE
     auto end_time = clock();
