@@ -2,49 +2,17 @@
 
 using namespace std;
 
-const long long MAXN = 300500;
+const long long MAXN = 100500;
 const long long INF = 0x3f3f3f3f;
 const long long LINF = 0x3f3f3f3f3f3f3f3f;
 const long long MOD = 998244353;
 const long long OVER_FLOW = 0xffffffff;
 
 long long n, q, m, k, T;
-vector<long long> edge[MAXN];
-bool vis[MAXN];
-long long clr[MAXN];
-vector<pair<long long, long long>> v;
-long long odd, even;
-bool flg;
-
-// a ^ b % c
-long long qpow(long long a, long long b, long long c) {
-    long long cur = 1;
-    while (b) {
-        if (b & 1) cur = cur * a % c;
-        a = a * a % c, b >>= 1;
-    }
-    return cur;
-}
-
-
-void dfs(long long p, long long x, long long color) {
-    for (auto i:edge[x]) {
-        if (!flg) break;
-        if (i == p) continue;
-        if (clr[i] != -1) {
-            if (clr[i] == color) continue;
-            else if (clr[i] != color) {
-                flg = false;
-                break;
-            }
-        } else {
-            clr[i] = color;
-            if (clr[i]) odd++;
-            else even++;
-            dfs(x, i, !color);
-        }
-    }
-}
+long long buf[MAXN];
+vector<pair<long long, long long>> dgre_else;
+vector<long long> dgre_1;
+vector<pair<long long, long long>> res;
 
 int main() {
 
@@ -72,44 +40,47 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
-    cin >> T;
-    while (T--) {
-        cin >> n >> m;
-        for (long long i = 1; i <= n; i++) {
-            vis[i] = false;
-            edge[i].clear();
-            clr[i] = -1;
-            v.clear();
+    cin >> n;
+    long long sm = 0;
+    for (long long i = 1; i <= n; i++) {
+        long long u;
+        cin >> u;
+        if (u == 1) dgre_1.push_back(i);
+        else dgre_else.emplace_back(i, u);
+        sm += u;
+    }
+    long long len = 0;
+    if (sm < 2 * n - 2) cout << "NO" << endl;
+    else {
+        len = dgre_else.size() - 1;
+        for (long long i = 1; i < dgre_else.size(); i++) {
+            res.emplace_back(dgre_else[i - 1].first, dgre_else[i].first);
+            dgre_else[i - 1].second--;
+            dgre_else[i].second--;
         }
-        for (long long i = 1; i <= m; i++) {
-            long long u, v;
-            cin >> u >> v;
-            edge[u].push_back(v), edge[v].push_back(u);
+        if (!dgre_1.empty()) {
+            len++;
+            res.emplace_back(dgre_1.back(), dgre_else[0].first);
+            dgre_1.pop_back();
+            dgre_else[0].second--;
         }
-        flg = true;
-        for (long long i = 1; i <= n; i++) {
-            if (clr[i] == -1) {
-                odd = even = 0;
-                clr[i] = 0;
-                even++;
-                dfs(-1, i, 1);
-                v.emplace_back(odd, even);
-            }
-            if (!flg) break;
+        if (!dgre_1.empty()) {
+            len++;
+            res.emplace_back(dgre_1.back(), dgre_else.back().first);
+            dgre_1.pop_back();
+            dgre_else.back().second--;
+        }
+        while (!dgre_1.empty()) {
+            while (dgre_else.back().second == 0) dgre_else.pop_back();
+            res.emplace_back(dgre_1.back(), dgre_else.back().first);
+            dgre_else.back().second--;
+            dgre_1.pop_back();
         }
 
-        if (flg) {
-            long long res = 1;
-            for (auto it:v) {
-                if (it.second == 1 && it.first == 0) res = res * 3 % MOD;
-                else {
-                    res *= qpow(2, it.first, MOD) + qpow(2, it.second, MOD);
-                    res %= MOD;
-                }
-            }
-            cout << res << endl;
-        } else {
-            cout << 0 << endl;
+        cout << "YES" << " " << len << endl;
+        cout << res.size() << endl;
+        for (auto it:res) {
+            cout << it.first << " " << it.second << endl;
         }
     }
 
