@@ -2,16 +2,49 @@
 
 using namespace std;
 
-const long long MAXN = 100050;
+const long long MAXN = 300500;
 const long long INF = 0x3f3f3f3f;
 const long long LINF = 0x3f3f3f3f3f3f3f3f;
 const long long MOD = 998244353;
 const long long OVER_FLOW = 0xffffffff;
 
-long long n, q, m, k, T, a, b;
-string str;
-long long buf[MAXN];
-long long nm[5];
+long long n, q, m, k, T;
+vector<long long> edge[MAXN];
+bool vis[MAXN];
+long long clr[MAXN];
+vector<pair<long long, long long>> v;
+long long odd, even;
+bool flg;
+
+// a ^ b % c
+long long qpow(long long a, long long b, long long c) {
+    long long cur = 1;
+    while (b) {
+        if (b & 1) cur = cur * a % c;
+        a = a * a % c, b >>= 1;
+    }
+    return cur;
+}
+
+
+void dfs(long long p, long long x, long long color) {
+    for (auto i:edge[x]) {
+        if (!flg) break;
+        if (i == p) continue;
+        if (clr[i] != -1) {
+            if (clr[i] == color) continue;
+            else if (clr[i] != color) {
+                flg = false;
+                break;
+            }
+        } else {
+            clr[i] = color;
+            if (clr[i]) odd++;
+            else even++;
+            dfs(x, i, !color);
+        }
+    }
+}
 
 int main() {
 
@@ -39,16 +72,47 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
-    cin >> n;
-    cin >> str;
-    for (long long i = 0; i < n; i++) cin >> buf[i];
-    for (long long i = 0; i < str.size(); i++) {
-        if (str[i] == 'h') nm[1] += buf[i];
-        else if (str[i] == 'a') nm[2] = min(nm[1], nm[2] + buf[i]);
-        else if (str[i] == 'r') nm[3] = min(nm[2], nm[3] + buf[i]);
-        else if (str[i] == 'd') nm[4] = min(nm[3], nm[4] + buf[i]);
+    cin >> T;
+    while (T--) {
+        cin >> n >> m;
+        for (long long i = 1; i <= n; i++) {
+            vis[i] = false;
+            edge[i].clear();
+            clr[i] = -1;
+            v.clear();
+        }
+        for (long long i = 1; i <= m; i++) {
+            long long u, v;
+            cin >> u >> v;
+            edge[u].push_back(v), edge[v].push_back(u);
+        }
+        flg = true;
+        for (long long i = 1; i <= n; i++) {
+            if (clr[i] == -1) {
+                odd = even = 0;
+                clr[i] = 0;
+                even++;
+                dfs(-1, i, 1);
+                v.emplace_back(odd, even);
+            }
+            if (!flg) break;
+        }
+
+        if (flg) {
+            long long res = 1;
+            for (auto it:v) {
+                if (it.second == 1 && it.first == 0) res = res * 3 % MOD;
+                else {
+                    res *= qpow(2, it.first, MOD) + qpow(2, it.second, MOD);
+                    res %= MOD;
+                }
+            }
+            cout << res << endl;
+        } else {
+            cout << 0 << endl;
+        }
     }
-    cout << nm[4] << endl;
+
 
 #ifndef ONLINE_JUDGE
     auto end_time = clock();
