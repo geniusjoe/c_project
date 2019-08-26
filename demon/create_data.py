@@ -7,7 +7,7 @@ import collections
 # sys.stdin = open("testdata.in", "r")
 sys.stdout = open("testdata.in", "w")
 
-N = 100
+N = 3000
 for i in range(1, N):
-    for j in range(i + 1, N):
-        print(i, j, sep=" ")
+    j=random.randint(1,100)
+    print(j,end=' ')

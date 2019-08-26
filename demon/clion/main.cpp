@@ -2,15 +2,15 @@
 
 using namespace std;
 
-const long long MAXN = 300500;
+const long long MAXN = 200500;
 const long long INF = 0x3f3f3f3f;
 const long long LINF = 0x3f3f3f3f3f3f3f3f;
 const long long MOD = 998244353;
 const long long OVER_FLOW = 0xffffffff;
 
-long long n, m, k, T;
-long long buf[MAXN];
-map<int, int> nxt, lst;
+int n, a, b, T;
+long long dp[MAXN][5];
+string str;
 
 
 int main() {
@@ -39,40 +39,19 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
-    cin >> n >> T;
-    long long sm = 0;
-    nxt[0] = 1;
-    lst[1] = 0;
-    for (long long i = 1; i <= n; i++) {
-        cin >> buf[i];
-        sm += buf[i];
-        if (i == n) nxt[i] = -1;
-        else nxt[i] = i + 1;
-        lst[i] = i - 1;
-    }
-    long long res = 0, nm = n;
-    long long mn = *min_element(buf + 1, buf + 1 + n);
-
-    while (T >= mn) {
-        if (T >= sm) {
-            long long tme = T / sm;
-            T -= T / sm * sm;
-            res += nm * tme;
-        } else {
-            for (long long i = nxt[0]; i != -1; i = nxt[i]) {
-                if (T >= buf[i]) {
-                    T -= buf[i];
-                    res++;
-                } else if (T < buf[i]) {
-                    nxt[lst[i]] = nxt[i];
-                    lst[nxt[i]] = lst[i];
-                    sm -= buf[i];
-                    nm--;
-                }
+    cin >> T;
+    while (T--) {
+        cin >> n >> a >> b >> str;
+        for (long long i = 0; i <= n; i++) for (long long j = 0; j <= 3; j++) dp[i][j] = LINF;
+        dp[0][0] = b;
+        for (long long i = 1; i <= n; i++) {
+            if (i == n || (str[i] == '0' && str[i - 1] == '0')) {
+                dp[i][0] = min(dp[i - 1][1] + b + 2 * a, dp[i - 1][0] + b + a);
             }
+            dp[i][1] = min(dp[i - 1][0] + 2 * a + 2 * b, dp[i - 1][1] + a + 2 * b);
         }
+        cout << dp[n][0] << endl;
     }
-    cout << res << endl;
 
 
 #ifndef ONLINE_JUDGE
