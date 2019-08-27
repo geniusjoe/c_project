@@ -2,15 +2,39 @@
 
 using namespace std;
 
-const long long MAXN = 200500;
+const long long MAXN = 20;
 const long long INF = 0x3f3f3f3f;
 const long long LINF = 0x3f3f3f3f3f3f3f3f;
 const long long MOD = 998244353;
 const long long OVER_FLOW = 0xffffffff;
 
-int n, a, b, T;
-long long dp[MAXN][5];
-string str;
+long long a, b, c, s, T;
+
+long long w[MAXN], len;
+long long dp[MAXN][MAXN];
+
+//判断n个数字中非零元素小于等于3的个数
+long long dfs(int pos, int limit, int pre) {
+    if (pos < 0) return pre <= 3;
+    if (pre > 3) return 0;
+    if (!limit && dp[pos][pre] != -1) return dp[pos][pre];
+    int up = limit ? w[pos] : 9;
+    long long res = 0;
+    for (int i = 0; i <= up; i++) {
+        res += dfs(pos - 1, limit && i == up, pre + (i != 0));
+    }
+    if (!limit) dp[pos][pre] = res;
+    return res;
+}
+
+long long solve(long long x) {
+    len = 0;
+    while (x) {
+        w[len++] = x % 10;
+        x /= 10;
+    }
+    return dfs(len - 1, 1, 0);
+}
 
 
 int main() {
@@ -32,6 +56,8 @@ int main() {
     4.做一些总比不做好.
     5.排序之前不能取模.
     6.0-1子矩阵子序列:前缀和
+    7.模拟题注意代码复用.
+    8.单个区间问题考虑前缀和.
 思考提醒：
     1.最大值和最小值问题可不可以用二分答案？
     2.有没有贪心策略？否则能不能dp？
@@ -40,17 +66,11 @@ int main() {
 
     ios::sync_with_stdio(false);
     cin >> T;
+    memset(dp, -1, sizeof(dp));
     while (T--) {
-        cin >> n >> a >> b >> str;
-        for (long long i = 0; i <= n; i++) for (long long j = 0; j <= 3; j++) dp[i][j] = LINF;
-        dp[0][0] = b;
-        for (long long i = 1; i <= n; i++) {
-            if (i == n || (str[i] == '0' && str[i - 1] == '0')) {
-                dp[i][0] = min(dp[i - 1][1] + b + 2 * a, dp[i - 1][0] + b + a);
-            }
-            dp[i][1] = min(dp[i - 1][0] + 2 * a + 2 * b, dp[i - 1][1] + a + 2 * b);
-        }
-        cout << dp[n][0] << endl;
+        long long l, r;
+        cin >> l >> r;
+        cout << solve(r) - solve(l - 1) << endl;
     }
 
 
