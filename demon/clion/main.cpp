@@ -9,8 +9,7 @@ const long long MOD = 998244353;
 const long long OVER_FLOW = 0xffffffff;
 
 long long c, s, T, n, m, q;
-long long sum123[2][MAXN], sum321[2][MAXN], sum111[2][MAXN];
-long long buf[2][MAXN];
+vector<pair<long long, long long>> res;
 
 int main() {
 
@@ -39,29 +38,27 @@ int main() {
     3.如果规模小的话还能尝试dfs,如果存在等式.转换关系少可以暴力枚举变量
 */
 
-//    ios::sync_with_stdio(false);
-    cin >> n;
-    for (long long i = 0; i <= 1; i++) for (long long j = 1; j <= n; j++) cin >> buf[i][j];
-    for (long long i = 0; i <= 1; i++) {
-        for (long long j = n; j >= 1; j--) {
-            sum111[i][j] = sum111[i][j + 1] + buf[i][j];
-            sum123[i][j] = sum123[i][j + 1] + j * buf[i][j];
-            sum321[i][j] = sum321[i][j + 1] + (n - j + 1) * buf[i][j];
+    ios::sync_with_stdio(false);
+    cin >> n >> m;
+    for (long long i = 1; i <= n; i++) {
+        for (long long j = i + 1; j <= n; j++) {
+            if (__gcd(i, j) == 1) {
+                res.emplace_back(i, j);
+                if (res.size() == m) {
+                    break;
+                }
+            }
         }
+        if (res.size() == m) break;
     }
-
-    long long res = sum123[0][1] - sum111[0][1] + sum111[1][1] * (n - 1) + sum321[1][1], sm = 0;
-    for (int i = 0, j = 1; j <= n; i ^= 1, j++) {
-        long long cur = sm;
-        cur += buf[i][j] * (2 * (j - 1)) + buf[i ^ 1][j] * (2 * (j - 1) + 1);
-        cur += sum123[i ^ 1][j + 1] + sum111[i ^ 1][j + 1] * (j - 1);
-        cur += sum321[i][j + 1] + sum111[i][j + 1] * (n + j - 1);
-
-        res = max(cur, res);
-
-        sm += buf[i][j] * (2 * (j - 1)) + buf[i ^ 1][j] * (2 * (j - 1) + 1);
+    if (res.size() == m && m >= n - 1) {
+        cout << "Possible" << endl;
+        for (auto it:res) {
+            cout << it.first << " " << it.second << endl;
+        }
+    } else if (res.size() < m || m < n - 1) {
+        cout << "Impossible" << endl;
     }
-    cout << res << endl;
 
 
 #ifndef ONLINE_JUDGE
