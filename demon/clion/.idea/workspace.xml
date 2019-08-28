@@ -117,7 +117,7 @@
       <workItem from="1566181627964" duration="3681000" />
       <workItem from="1566207266637" duration="7891000" />
       <workItem from="1566267978559" duration="107568000" />
-      <workItem from="1566733675565" duration="31250000" />
+      <workItem from="1566733675565" duration="49282000" />
     </task>
     <servers />
   </component>
@@ -165,8 +165,13 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/main.cpp</url>
-          <line>71</line>
-          <option name="timeStamp" value="97" />
+          <line>53</line>
+          <option name="timeStamp" value="107" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/main.cpp</url>
+          <line>52</line>
+          <option name="timeStamp" value="108" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
@@ -175,6 +180,9 @@
         <watch expression="n " language="ObjectiveC" />
         <watch expression="T " language="ObjectiveC" />
         <watch expression="res " language="ObjectiveC" />
+        <watch expression="sum111" language="ObjectiveC" />
+        <watch expression="sum123" language="ObjectiveC" />
+        <watch expression="sum321" language="ObjectiveC" />
       </configuration>
     </watches-manager>
   </component>

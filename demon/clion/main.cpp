@@ -2,40 +2,15 @@
 
 using namespace std;
 
-const long long MAXN = 20;
+const long long MAXN = 300500;
 const long long INF = 0x3f3f3f3f;
 const long long LINF = 0x3f3f3f3f3f3f3f3f;
 const long long MOD = 998244353;
 const long long OVER_FLOW = 0xffffffff;
 
-long long a, b, c, s, T;
-
-long long w[MAXN], len;
-long long dp[MAXN][MAXN];
-
-//判断n个数字中非零元素小于等于3的个数
-long long dfs(int pos, int limit, int pre) {
-    if (pos < 0) return pre <= 3;
-    if (pre > 3) return 0;
-    if (!limit && dp[pos][pre] != -1) return dp[pos][pre];
-    int up = limit ? w[pos] : 9;
-    long long res = 0;
-    for (int i = 0; i <= up; i++) {
-        res += dfs(pos - 1, limit && i == up, pre + (i != 0));
-    }
-    if (!limit) dp[pos][pre] = res;
-    return res;
-}
-
-long long solve(long long x) {
-    len = 0;
-    while (x) {
-        w[len++] = x % 10;
-        x /= 10;
-    }
-    return dfs(len - 1, 1, 0);
-}
-
+long long c, s, T, n, m, q;
+long long sum123[2][MAXN], sum321[2][MAXN], sum111[2][MAXN];
+long long buf[2][MAXN];
 
 int main() {
 
@@ -64,14 +39,29 @@ int main() {
     3.如果规模小的话还能尝试dfs,如果存在等式.转换关系少可以暴力枚举变量
 */
 
-    ios::sync_with_stdio(false);
-    cin >> T;
-    memset(dp, -1, sizeof(dp));
-    while (T--) {
-        long long l, r;
-        cin >> l >> r;
-        cout << solve(r) - solve(l - 1) << endl;
+//    ios::sync_with_stdio(false);
+    cin >> n;
+    for (long long i = 0; i <= 1; i++) for (long long j = 1; j <= n; j++) cin >> buf[i][j];
+    for (long long i = 0; i <= 1; i++) {
+        for (long long j = n; j >= 1; j--) {
+            sum111[i][j] = sum111[i][j + 1] + buf[i][j];
+            sum123[i][j] = sum123[i][j + 1] + j * buf[i][j];
+            sum321[i][j] = sum321[i][j + 1] + (n - j + 1) * buf[i][j];
+        }
     }
+
+    long long res = sum123[0][1] - sum111[0][1] + sum111[1][1] * (n - 1) + sum321[1][1], sm = 0;
+    for (int i = 0, j = 1; j <= n; i ^= 1, j++) {
+        long long cur = sm;
+        cur += buf[i][j] * (2 * (j - 1)) + buf[i ^ 1][j] * (2 * (j - 1) + 1);
+        cur += sum123[i ^ 1][j + 1] + sum111[i ^ 1][j + 1] * (j - 1);
+        cur += sum321[i][j + 1] + sum111[i][j + 1] * (n + j - 1);
+
+        res = max(cur, res);
+
+        sm += buf[i][j] * (2 * (j - 1)) + buf[i ^ 1][j] * (2 * (j - 1) + 1);
+    }
+    cout << res << endl;
 
 
 #ifndef ONLINE_JUDGE

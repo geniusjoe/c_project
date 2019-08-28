@@ -4,7 +4,10 @@ import sys
 
 sys.stdout = open("testdata.in", "w")
 
-N = 2000
+print(1)
+print('1000000')
+
+N = 1000000
 for i in range(1, N):
-    j=random.randint(1,1e9)
+    j=random.randint(1,10000)
     print(j,end=' ')
