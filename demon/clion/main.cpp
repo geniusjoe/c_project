@@ -8,8 +8,9 @@ const long long LINF = 0x3f3f3f3f3f3f3f3f;
 const long long MOD = 998244353;
 const long long OVER_FLOW = 0xffffffff;
 
-long long c, s, T, n, m, q;
-vector<pair<long long, long long>> res;
+long long c, s, T, n, m, q, M;
+vector<pair<long long, long long>> v;
+map<long long, long long> res;
 
 int main() {
 
@@ -39,26 +40,23 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
-    cin >> n >> m;
+    cin >> n;
     for (long long i = 1; i <= n; i++) {
-        for (long long j = i + 1; j <= n; j++) {
-            if (__gcd(i, j) == 1) {
-                res.emplace_back(i, j);
-                if (res.size() == m) {
-                    break;
-                }
-            }
-        }
-        if (res.size() == m) break;
+        long long l, r;
+        cin >> l >> r;
+        v.emplace_back(l, 1);
+        v.emplace_back(r + 1, -1);
     }
-    if (res.size() == m && m >= n - 1) {
-        cout << "Possible" << endl;
-        for (auto it:res) {
-            cout << it.first << " " << it.second << endl;
-        }
-    } else if (res.size() < m || m < n - 1) {
-        cout << "Impossible" << endl;
+    sort(v.begin(), v.end());
+    long long cnt = 1;
+    for (long long i = 1; i < v.size(); i++) {
+        res[cnt] += v[i].first - v[i - 1].first;
+        cnt += v[i].second;
     }
+    for (long long i = 1; i <= n; i++) {
+        cout << res[i] << ' ';
+    }
+    cout << endl;
 
 
 #ifndef ONLINE_JUDGE

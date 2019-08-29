@@ -117,7 +117,7 @@
       <workItem from="1566181627964" duration="3681000" />
       <workItem from="1566207266637" duration="7891000" />
       <workItem from="1566267978559" duration="107568000" />
-      <workItem from="1566733675565" duration="53394000" />
+      <workItem from="1566733675565" duration="60213000" />
     </task>
     <servers />
   </component>
@@ -161,25 +161,13 @@
     </option>
   </component>
   <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/main.cpp</url>
-          <line>42</line>
-          <option name="timeStamp" value="112" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/main.cpp</url>
-          <line>53</line>
-          <option name="timeStamp" value="113" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
     <watches-manager>
       <configuration name="CMakeRunConfiguration">
         <watch expression="n " language="ObjectiveC" />
         <watch expression="T " language="ObjectiveC" />
         <watch expression="res " language="ObjectiveC" />
+        <watch expression="pre_sm" language="ObjectiveC" />
+        <watch expression="buf " language="ObjectiveC" />
       </configuration>
     </watches-manager>
   </component>
