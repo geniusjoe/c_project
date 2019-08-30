@@ -3,10 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="3d7c6a52-c6ff-4b29-b1fc-d38ffa8c0a5e" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/demon/acm.py" beforeDir="false" afterPath="$PROJECT_DIR$/demon/acm.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/demon/clion/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/demon/clion/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/demon/clion/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/demon/clion/main.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/demon/testdata.in" beforeDir="false" afterPath="$PROJECT_DIR$/demon/testdata.in" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -180,6 +178,7 @@
       <workItem from="1566235249383" duration="1753000" />
       <workItem from="1566459862151" duration="4399000" />
       <workItem from="1566733684884" duration="3014000" />
+      <workItem from="1567139127923" duration="689000" />
     </task>
     <servers />
   </component>
