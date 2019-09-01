@@ -2,7 +2,7 @@
 
 using namespace std;
 
-const long long MAXN = 3000;
+const long long MAXN = 200000;
 const long long INF = 0x3f3f3f3f;
 const long long LINF = 0x1f3f3f3f3f3f3f3f;
 const long long MOD = 998244353;
@@ -10,8 +10,27 @@ const long long OVER_FLOW = 0xffffffff;
 
 
 long long c, s, T, n, m, M, a, b;
-string str;
+long long nxt[MAXN], l[MAXN], r[MAXN];  /**< f[i]记录父节点 */;
+long long f[MAXN];
 
+
+int find(int x) { //模板函数；
+    if (f[x] != x)
+        f[x] = find(f[x]);
+    return f[x];
+}
+
+
+void combine(int a, int b) {
+    int fa = find(a);
+    int fb = find(b);
+    if (fa != fb) {
+        f[fb] = fa;
+        nxt[r[fa]] = l[fb];
+        r[fa] = r[fb];
+        l[fb] = l[fa];
+    }
+}
 
 int main() {
 
@@ -40,37 +59,26 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
-    cin >> str;
-    bool flg = true;
-    for (long long i = 1; i < str.size() / 2; i++) {
-        if (str[i] != str[i - 1]) {
-            flg = false;
-            break;
-        }
+    cin >> n;
+    for (int i = 1; i <= n; i++) {
+        f[i] = i;
+        l[i] = r[i] = i;
     }
-    if (flg) {
-        cout << "Impossible" << endl;
-    } else {
-        bool psb = false;
-        for (long long i = 1; i < str.size(); i++) {
-            string cur = str.substr(i) + str.substr(0, i);
-            if (cur != str) {
-                bool flag = true;
-                for (long long j = 0; j < cur.size() / 2; j++) {
-                    if (cur[j] == cur[cur.size() - 1 - j]) continue;
-                    else {
-                        flag = false;
-                        break;
-                    }
-                }
-                if (flag) {
-                    cout << 1 << endl;
-                    psb = true;
-                    break;
-                }
+    for (long long i = 1; i <= n - 1; i++) {
+        long long u, v;
+        cin >> u >> v;
+        combine(u, v);
+    }
+    for (long long i = 1; i <= n; i++) {
+        if (l[i] == i) {
+            cout << i << " ";
+            long long cur = nxt[i];
+            while (cur) {
+                cout << cur << " ";
+                cur = nxt[cur];
             }
+            cout << endl;
         }
-        if (!psb) cout << 2 << endl;
     }
 
 
