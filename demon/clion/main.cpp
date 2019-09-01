@@ -10,29 +10,7 @@ const long long OVER_FLOW = 0xffffffff;
 
 
 long long c, s, T, n, m, M, a, b;
-vector<pair<long long, long long>> res;
-long long buf[300050];
-
-long long ans;//最小环长度
-long long dis[MAXN][MAXN];//存储最后最短路的结果
-long long mp[MAXN][MAXN]; //存储距离
-void floyd() {
-    ans = LINF;
-    for (int k = 1; k <= n; ++k) {
-        for (int i = 1; i <= k; ++i) {
-            for (int j = i + 1; j <= k; ++j) {
-                ans = min(ans, dis[i][j] + mp[i][k] + mp[k][j]);
-            }
-        }
-
-        for (int i = 1; i <= n; ++i) {
-            for (int j = 1; j <= n; ++j) {
-                if (dis[i][j] > dis[i][k] + dis[k][j])
-                    dis[i][j] = dis[i][k] + dis[k][j];
-            }
-        }
-    }
-}
+string str;
 
 
 int main() {
@@ -62,32 +40,37 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
-    cin >> n;
-    long long cnt = 0;
-    for (long long i = 1; i <= n; i++) {
-        long long u;
-        cin >> u;
-        if (u != 0) buf[++cnt] = u;
+    cin >> str;
+    bool flg = true;
+    for (long long i = 1; i < str.size() / 2; i++) {
+        if (str[i] != str[i - 1]) {
+            flg = false;
+            break;
+        }
     }
-    for (long long i = 1; i < MAXN; i++) {
-        for (long long j = 1; j < MAXN; j++) dis[i][j] = mp[i][j] = LINF;
-    }
-    if (cnt > 200) {
-        cout << "3" << endl;
+    if (flg) {
+        cout << "Impossible" << endl;
     } else {
-        for (long long i = 1; i <= cnt; i++) {
-            for (long long j = 1; j < i; j++) {
-                if (buf[i] & buf[j]) {
-                    mp[j][i] = mp[i][j] = 1;
-                    //dis[i][j] = dis[j][i] = 1;
+        bool psb = false;
+        for (long long i = 1; i < str.size(); i++) {
+            string cur = str.substr(i) + str.substr(0, i);
+            if (cur != str) {
+                bool flag = true;
+                for (long long j = 0; j < cur.size() / 2; j++) {
+                    if (cur[j] == cur[cur.size() - 1 - j]) continue;
+                    else {
+                        flag = false;
+                        break;
+                    }
+                }
+                if (flag) {
+                    cout << 1 << endl;
+                    psb = true;
+                    break;
                 }
             }
         }
-        n = cnt;
-        floyd();
-        if (ans != LINF)
-            cout << ans << endl;
-        else cout << -1 << endl;
+        if (!psb) cout << 2 << endl;
     }
 
 
