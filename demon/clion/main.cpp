@@ -2,35 +2,15 @@
 
 using namespace std;
 
-const long long MAXN = 200000;
+const long long MAXN = 200500;
 const long long INF = 0x3f3f3f3f;
 const long long LINF = 0x1f3f3f3f3f3f3f3f;
 const long long MOD = 998244353;
 const long long OVER_FLOW = 0xffffffff;
 
 
-long long c, s, T, n, m, M, a, b;
-long long nxt[MAXN], l[MAXN], r[MAXN];  /**< f[i]记录父节点 */;
-long long f[MAXN];
-
-
-int find(int x) { //模板函数；
-    if (f[x] != x)
-        f[x] = find(f[x]);
-    return f[x];
-}
-
-
-void combine(int a, int b) {
-    int fa = find(a);
-    int fb = find(b);
-    if (fa != fb) {
-        f[fb] = fa;
-        nxt[r[fa]] = l[fb];
-        r[fa] = r[fb];
-        l[fb] = l[fa];
-    }
-}
+long long c, s, T, n, m, M, k;
+map<long long, long long> mp;
 
 int main() {
 
@@ -59,27 +39,26 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
-    cin >> n;
-    for (int i = 1; i <= n; i++) {
-        f[i] = i;
-        l[i] = r[i] = i;
-    }
-    for (long long i = 1; i <= n - 1; i++) {
-        long long u, v;
-        cin >> u >> v;
-        combine(u, v);
-    }
-    for (long long i = 1; i <= n; i++) {
-        if (l[i] == i) {
-            cout << i << " ";
-            long long cur = nxt[i];
-            while (cur) {
-                cout << cur << " ";
-                cur = nxt[cur];
-            }
-            cout << endl;
+    long long b;
+    cin >> n >> b;
+    for (long long i = 2; i * i <= b; i++) {
+        while (b % i == 0) {
+            mp[i]++;
+            b /= i;
         }
     }
+    if (b != 1) mp[b]++;
+    long long res = LINF;
+    for (auto it = mp.begin(); it != mp.end(); it++) {
+        long long cur = n, cnt = 0;
+        while (cur) {
+            cnt += cur / it->first;
+            cur /= it->first;
+        }
+        cnt /= it->second;
+        res = min(res, cnt);
+    }
+    cout << res << endl;
 
 
 #ifndef ONLINE_JUDGE
