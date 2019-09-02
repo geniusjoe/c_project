@@ -8,8 +8,24 @@ const long long LINF = 0x1f3f3f3f3f3f3f3f;
 const long long MOD = 998244353;
 const long long OVER_FLOW = 0xffffffff;
 
+long long s, T, n, m, M, k, A, B;
+long long buf[MAXN];
+long long pre_sm[MAXN];
 
-long long c, s, T, n, m, M, k;
+long long dfs(long long l, long long r) {
+    long long head = lower_bound(buf + 1, buf + 1 + k, l) - buf;
+    long long tail = upper_bound(buf + 1, buf + 1 + k, r) - buf;
+    tail--;
+    long long len = tail - head + 1;
+    if (len == 0) return A;
+    long long cur = (r - l + 1) * B * len;
+    long long mid = (l + r) >> 1;
+    if (l < r)
+        cur = min(cur, dfs(l, mid) + dfs(mid + 1, r));
+    return cur;
+
+}
+
 
 int main() {
 
@@ -38,15 +54,11 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
-    cin >> n;
-    for (long long i = 1; i <= n; i++) {
-        for (long long j = 1; j <= n; j++) {
-            long long idx = (n / 4) * ((i - 1) / 4) + (j - 1) / 4;
-            cout << idx * 16 + (i - 1) % 4 * 4 + (j - 1) % 4 << " ";
-        }
-        cout << endl;
-    }
-
+    cin >> n >> k >> A >> B;
+    for (long long i = 1; i <= k; i++) cin >> buf[i];
+    sort(buf + 1, buf + 1 + k);
+    long long ans = dfs(1, (1 << n));
+    cout << ans << endl;
 
 #ifndef ONLINE_JUDGE
     auto end_time = clock();
