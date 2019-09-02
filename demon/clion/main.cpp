@@ -10,7 +10,6 @@ const long long OVER_FLOW = 0xffffffff;
 
 
 long long c, s, T, n, m, M, k;
-map<long long, long long> mp;
 
 int main() {
 
@@ -39,26 +38,14 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
-    long long b;
-    cin >> n >> b;
-    for (long long i = 2; i * i <= b; i++) {
-        while (b % i == 0) {
-            mp[i]++;
-            b /= i;
+    cin >> n;
+    for (long long i = 1; i <= n; i++) {
+        for (long long j = 1; j <= n; j++) {
+            long long idx = (n / 4) * ((i - 1) / 4) + (j - 1) / 4;
+            cout << idx * 16 + (i - 1) % 4 * 4 + (j - 1) % 4 << " ";
         }
+        cout << endl;
     }
-    if (b != 1) mp[b]++;
-    long long res = LINF;
-    for (auto it = mp.begin(); it != mp.end(); it++) {
-        long long cur = n, cnt = 0;
-        while (cur) {
-            cnt += cur / it->first;
-            cur /= it->first;
-        }
-        cnt /= it->second;
-        res = min(res, cnt);
-    }
-    cout << res << endl;
 
 
 #ifndef ONLINE_JUDGE
