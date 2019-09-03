@@ -9,29 +9,21 @@ const long long MOD = 998244353;
 const long long OVER_FLOW = 0xffffffff;
 
 long long s, T, n, m, M, k, A, B;
-long long buf[MAXN];
-long long pre_sm[MAXN];
+string str;
 
-long long dfs(long long l, long long r) {
-    long long head = lower_bound(buf + 1, buf + 1 + k, l) - buf;
-    long long tail = upper_bound(buf + 1, buf + 1 + k, r) - buf;
-    tail--;
-    long long len = tail - head + 1;
-    if (len == 0) return A;
-    long long cur = (r - l + 1) * B * len;
-    long long mid = (l + r) >> 1;
-    if (l < r)
-        cur = min(cur, dfs(l, mid) + dfs(mid + 1, r));
+string get_res(long long x, long long y) {
+    cout << "? " << x << " " << y << "\n";
+    fflush(stdout);
+    string cur;
+    cin >> cur;
     return cur;
-
 }
-
 
 int main() {
 
 #ifndef ONLINE_JUDGE
-    freopen("testdata.in", "r+", stdin);
-    freopen("testdata.out", "w+", stdout);
+//    freopen("testdata.in", "r+", stdin);
+//    freopen("testdata.out", "w+", stdout);
 #endif // ONLINE_JUDGE
 
 #ifndef ONLINE_JUDGE
@@ -51,14 +43,34 @@ int main() {
     1.最大值和最小值问题可不可以用二分答案？
     2.有没有贪心策略？否则能不能dp？
     3.如果规模小的话还能尝试dfs,如果存在等式.转换关系少可以暴力枚举变量
+    4.注意数据规模,考虑从数据入手
 */
 
     ios::sync_with_stdio(false);
-    cin >> n >> k >> A >> B;
-    for (long long i = 1; i <= k; i++) cin >> buf[i];
-    sort(buf + 1, buf + 1 + k);
-    long long ans = dfs(1, (1 << n));
-    cout << ans << endl;
+    while (cin >> str) {
+        if (str != "start") break;
+        long long cur = 1, lst = 0;
+        while (cur <= (1 << 30)) {
+            string w = get_res(lst, cur);
+            if (w == "x") {
+                break;
+            } else {
+                lst = cur;
+                cur <<= 1;
+            }
+        }
+        long long low = lst, high = cur;
+        while (low + 1 < high) {
+            long long mid = (low + high) >> 1;
+            string w = get_res(mid, low);
+            if (w == "x") low = mid;
+            else high = mid;
+        }
+        cout << "! " << high << endl;
+
+        fflush(stdout);
+    }
+
 
 #ifndef ONLINE_JUDGE
     auto end_time = clock();
