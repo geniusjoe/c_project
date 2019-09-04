@@ -2,49 +2,28 @@
 
 using namespace std;
 
-const long long MAXN = 2005;
+const long long MAXN = 3005000;
 const long long INF = 0x3f3f3f3f;
 const long long LINF = 0x1f3f3f3f3f3f3f3f;
 const long long MOD = (long long) 1e9 + 7;
 const long long OVER_FLOW = 0xffffffff;
 
-struct point {
-    long long x, y, rst_x, rst_y;
-};
 
 long long s, T, n, m, M, k, A, B, p;
-long long r, c, x, y;
-string graph[MAXN];
-queue<point> q;
-pair<long long, long long> buf[MAXN][MAXN];
+long long pre[MAXN], suf[MAXN];
+long long vis[MAXN];
 
-bool ok(point x) {
-    return (x.x >= 1 && x.x <= n && x.y >= 1 && x.y <= m &&
-            (graph[x.x][x.y - 1] == '.' ||
-             (graph[x.x][x.y - 1] == '1' && (buf[x.x][x.y].first < x.rst_x || buf[x.x][x.y].second < x.rst_y)))
-            && x.rst_y >= 0 && x.rst_x >= 0);
-}
+struct point {
+    long long id, tme, cst;
 
-void solve() {
-    q.push(point{r, c, x, y});
-    graph[r][c - 1] = '1';
-    buf[r][c].first = x, buf[r][c].second = y;
-    while (!q.empty()) {
-        point cur = q.front();
-        q.pop();
-        long long dx[] = {-1, 0, 1, 0}, dy[] = {0, -1, 0, 1};
-        for (long long i = 0; i < 4; i++) {
-            point nxt{cur.x + dx[i], cur.y + dy[i], cur.rst_x - (dy[i] == -1), cur.rst_y - (dy[i] == 1)};
-            if (ok(nxt)) {
-                graph[nxt.x][nxt.y - 1] = '1';
-                q.push(nxt);
-                buf[nxt.x][nxt.y].first = max(buf[nxt.x][nxt.y].first, nxt.rst_x);
-                buf[nxt.x][nxt.y].second = max(buf[nxt.x][nxt.y].second, nxt.rst_y);
-            }
-        }
+    bool operator<(point point1) {
+        return this->tme < point1.tme;
     }
-}
+};
 
+vector<point> come, go;
+queue<point> q_cme, q_go;
+long long res1[MAXN], res2[MAXN];
 
 int main() {
 
@@ -75,18 +54,72 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
-    cin >> n >> m;
-    cin >> r >> c;
-    cin >> x >> y;
-    for (long long i = 1; i <= n; i++) cin >> graph[i];
-    solve();
-    long long res = 0;
-    for (long long i = 1; i <= n; i++) {
-        for (long long j = 1; j <= m; j++) {
-            if (graph[i][j - 1] == '1') res++;
+    cin >> n >> m >> k;
+    for (long long i = 1; i <= m; i++) {
+        long long di, fi, ti, ci;
+        cin >> di >> fi >> ti >> ci;
+        if (fi == 0) {
+            go.push_back(point{ti, di, ci});
+        } else {
+            come.push_back(point{fi, di, ci});
         }
     }
-    cout << res << endl;
+    sort(go.begin(), go.end()), sort(come.begin(), come.end());
+    if (!go.empty())
+        for (long long i = go.size() - 1; i >= 0; i--) q_go.push(go[i]);
+    for (auto it:come) q_cme.push(it);
+    for (long long i = 1; i <= 1000000; i++) res1[i] = vis[i] = LINF;
+
+    long long nm = 0, sm = 0;
+    for (long long i = 1; i <= 1000000; i++) {
+        while (!q_cme.empty()) {
+            point cur = q_cme.front();
+            if (cur.tme == i) {
+                q_cme.pop();
+                if (vis[cur.id] == LINF) {
+                    nm++;
+                    vis[cur.id] = cur.cst;
+                    sm += cur.cst;
+                } else if (vis[cur.id] > cur.cst) {
+                    sm -= vis[cur.id];
+                    sm += cur.cst;
+                    vis[cur.id] = cur.cst;
+                }
+            } else break;
+        }
+        if (nm == n) res1[i] = sm;
+    }
+
+    nm = sm = 0;
+    for (long long i = 1; i <= 1000000; i++) res2[i] = vis[i] = LINF;
+    for (long long i = 1000000; i >= 1; i--) {
+        while (!q_go.empty()) {
+            point cur = q_go.front();
+            if (cur.tme == i) {
+                q_go.pop();
+                if (vis[cur.id] == LINF) {
+                    nm++;
+                    vis[cur.id] = cur.cst;
+                    sm += cur.cst;
+                } else if (vis[cur.id] > cur.cst) {
+                    sm -= vis[cur.id];
+                    sm += cur.cst;
+                    vis[cur.id] = cur.cst;
+                }
+            } else break;
+        }
+        if (nm == n) res2[i] = sm;
+    }
+
+    long long res = LINF;
+    for (long long i = 1; i <= 1000000 - k - 1; i++) {
+        res = min(res, res1[i] + res2[i + k + 1]);
+    }
+
+    if (res == LINF)
+        cout << -1 << endl;
+    else
+        cout << res << endl;
 
 
 #ifndef ONLINE_JUDGE
