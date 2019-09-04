@@ -2,12 +2,12 @@ import random
 import math
 import sys
 
-sys.stdout = open("testdata.in", "w")
+# sys.stdout = open("testdata.in", "w")
 
-print(1)
-print('1000000')
-
-N = 1000000
+N = 1000
 for i in range(1, N):
-    j=random.randint(1,10000)
-    print(j,end=' ')
+    print(i)
+    for j in range(0, i + 10000):
+        if i - j == i ^ j:
+            print(j)
+    print("\n")
