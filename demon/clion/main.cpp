@@ -2,7 +2,7 @@
 
 using namespace std;
 
-const long long MAXN = 3005000;
+const long long MAXN = 1005000;
 const long long INF = 0x3f3f3f3f;
 const long long LINF = 0x1f3f3f3f3f3f3f3f;
 const long long MOD = (long long) 1e9 + 7;
@@ -10,20 +10,9 @@ const long long OVER_FLOW = 0xffffffff;
 
 
 long long s, T, n, m, M, k, A, B, p;
-long long pre[MAXN], suf[MAXN];
-long long vis[MAXN];
-
-struct point {
-    long long id, tme, cst;
-
-    bool operator<(point point1) {
-        return this->tme < point1.tme;
-    }
-};
-
-vector<point> come, go;
-queue<point> q_cme, q_go;
-long long res1[MAXN], res2[MAXN];
+vector<long long> dp[2][MAXN], d[2][MAXN];
+const long long hsh1 = (long long) 1e8 + 7, hsh2 = (long long) 1e9 + 7;
+string graph[MAXN];
 
 int main() {
 
@@ -54,72 +43,62 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
-    cin >> n >> m >> k;
-    for (long long i = 1; i <= m; i++) {
-        long long di, fi, ti, ci;
-        cin >> di >> fi >> ti >> ci;
-        if (fi == 0) {
-            go.push_back(point{ti, di, ci});
-        } else {
-            come.push_back(point{fi, di, ci});
+    cin >> n >> m;
+
+    for (long long i = 0; i <= n + 5; i++) {
+        dp[0][i].resize(m + 5);
+        dp[1][i].resize(m + 5);
+        d[0][i].resize(m + 5);
+        d[1][i].resize(m + 5);
+    }
+
+    for (long long i = 1; i <= n; i++) {
+        cin >> graph[i];
+    }
+    dp[0][0][1] = dp[1][0][1] = 1;
+    for (long long i = 1; i <= n; i++) {
+        for (long long j = 1; j <= m; j++) {
+            if (graph[i][j - 1] == '#') continue;
+            dp[0][i][j] = dp[0][i - 1][j] + dp[0][i][j - 1];
+            dp[0][i][j] %= hsh1;
+            dp[1][i][j] = dp[1][i - 1][j] + dp[1][i][j - 1];
+            dp[1][i][j] %= hsh2;
         }
     }
-    sort(go.begin(), go.end()), sort(come.begin(), come.end());
-    if (!go.empty())
-        for (long long i = go.size() - 1; i >= 0; i--) q_go.push(go[i]);
-    for (auto it:come) q_cme.push(it);
-    for (long long i = 1; i <= 1000000; i++) res1[i] = vis[i] = LINF;
 
-    long long nm = 0, sm = 0;
-    for (long long i = 1; i <= 1000000; i++) {
-        while (!q_cme.empty()) {
-            point cur = q_cme.front();
-            if (cur.tme == i) {
-                q_cme.pop();
-                if (vis[cur.id] == LINF) {
-                    nm++;
-                    vis[cur.id] = cur.cst;
-                    sm += cur.cst;
-                } else if (vis[cur.id] > cur.cst) {
-                    sm -= vis[cur.id];
-                    sm += cur.cst;
-                    vis[cur.id] = cur.cst;
+    d[0][n + 1][m] = d[1][n + 1][m] = 1;
+    for (long long i = n; i >= 1; i--) {
+        for (long long j = m; j >= 1; j--) {
+            if (graph[i][j - 1] == '#') continue;
+            d[0][i][j] = d[0][i + 1][j] + d[0][i][j + 1];
+            d[0][i][j] %= hsh1;
+            d[1][i][j] = d[1][i + 1][j] + d[1][i][j + 1];
+            d[1][i][j] %= hsh2;
+        }
+    }
+
+    if (dp[0][n][m] == 0 && dp[1][n][m] == 0) {
+        cout << 0 << endl;
+    } else {
+        bool flg = false;
+        long long tmp1 = dp[0][1][1] * d[0][1][1] % hsh1;
+        long long tmp2 = dp[1][1][1] * d[1][1][1] % hsh2;
+
+        for (long long i = 1; i <= n; i++) {
+            for (long long j = 1; j <= m; j++) {
+                if ((i == 1 && j == 1) || (i == n && j == m)) continue;
+                if (dp[0][i][j] * d[0][i][j] % hsh1 == tmp1 && dp[1][i][j] * d[1][i][j] % hsh2 == tmp2) {
+                    flg = true;
+                    break;
                 }
-            } else break;
+            }
         }
-        if (nm == n) res1[i] = sm;
-    }
 
-    nm = sm = 0;
-    for (long long i = 1; i <= 1000000; i++) res2[i] = vis[i] = LINF;
-    for (long long i = 1000000; i >= 1; i--) {
-        while (!q_go.empty()) {
-            point cur = q_go.front();
-            if (cur.tme == i) {
-                q_go.pop();
-                if (vis[cur.id] == LINF) {
-                    nm++;
-                    vis[cur.id] = cur.cst;
-                    sm += cur.cst;
-                } else if (vis[cur.id] > cur.cst) {
-                    sm -= vis[cur.id];
-                    sm += cur.cst;
-                    vis[cur.id] = cur.cst;
-                }
-            } else break;
-        }
-        if (nm == n) res2[i] = sm;
+        if (flg)
+            cout << 1 << endl;
+        else
+            cout << 2 << endl;
     }
-
-    long long res = LINF;
-    for (long long i = 1; i <= 1000000 - k - 1; i++) {
-        res = min(res, res1[i] + res2[i + k + 1]);
-    }
-
-    if (res == LINF)
-        cout << -1 << endl;
-    else
-        cout << res << endl;
 
 
 #ifndef ONLINE_JUDGE
