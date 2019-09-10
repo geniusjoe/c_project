@@ -9,17 +9,19 @@ const long long MOD = (long long) 1e9 + 7;
 const long long OVER_FLOW = 0xffffffff;
 
 long long n, m;
-long long buf[MAXN];
-vector<long long> v;
-vector <pair<long long, long long>> res;
 
-struct edge {
-    long long a, b, w;
-
-    bool operator<(edge edge1) {
-        return this->w > edge1.w;
+int phi[1000006];
+void process_phis(int x){
+    iota(phi,phi+x+1,0);
+    for(int i = 2 ; i<=x;i++){
+        if(phi[i]==i){
+            phi[i]=i-1;
+            for(int j=2*i;j<=x;j+=i){
+                phi[j]=(phi[j]/i)*(i-1);
+            }
+        }
     }
-} edges[MAXN];
+}
 
 int main() {
 
@@ -50,30 +52,17 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
-    cin >> n;
-    for (long long i = 1; i <= n; i++) {
-        long long u;
-        cin >> u;
-        edges[i] = {2 * i - 1, 2 * i, u};
-    }
-    sort(edges + 1, edges + 1 + n);
-    for (long long i = 1; i <= n; i++)
-        v.push_back(edges[i].a);
-    for (long long i = 1; i < n; i++)
-        res.emplace_back(v[i], v[i - 1]);
-
-    for (long long i = 1; i <= n; i++) {
-        if (edges[i].w+i > v.size()) {
-            res.emplace_back(edges[i].b, v.back());
-            v.push_back(edges[i].b);
-        } else if (edges[i].w < n) {
-            res.emplace_back(edges[i].b, v[i + edges[i].w - 2]);
-        }
+    long long k;
+    cin >> n>>k;
+    if(k==1)
+        cout<<3<<endl;
+    else{
+        process_phis(n);
+        k+=2;
+        sort(phi+1,phi+1+n);
+        cout<<accumulate(phi+1,phi+1+k,0ll)<<endl;
     }
 
-    for (auto it:res) {
-        cout << it.first << " " << it.second << "\n";
-    }
 
 
 #ifndef ONLINE_JUDGE
