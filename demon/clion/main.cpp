@@ -10,24 +10,20 @@ const long long OVER_FLOW = 0xffffffff;
 
 long long n, m;
 
-int phi[1000006];
-void process_phis(int x){
-    iota(phi,phi+x+1,0);
-    for(int i = 2 ; i<=x;i++){
-        if(phi[i]==i){
-            phi[i]=i-1;
-            for(int j=2*i;j<=x;j+=i){
-                phi[j]=(phi[j]/i)*(i-1);
-            }
-        }
-    }
-}
+#define setbit(x, y) x|=(1ll<<y)
+
+#define clrbit(x, y) x&=~(1ll<<y)
+
+#define reversebit(x, y) x^=(1ll<<y)
+
+#define getbit(x, y) ((x) >> (y)&1ll)
+
 
 int main() {
 
 #ifndef ONLINE_JUDGE
-    freopen("testdata.in", "r+", stdin);
-    freopen("testdata.out", "w+", stdout);
+//    freopen("testdata.in", "r+", stdin);
+//    freopen("testdata.out", "w+", stdout);
 #endif // ONLINE_JUDGE
 
 #ifndef ONLINE_JUDGE
@@ -52,17 +48,33 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
-    long long k;
-    cin >> n>>k;
-    if(k==1)
-        cout<<3<<endl;
-    else{
-        process_phis(n);
-        k+=2;
-        sort(phi+1,phi+1+n);
-        cout<<accumulate(phi+1,phi+1+k,0ll)<<endl;
-    }
 
+    cout << "? ";
+    for (long long i = 1; i <= 100; i++) {
+        cout << i << " ";
+    }
+    cout << endl;
+    fflush(stdout);
+    long long res = 0;
+    cin >> res;
+    for (long long i = 0; i < 7; i++) {
+        clrbit(res, i);
+    }
+    cout << endl;
+    fflush(stdout);
+
+    cout << "? ";
+    for (long long i = 1; i <= 100; i++) {
+        cout << (i << 7) << " ";
+    }
+    cout << endl;
+    fflush(stdout);
+    long long res1 = 0;
+    cin >> res1;
+    for (long long i = 7; i < 14; i++) {
+        clrbit(res1, i);
+    }
+    cout << "! " << (long long) (res1 | res) << endl;
 
 
 #ifndef ONLINE_JUDGE

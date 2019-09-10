@@ -57,11 +57,11 @@
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="7">
-    <option name="x" value="4298" />
-    <option name="y" value="1457" />
-    <option name="width" value="799" />
-    <option name="height" value="608" />
+  <component name="ProjectFrameBounds" extendedState="6">
+    <option name="x" value="-12" />
+    <option name="y" value="-12" />
+    <option name="width" value="3866" />
+    <option name="height" value="2106" />
   </component>
   <component name="ProjectId" id="1PYwqpPRWoLsa5B6QQKsPm71g2E" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
@@ -193,15 +193,15 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="3833" y="1073" width="1038" height="794" extended-state="7" />
+    <frame x="-6" y="-6" width="1933" height="1053" extended-state="7" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.20837487" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.11011591" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.3228228" />
+      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.23218143" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
