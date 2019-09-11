@@ -2,16 +2,29 @@
 
 using namespace std;
 
-const long long MAXN = 2005;
+const long long MAXN = 5005;
 const long long INF = 0x7f3f3f3f;
 const long long LINF = 0x1f3f3f3f3f3f3f3f;
 const long long MOD = 998244853;
 const long long OVER_FLOW = 0xffffffff;
 
 long long n, m;
+bool flg;
+long long vis[MAXN], color[MAXN];
+vector <pair<long long, long long>> edges[MAXN];
 
-long long k[MAXN][MAXN], f[MAXN][MAXN], C[MAXN << 1][MAXN << 1];
-
+void dfs(long long x) {
+    for (auto it:edges[x]) {
+        if (vis[it.first] == -1) {
+            vis[it.first] = 0;
+            dfs(it.first);
+        } else if (vis[it.first] == 0) {
+            color[it.second] = 1;
+            flg = true;
+        }
+    }
+    vis[x] = 1;
+}
 
 int main() {
 
@@ -42,15 +55,24 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
-    string str;
-    cin >> str;
-    long long cnt = 0;
-    for (long long i = str.size() - 1; i >= 0; i--) {
-        if (str[i] == '0') cnt++;
-        else if (cnt) cnt--;
-        else str[i] = '0';
+    cin >> n >> m;
+    flg = false;
+    for (long long i = 1; i <= n; i++) vis[i] = -1;
+    for (long long i = 1; i <= m; i++) {
+        long long u, v;
+        cin >> u >> v;
+        edges[u].emplace_back(v, i);
     }
-    cout << str << endl;
+    for (long long i = 1; i <= n; i++) {
+        if (vis[i] == -1) dfs(i);
+    }
+    if (!flg) cout << 1 << endl;
+    else cout << 2 << endl;
+    for (long long i = 1; i <= m; i++) {
+        cout << color[i] + 1 << " ";
+    }
+    cout << endl;
+
 
 #ifndef ONLINE_JUDGE
     auto end_time = clock();
