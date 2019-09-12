@@ -47,8 +47,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/main.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="86">
-              <caret line="76" column="30" lean-forward="true" selection-start-line="76" selection-start-column="30" selection-end-line="76" selection-end-column="30" />
+            <state relative-caret-position="193">
+              <caret line="69" column="13" lean-forward="true" selection-start-line="69" selection-start-column="13" selection-end-line="69" selection-end-column="13" />
             </state>
           </provider>
         </entry>
@@ -56,8 +56,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/cmake-build-debug/testdata.in">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="66">
-              <caret line="3" selection-start-line="3" selection-end-line="3" />
+            <state relative-caret-position="22">
+              <caret line="1" column="6" selection-start-line="1" selection-start-column="6" selection-end-line="1" selection-end-column="6" />
             </state>
           </provider>
         </entry>
@@ -77,11 +77,11 @@
     <findStrings>
       <find>x</find>
       <find>long long</find>
-      <find>long long</find>
       <find>LINF</find>
       <find>int</find>
       <find>INF</find>
       <find>n</find>
+      <find>N</find>
     </findStrings>
     <replaceStrings>
       <replace>p</replace>
@@ -90,6 +90,7 @@
       <replace>long long</replace>
       <replace>LINF</replace>
       <replace>x</replace>
+      <replace>MAXN</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
@@ -105,10 +106,10 @@
   </component>
   <component name="OCFindUsagesOptions" text="true" ivars="false" properties="true" derivedClasses="false" />
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="4067" />
-    <option name="y" value="1172" />
+    <option name="x" value="4285" />
+    <option name="y" value="1595" />
     <option name="width" value="340" />
-    <option name="height" value="73" />
+    <option name="height" value="72" />
   </component>
   <component name="ProjectId" id="1PYwuuPngpWZd0JqhT8HvMHQv6m" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
@@ -215,12 +216,12 @@
       <workItem from="1567567108362" duration="14552000" />
       <workItem from="1567610769197" duration="20283000" />
       <workItem from="1567785106560" duration="35584000" />
-      <workItem from="1568257597432" duration="3328000" />
+      <workItem from="1568257597432" duration="7655000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="132188000" />
+    <option name="totallyTimeSpent" value="136515000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -320,18 +321,13 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/main.cpp</url>
-          <line>67</line>
-          <option name="timeStamp" value="79" />
+          <line>60</line>
+          <option name="timeStamp" value="85" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/main.cpp</url>
-          <line>84</line>
-          <option name="timeStamp" value="80" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/main.cpp</url>
-          <line>47</line>
-          <option name="timeStamp" value="81" />
+          <line>74</line>
+          <option name="timeStamp" value="86" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
@@ -342,11 +338,22 @@
         <watch expression="res " language="ObjectiveC" />
         <watch expression="it " language="ObjectiveC" />
         <watch expression="st " language="ObjectiveC" />
+        <watch expression="dp " language="ObjectiveC" />
       </configuration>
     </watches-manager>
   </component>
   <component name="debuggerHistoryManager">
     <expressions id="watch">
+      <expression>
+        <expression-string>dp</expression-string>
+        <language-id>ObjectiveC</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>点评</expression-string>
+        <language-id>ObjectiveC</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
       <expression>
         <expression-string>st</expression-string>
         <language-id>ObjectiveC</language-id>
@@ -384,16 +391,6 @@
       </expression>
       <expression>
         <expression-string>ans[lchild(p)]</expression-string>
-        <language-id>ObjectiveC</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>ans[rchild(1)]</expression-string>
-        <language-id>ObjectiveC</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>rchild(1)</expression-string>
         <language-id>ObjectiveC</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
@@ -451,15 +448,15 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/cmake-build-debug/testdata.in">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="66">
-          <caret line="3" selection-start-line="3" selection-end-line="3" />
+        <state relative-caret-position="22">
+          <caret line="1" column="6" selection-start-line="1" selection-start-column="6" selection-end-line="1" selection-end-column="6" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/main.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="86">
-          <caret line="76" column="30" lean-forward="true" selection-start-line="76" selection-start-column="30" selection-end-line="76" selection-end-column="30" />
+        <state relative-caret-position="193">
+          <caret line="69" column="13" lean-forward="true" selection-start-line="69" selection-start-column="13" selection-end-line="69" selection-end-column="13" />
         </state>
       </provider>
     </entry>

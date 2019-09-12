@@ -2,17 +2,29 @@
 
 using namespace std;
 
-const long long MAXN = 1000500;
+const long long MAXN = 2000500;
 const long long INF = 0x7f3f3f3f;
 const long long LINF = 0x1f3f3f3f3f3f3f3f;
 const long long MOD = 998244853;
 const long long OVER_FLOW = 0xffffffff;
 
 long long n, m; /**< n个数,m个操作,以model为模 */
-long long res[MAXN];
-vector<pair<long long, long long>> in[MAXN], out[MAXN];
-multiset<long long> st[MAXN];
+long long buf[MAXN];
+long long dp[MAXN];
 
+
+int a[MAXN], f[MAXN][21], A[MAXN];
+
+void add(int x, int p) {
+    if (p == -1) {
+        if (A[x] != 2) A[x]++;
+        return;
+    }
+    if (f[x][p] == 2) return;
+    f[x][p]++;
+    add(x, p - 1);
+    if ((x >> p) & 1) add(x ^ (1 << p), p - 1);
+}
 
 int main() {
 
@@ -43,49 +55,25 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
-    long long w;
-    cin >> n >> w;
-    for (long long i = 1; i <= n; i++) {
-        long long len;
-        cin >> len;
-        long long l = 1, r = w - len + 1;
-        in[l].emplace_back(0, i);
-        out[r].emplace_back(0, i);
-
-        l = len + 1, r = w + 1;
-        in[l].emplace_back(0, i);
-        out[r].emplace_back(0, i);
-
-        for (long long j = 1; j <= len; j++) {
-            long long u;
-            cin >> u;
-            l = j, r = j + (w - len) + 1;
-            in[l].emplace_back(u, i);
-            out[r].emplace_back(u, i);
+    cin >> n;
+    for (long long i = 1; i <= n; i++) cin >> buf[i];
+    long long res = 0;
+    for (long long i = n; i >= 1; i--) {
+        if (i <= n - 2) {
+            long long t = 0;
+            for (long long j = 20; j >= 0; j--) {
+                if (buf[i] & (1 << j)) {
+                    continue;
+                } else if (A[t | (1 << j)] >= 2) {
+                    t |= (1 << j);
+                }
+            }
+            res = max(res, t | buf[i]);
         }
+        add(buf[i], 20);
     }
+    cout << res << endl;
 
-    for (long long i = 1; i <= w; i++) {
-        res[i] = res[i - 1];
-        for (auto it:in[i]) {
-            if (!st[it.second].empty())
-                res[i] -= *st[it.second].rbegin();
-            st[it.second].insert(it.first);
-            res[i] += *st[it.second].rbegin();
-        }
-
-        for (auto it:out[i]) {
-            if (!st[it.second].empty())
-                res[i] -= *st[it.second].rbegin();
-            st[it.second].erase(st[it.second].find(it.first));
-            res[i] += *st[it.second].rbegin();
-        }
-    }
-
-    for (long long i = 1; i <= w; i++) {
-        cout << res[i] << " ";
-    }
-    cout << endl;
 
 #ifndef ONLINE_JUDGE
     auto end_time = clock();
