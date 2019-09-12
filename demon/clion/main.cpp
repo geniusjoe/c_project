@@ -2,28 +2,69 @@
 
 using namespace std;
 
-const long long MAXN = 2000500;
+const long long MAXN = 300500;
 const long long INF = 0x7f3f3f3f;
 const long long LINF = 0x1f3f3f3f3f3f3f3f;
-const long long MOD = 998244853;
+const long long MOD = 998244353;
 const long long OVER_FLOW = 0xffffffff;
 
 long long n, m; /**< n个数,m个操作,以model为模 */
-long long buf[MAXN];
-long long dp[MAXN];
+vector<long long> v;
+long long A[MAXN];
 
+struct node {
+    long long l, r;
 
-int a[MAXN], f[MAXN][21], A[MAXN];
-
-void add(int x, int p) {
-    if (p == -1) {
-        if (A[x] != 2) A[x]++;
-        return;
+    bool operator==(node node1) {
+        return (this->l == node1.l && this->r == node1.r);
     }
-    if (f[x][p] == 2) return;
-    f[x][p]++;
-    add(x, p - 1);
-    if ((x >> p) & 1) add(x ^ (1 << p), p - 1);
+} nodes[MAXN];
+
+bool cmp1(node node1, node node2) {
+    if (node1.l == node2.l)
+        return node1.r < node2.r;
+    return node1.l < node2.l;
+}
+
+bool cmp2(node node1, node node2) {
+    if (node1.r == node2.r)
+        return node1.l < node2.l;
+    return node1.r < node2.r;
+}
+
+void arange() {
+    A[1] = 1;
+    for (long long i = 2; i <= n; i++)
+        A[i] = A[i - 1] * i % MOD;
+}
+
+long long calc(long long type) {
+    v.clear();
+    long long cnt = 0;
+    for (long long i = 1; i <= n; i++) {
+        if (i == 1) cnt++;
+        else if (type == 3 && nodes[i].l < nodes[i - 1].l) return 0;
+        else if (type == 1 && nodes[i].l != nodes[i - 1].l) {
+            v.push_back(cnt);
+            cnt = 1;
+        } else if (type == 2 && nodes[i].r != nodes[i - 1].r) {
+            v.push_back(cnt);
+            cnt = 1;
+        } else if (type == 3 && (nodes[i].l > nodes[i - 1].l || nodes[i].r > nodes[i - 1].r)) {
+            v.push_back(cnt);
+            cnt = 1;
+        } else
+            cnt++;
+    }
+    v.push_back(cnt);
+
+    long long cur = 1;
+    for (auto it:v) {
+        if (it > 1) {
+            cur = cur * A[it] % MOD;
+        }
+    }
+    return cur;
 }
 
 int main() {
@@ -56,24 +97,21 @@ int main() {
 
     ios::sync_with_stdio(false);
     cin >> n;
-    for (long long i = 1; i <= n; i++) cin >> buf[i];
-    long long res = 0;
-    for (long long i = n; i >= 1; i--) {
-        if (i <= n - 2) {
-            long long t = 0;
-            for (long long j = 20; j >= 0; j--) {
-                if (buf[i] & (1 << j)) {
-                    continue;
-                } else if (A[t | (1 << j)] >= 2) {
-                    t |= (1 << j);
-                }
-            }
-            res = max(res, t | buf[i]);
-        }
-        add(buf[i], 20);
+    arange();
+    for (long long i = 1; i <= n; i++) {
+        cin >> nodes[i].l >> nodes[i].r;
     }
-    cout << res << endl;
+    long long res = 1;
+    res = res * A[n] % MOD;
+    sort(nodes + 1, nodes + 1 + n, cmp1);
+    res = (res - calc(1) + MOD) % MOD;
 
+    sort(nodes + 1, nodes + 1 + n, cmp2);
+    res = (res - calc(2) + MOD) % MOD;
+
+    res = (res + calc(3)) % MOD;
+
+    cout << res << endl;
 
 #ifndef ONLINE_JUDGE
     auto end_time = clock();
