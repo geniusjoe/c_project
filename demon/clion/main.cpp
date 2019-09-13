@@ -2,32 +2,18 @@
 
 using namespace std;
 
-const long long MAXN = 500500;
+const long long MAXN = 5005;
 const long long INF = 0x7f3f3f3f;
 const long long LINF = 0x1f3f3f3f3f3f3f3f;
 const long long MOD = 998244353;
 const long long OVER_FLOW = 0xffffffff;
 
 long long n, m; /**< n个数,m个操作,以model为模 */
-long long buf[MAXN];
-long long rst[720][720];
+string str[MAXN];
+long long dp[MAXN][MAXN];
 
-template<class T>
-inline bool scan_d(T &ret) {
-    char c;
-    int sgn;
-    if (c = getchar(), c == EOF) return 0;
-    while (c != '-' && (c < '0' || c > '9')) c = getchar();
-    sgn = (c == '-') ? -1 : 1;
-    ret = (c == '-') ? 0 : (c - '0');
-    while (c = getchar(), c >= '0' && c <= '9') ret = ret * 10 + (c - '0');
-    ret *= sgn;
-    return 1;
-}
-
-inline void out(int x) {
-    if (x > 9) out(x / 10);
-    putchar(x % 10 + '0');
+void add(long long l1, long long r1, long long l2, long long r2) {
+    dp[l1][l2]++, dp[l1][r2 + 1]--, dp[r1 + 1][l2]--, dp[r1 + 1][r2 + 1]++;
 }
 
 int main() {
@@ -58,31 +44,49 @@ int main() {
     4.如果存在等式.转换关系少可以暴力枚举变量,或者考虑从数据大小入手
 */
 
-//    ios::sync_with_stdio(false);
-    long long T;
-//    cin >> T;
-    scan_d(T);
-    while (T--) {
-        long long op, u, v;
-//        cin >> op >> u >> v;
-        scan_d(op), scan_d(u), scan_d(v);
-        if (op == 1) {
-            for (long long i = 1; i <= 710; i++) {
-                rst[i][u % i] += v;
-            }
-            buf[u] += v;
-        } else {
-            if (u <= 710)
-                cout << rst[u][v] << '\n';
-            else {
-                long long cur = 0;
-                for (long long i = v; i <= 500000; i += u) {
-                    cur += buf[i];
-                }
-                cout << cur << '\n';
+    ios::sync_with_stdio(false);
+    long long k;
+    cin >> n >> k;
+    for (long long i = 1; i <= n; i++) {
+        cin >> str[i];
+    }
+    for (long long i = 1; i <= n; i++) {
+        long long l = -1, r = -1;
+        for (long long j = 1; j <= n; j++) {
+            if (str[i][j - 1] == 'B') {
+                if (l == -1) l = j;
+                r = j;
             }
         }
+        if (l == -1) add(1, n, 1, n);
+        else if (r - l + 1 <= k) add(max(1ll, i - k + 1), i, max(1ll, r - k + 1), l);
     }
+    for (long long i = 1; i <= n; i++) {
+        long long l = -1, r = -1;
+        for (long long j = 1; j <= n; j++) {
+            if (str[j][i - 1] == 'B') {
+                if (l == -1) l = j;
+                r = j;
+            }
+        }
+        if (l == -1) add(1, n, 1, n);
+        else if (r - l + 1 <= k) add(max(1ll, r - k + 1), l, max(1ll, i - k + 1), i);
+    }
+
+    for (long long i = 1; i <= n; i++) {
+        for (long long j = 1; j <= n; j++) {
+            dp[i][j] = dp[i][j] + dp[i - 1][j] + dp[i][j - 1] - dp[i - 1][j - 1];
+        }
+    }
+
+    long long res = 0;
+    for (long long i = 1; i <= n; i++) {
+        for (long long j = 1; j <= n; j++) {
+            res = max(res, dp[i][j]);
+        }
+    }
+
+    cout << res << endl;
 
 #ifndef ONLINE_JUDGE
     auto end_time = clock();
