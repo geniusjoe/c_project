@@ -9,48 +9,8 @@ const long long MOD = 998244353;
 const long long OVER_FLOW = 0xffffffff;
 
 long long n; /**< n个数,m个操作,以model为模 */
-const int N = 1000002;
-int nxt[N];
-char S[N], T[N];
-int slen, tlen;
+string str;
 
-void getNext()
-{
-    int j, k;
-    j = 0; k = -1; nxt[0] = -1;
-    while(j < tlen)
-        if(k == -1 || T[j] == T[k])
-            nxt[++j] = ++k;
-        else
-            k = nxt[k];
-
-}
-int KMP(int len)
-{
-    int n=strlen(T);
-
-    int i=max(0,len-n),j=0;
-    getNext();
-    for(i; i<len;)
-    {
-        while(S[i]!=T[j])
-        {
-            if(nxt[j]==0)
-            {
-                j=0;
-                break;
-            }
-            else j=nxt[j];
-        }
-        if(S[i]==T[j])
-        {
-            j++;
-        }
-        i++;
-    }
-    return j;
-
-}
 int main() {
 
 #ifndef ONLINE_JUDGE
@@ -80,23 +40,55 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
-    int TT;
-    cin>>TT;
-    cin>>S;
-    slen = strlen(S);
-    while(TT--)
-    {
-        cin>>T;
-        tlen = strlen(T);
-        int m=tlen;
-        int c=KMP(slen);
-        int i=slen-c;
-        for(int j=0;j<m;j++){
-            S[i++]=T[j];
-        }S[i]='\0';
-        slen+=m-c;
+    long long T;
+    cin >> T;
+    while (T--) {
+        cin >> str;
+        long long up = 0, down = 0, left = 0, right = 0;
+        long long f_up = 0, l_up = 0, f_down = 0, l_down = 0, f_left = 0, l_left = 0, f_right = 0, l_right = 0;
+        long long cur_x = 0, cur_y = 0;
+        for (long long i = 0; i < str.size(); i++) {
+            if (str[i] == 'W') {
+                cur_x++;
+                if (cur_x > up) {
+                    up = cur_x;
+                    f_up = l_up = i;
+                } else if (cur_x == up) {
+                    l_up = i;
+                }
+            } else if (str[i] == 'S') {
+                cur_x--;
+                if (cur_x < down) {
+                    down = cur_x;
+                    f_down = l_down = i;
+                } else if (cur_x == down) {
+                    l_down = i;
+                }
+            } else if (str[i] == 'A') {
+                cur_y--;
+                if (cur_y < left) {
+                    left = cur_y;
+                    f_left = l_left = i;
+                } else if (cur_y == left) {
+                    l_left = i;
+                }
+            } else if (str[i] == 'D') {
+                cur_y++;
+                if (cur_y > right) {
+                    right = cur_y;
+                    f_right = l_right = i;
+                } else if (cur_y == right) {
+                    l_right = i;
+                }
+            }
+        }
+
+        long long res = (up - down + 1) * (right - left + 1);
+        if (l_up < f_down || l_down < f_up) res = min(res, max(2ll, (up - down)) * (right - left + 1));
+        if (l_left < f_right || l_right < f_left) res = min(res, max(2ll, (right - left)) * (up - down + 1));
+
+        cout << res << endl;
     }
-    cout<<S<<"\n";
 
 #ifndef ONLINE_JUDGE
     auto end_time = clock();
