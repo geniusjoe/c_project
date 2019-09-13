@@ -2,69 +2,32 @@
 
 using namespace std;
 
-const long long MAXN = 300500;
+const long long MAXN = 500500;
 const long long INF = 0x7f3f3f3f;
 const long long LINF = 0x1f3f3f3f3f3f3f3f;
 const long long MOD = 998244353;
 const long long OVER_FLOW = 0xffffffff;
 
 long long n, m; /**< n个数,m个操作,以model为模 */
-vector<long long> v;
-long long A[MAXN];
+long long buf[MAXN];
+long long rst[720][720];
 
-struct node {
-    long long l, r;
-
-    bool operator==(node node1) {
-        return (this->l == node1.l && this->r == node1.r);
-    }
-} nodes[MAXN];
-
-bool cmp1(node node1, node node2) {
-    if (node1.l == node2.l)
-        return node1.r < node2.r;
-    return node1.l < node2.l;
+template<class T>
+inline bool scan_d(T &ret) {
+    char c;
+    int sgn;
+    if (c = getchar(), c == EOF) return 0;
+    while (c != '-' && (c < '0' || c > '9')) c = getchar();
+    sgn = (c == '-') ? -1 : 1;
+    ret = (c == '-') ? 0 : (c - '0');
+    while (c = getchar(), c >= '0' && c <= '9') ret = ret * 10 + (c - '0');
+    ret *= sgn;
+    return 1;
 }
 
-bool cmp2(node node1, node node2) {
-    if (node1.r == node2.r)
-        return node1.l < node2.l;
-    return node1.r < node2.r;
-}
-
-void arange() {
-    A[1] = 1;
-    for (long long i = 2; i <= n; i++)
-        A[i] = A[i - 1] * i % MOD;
-}
-
-long long calc(long long type) {
-    v.clear();
-    long long cnt = 0;
-    for (long long i = 1; i <= n; i++) {
-        if (i == 1) cnt++;
-        else if (type == 3 && nodes[i].l < nodes[i - 1].l) return 0;
-        else if (type == 1 && nodes[i].l != nodes[i - 1].l) {
-            v.push_back(cnt);
-            cnt = 1;
-        } else if (type == 2 && nodes[i].r != nodes[i - 1].r) {
-            v.push_back(cnt);
-            cnt = 1;
-        } else if (type == 3 && (nodes[i].l > nodes[i - 1].l || nodes[i].r > nodes[i - 1].r)) {
-            v.push_back(cnt);
-            cnt = 1;
-        } else
-            cnt++;
-    }
-    v.push_back(cnt);
-
-    long long cur = 1;
-    for (auto it:v) {
-        if (it > 1) {
-            cur = cur * A[it] % MOD;
-        }
-    }
-    return cur;
+inline void out(int x) {
+    if (x > 9) out(x / 10);
+    putchar(x % 10 + '0');
 }
 
 int main() {
@@ -95,23 +58,31 @@ int main() {
     4.如果存在等式.转换关系少可以暴力枚举变量,或者考虑从数据大小入手
 */
 
-    ios::sync_with_stdio(false);
-    cin >> n;
-    arange();
-    for (long long i = 1; i <= n; i++) {
-        cin >> nodes[i].l >> nodes[i].r;
+//    ios::sync_with_stdio(false);
+    long long T;
+//    cin >> T;
+    scan_d(T);
+    while (T--) {
+        long long op, u, v;
+//        cin >> op >> u >> v;
+        scan_d(op), scan_d(u), scan_d(v);
+        if (op == 1) {
+            for (long long i = 1; i <= 710; i++) {
+                rst[i][u % i] += v;
+            }
+            buf[u] += v;
+        } else {
+            if (u <= 710)
+                cout << rst[u][v] << '\n';
+            else {
+                long long cur = 0;
+                for (long long i = v; i <= 500000; i += u) {
+                    cur += buf[i];
+                }
+                cout << cur << '\n';
+            }
+        }
     }
-    long long res = 1;
-    res = res * A[n] % MOD;
-    sort(nodes + 1, nodes + 1 + n, cmp1);
-    res = (res - calc(1) + MOD) % MOD;
-
-    sort(nodes + 1, nodes + 1 + n, cmp2);
-    res = (res - calc(2) + MOD) % MOD;
-
-    res = (res + calc(3)) % MOD;
-
-    cout << res << endl;
 
 #ifndef ONLINE_JUDGE
     auto end_time = clock();
