@@ -8,14 +8,49 @@ const long long LINF = 0x1f3f3f3f3f3f3f3f;
 const long long MOD = 998244353;
 const long long OVER_FLOW = 0xffffffff;
 
-long long n, m; /**< n个数,m个操作,以model为模 */
-string str[MAXN];
-long long dp[MAXN][MAXN];
+long long n; /**< n个数,m个操作,以model为模 */
+const int N = 1000002;
+int nxt[N];
+char S[N], T[N];
+int slen, tlen;
 
-void add(long long l1, long long r1, long long l2, long long r2) {
-    dp[l1][l2]++, dp[l1][r2 + 1]--, dp[r1 + 1][l2]--, dp[r1 + 1][r2 + 1]++;
+void getNext()
+{
+    int j, k;
+    j = 0; k = -1; nxt[0] = -1;
+    while(j < tlen)
+        if(k == -1 || T[j] == T[k])
+            nxt[++j] = ++k;
+        else
+            k = nxt[k];
+
 }
+int KMP(int len)
+{
+    int n=strlen(T);
 
+    int i=max(0,len-n),j=0;
+    getNext();
+    for(i; i<len;)
+    {
+        while(S[i]!=T[j])
+        {
+            if(nxt[j]==0)
+            {
+                j=0;
+                break;
+            }
+            else j=nxt[j];
+        }
+        if(S[i]==T[j])
+        {
+            j++;
+        }
+        i++;
+    }
+    return j;
+
+}
 int main() {
 
 #ifndef ONLINE_JUDGE
@@ -45,48 +80,23 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
-    long long k;
-    cin >> n >> k;
-    for (long long i = 1; i <= n; i++) {
-        cin >> str[i];
+    int TT;
+    cin>>TT;
+    cin>>S;
+    slen = strlen(S);
+    while(TT--)
+    {
+        cin>>T;
+        tlen = strlen(T);
+        int m=tlen;
+        int c=KMP(slen);
+        int i=slen-c;
+        for(int j=0;j<m;j++){
+            S[i++]=T[j];
+        }S[i]='\0';
+        slen+=m-c;
     }
-    for (long long i = 1; i <= n; i++) {
-        long long l = -1, r = -1;
-        for (long long j = 1; j <= n; j++) {
-            if (str[i][j - 1] == 'B') {
-                if (l == -1) l = j;
-                r = j;
-            }
-        }
-        if (l == -1) add(1, n, 1, n);
-        else if (r - l + 1 <= k) add(max(1ll, i - k + 1), i, max(1ll, r - k + 1), l);
-    }
-    for (long long i = 1; i <= n; i++) {
-        long long l = -1, r = -1;
-        for (long long j = 1; j <= n; j++) {
-            if (str[j][i - 1] == 'B') {
-                if (l == -1) l = j;
-                r = j;
-            }
-        }
-        if (l == -1) add(1, n, 1, n);
-        else if (r - l + 1 <= k) add(max(1ll, r - k + 1), l, max(1ll, i - k + 1), i);
-    }
-
-    for (long long i = 1; i <= n; i++) {
-        for (long long j = 1; j <= n; j++) {
-            dp[i][j] = dp[i][j] + dp[i - 1][j] + dp[i][j - 1] - dp[i - 1][j - 1];
-        }
-    }
-
-    long long res = 0;
-    for (long long i = 1; i <= n; i++) {
-        for (long long j = 1; j <= n; j++) {
-            res = max(res, dp[i][j]);
-        }
-    }
-
-    cout << res << endl;
+    cout<<S<<"\n";
 
 #ifndef ONLINE_JUDGE
     auto end_time = clock();
