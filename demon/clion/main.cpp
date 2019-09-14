@@ -9,7 +9,91 @@ const long long MOD = 998244353;
 const long long OVER_FLOW = 0xffffffff;
 
 long long n; /**< n个数,m个操作,以model为模 */
-string str;
+long long res1[500010], res2[500010];
+
+
+struct Trie {
+    int next[500010][26], fail[500010], end[500010];
+    int root, L;
+
+    int newnode() {
+        for (int i = 0; i < 26; i++)
+            next[L][i] = -1;
+        end[L++] = 0;
+        return L - 1;
+    }
+
+    void init() {
+        L = 0;
+        root = newnode();
+    }
+
+    void insert(char buf[]) {
+        int len = strlen(buf);
+        int now = root;
+        for (int i = 0; i < len; i++) {
+            if (next[now][buf[i] - 'a'] == -1)
+                next[now][buf[i] - 'a'] = newnode();
+            now = next[now][buf[i] - 'a'];
+        }
+        end[now]++;
+    }
+
+    void build() {
+        queue<int> Q;
+        fail[root] = root;
+        for (int i = 0; i < 26; i++)
+            if (next[root][i] == -1)
+                next[root][i] = root;
+            else {
+                fail[next[root][i]] = root;
+                Q.push(next[root][i]);
+            }
+        while (!Q.empty()) {
+            int now = Q.front();
+            Q.pop();
+            end[now]+=end[fail[now]];
+            for (int i = 0; i < 26; i++)
+
+                if (next[now][i] == -1)
+                    next[now][i] = next[fail[now]][i];
+                else {
+                    fail[next[now][i]] = next[fail[now]][i];
+                    Q.push(next[now][i]);
+                }
+        }
+    }
+
+    int query(char buf[], long long res1[]) {
+        int len = strlen(buf);
+        int now = root;
+        int res = 0;
+        for (int i = 0; i < len; i++) {
+            now = next[now][buf[i] - 'a'];
+            int temp = now;
+//            while (temp != root) {
+//                res += end[temp];
+//                end[temp] = 0;
+                res1[i] += end[temp];
+//                temp = fail[temp];
+//            }
+        }
+        return res;
+    }
+
+    void debug() {
+        for (int i = 0; i < L; i++) {
+            printf("id␣=␣%3d,fail␣=␣%3d,end␣=␣%3d,chi␣=␣[", i, fail[i
+            ], end[i]);
+            for (int j = 0; j < 26; j++)
+                printf("%2d", next[i][j]);
+            printf("]\n");
+        }
+    }
+};
+
+char buf[1000010], raw[1000010];
+Trie ac1, ac2;
 
 int main() {
 
@@ -39,56 +123,32 @@ int main() {
     4.如果存在等式.转换关系少可以暴力枚举变量,或者考虑从数据大小入手
 */
 
-    ios::sync_with_stdio(false);
+//    ios::sync_with_stdio(false);
     long long T;
-    cin >> T;
+//    cin >> raw;
+//    cin >> T;
+    scanf("%s", raw), scanf("%I64d", &T);
+    ac1.init(), ac2.init();
     while (T--) {
-        cin >> str;
-        long long up = 0, down = 0, left = 0, right = 0;
-        long long f_up = 0, l_up = 0, f_down = 0, l_down = 0, f_left = 0, l_left = 0, f_right = 0, l_right = 0;
-        long long cur_x = 0, cur_y = 0;
-        for (long long i = 0; i < str.size(); i++) {
-            if (str[i] == 'W') {
-                cur_x++;
-                if (cur_x > up) {
-                    up = cur_x;
-                    f_up = l_up = i;
-                } else if (cur_x == up) {
-                    l_up = i;
-                }
-            } else if (str[i] == 'S') {
-                cur_x--;
-                if (cur_x < down) {
-                    down = cur_x;
-                    f_down = l_down = i;
-                } else if (cur_x == down) {
-                    l_down = i;
-                }
-            } else if (str[i] == 'A') {
-                cur_y--;
-                if (cur_y < left) {
-                    left = cur_y;
-                    f_left = l_left = i;
-                } else if (cur_y == left) {
-                    l_left = i;
-                }
-            } else if (str[i] == 'D') {
-                cur_y++;
-                if (cur_y > right) {
-                    right = cur_y;
-                    f_right = l_right = i;
-                } else if (cur_y == right) {
-                    l_right = i;
-                }
-            }
-        }
-
-        long long res = (up - down + 1) * (right - left + 1);
-        if (l_up < f_down || l_down < f_up) res = min(res, max(2ll, (up - down)) * (right - left + 1));
-        if (l_left < f_right || l_right < f_left) res = min(res, max(2ll, (right - left)) * (up - down + 1));
-
-        cout << res << endl;
+//        cin >> buf;
+        scanf("%s", buf);
+        long long cur_len = strlen(buf);
+        ac1.insert(buf);
+        reverse(buf, buf + cur_len);
+        ac2.insert(buf);
     }
+    ac1.build(), ac2.build();
+//    strcpy(buf, raw);
+    long long str_len = strlen(raw);
+    ac1.query(raw, res1);
+    reverse(raw, raw + str_len);
+    ac2.query(raw, res2);
+    long long res = 0;
+    for (long long i = 0; i < str_len - 1; i++) {
+        res += res1[i] * res2[str_len - i - 2];
+    }
+//    cout << res << endl;
+    printf("%I64d\n", res);
 
 #ifndef ONLINE_JUDGE
     auto end_time = clock();
