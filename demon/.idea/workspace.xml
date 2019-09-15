@@ -10,10 +10,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fe737d29-c3df-4837-a285-7514b3479af9" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/acm.py" beforeDir="false" afterPath="$PROJECT_DIR$/acm.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/clion/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/clion/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/clion/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/clion/main.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/testdata.in" beforeDir="false" afterPath="$PROJECT_DIR$/testdata.in" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -29,8 +27,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/acm.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="304">
-              <caret line="16" column="34" selection-start-line="16" selection-start-column="34" selection-end-line="16" selection-end-column="34" />
+            <state relative-caret-position="114">
+              <caret line="6" column="22" selection-start-line="6" selection-start-column="22" selection-end-line="6" selection-end-column="22" />
               <folding>
                 <element signature="e#0#13#0" expanded="true" />
               </folding>
@@ -57,11 +55,11 @@
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="1">
-    <option name="x" value="-400" />
-    <option name="y" value="826" />
-    <option name="width" value="3866" />
-    <option name="height" value="2106" />
+  <component name="ProjectFrameBounds" extendedState="7">
+    <option name="x" value="4088" />
+    <option name="y" value="1207" />
+    <option name="width" value="813" />
+    <option name="height" value="647" />
   </component>
   <component name="ProjectId" id="1PYwqpPRWoLsa5B6QQKsPm71g2E" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
@@ -70,7 +68,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -82,6 +79,7 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -193,10 +191,10 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-6" y="-6" width="1933" height="1053" extended-state="7" />
+    <frame x="3833" y="1073" width="1038" height="794" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.11011591" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.20837487" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -275,8 +273,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/acm.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="304">
-          <caret line="16" column="34" selection-start-line="16" selection-start-column="34" selection-end-line="16" selection-end-column="34" />
+        <state relative-caret-position="114">
+          <caret line="6" column="22" selection-start-line="6" selection-start-column="22" selection-end-line="6" selection-end-column="22" />
           <folding>
             <element signature="e#0#13#0" expanded="true" />
           </folding>

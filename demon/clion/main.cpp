@@ -2,98 +2,28 @@
 
 using namespace std;
 
-const long long MAXN = 5005;
-const long long INF = 0x7f3f3f3f;
+const long long MAXN = 200500;
+const long long INF = 0x3f3f3f3f;
 const long long LINF = 0x1f3f3f3f3f3f3f3f;
 const long long MOD = 998244353;
 const long long OVER_FLOW = 0xffffffff;
 
-long long n; /**< n个数,m个操作,以model为模 */
-long long res1[500010], res2[500010];
+long long n;
+long long lb[MAXN], rb[MAXN];
+vector<long long> v[MAXN], buf;
+long long dp[MAXN][2];
 
+long long calc(long long y1, long long y2, long long line) {
+    return abs(y1 - line) + abs(line - y2);
+}
 
-struct Trie {
-    int next[500010][26], fail[500010], end[500010];
-    int root, L;
+long long dist(long long x1, long long y1, long long x2, long long y2) {
+    long long dis_x = abs(x1 - x2);
+    long long dis_y = min(min(calc(y1, y2, lb[y1]), calc(y1, y2, lb[y2])),
+                          min(calc(y1, y2, rb[y1]), calc(y1, y2, rb[y2])));
+    return dis_x + dis_y;
+}
 
-    int newnode() {
-        for (int i = 0; i < 26; i++)
-            next[L][i] = -1;
-        end[L++] = 0;
-        return L - 1;
-    }
-
-    void init() {
-        L = 0;
-        root = newnode();
-    }
-
-    void insert(char buf[]) {
-        int len = strlen(buf);
-        int now = root;
-        for (int i = 0; i < len; i++) {
-            if (next[now][buf[i] - 'a'] == -1)
-                next[now][buf[i] - 'a'] = newnode();
-            now = next[now][buf[i] - 'a'];
-        }
-        end[now]++;
-    }
-
-    void build() {
-        queue<int> Q;
-        fail[root] = root;
-        for (int i = 0; i < 26; i++)
-            if (next[root][i] == -1)
-                next[root][i] = root;
-            else {
-                fail[next[root][i]] = root;
-                Q.push(next[root][i]);
-            }
-        while (!Q.empty()) {
-            int now = Q.front();
-            Q.pop();
-            end[now]+=end[fail[now]];
-            for (int i = 0; i < 26; i++)
-
-                if (next[now][i] == -1)
-                    next[now][i] = next[fail[now]][i];
-                else {
-                    fail[next[now][i]] = next[fail[now]][i];
-                    Q.push(next[now][i]);
-                }
-        }
-    }
-
-    int query(char buf[], long long res1[]) {
-        int len = strlen(buf);
-        int now = root;
-        int res = 0;
-        for (int i = 0; i < len; i++) {
-            now = next[now][buf[i] - 'a'];
-            int temp = now;
-//            while (temp != root) {
-//                res += end[temp];
-//                end[temp] = 0;
-                res1[i] += end[temp];
-//                temp = fail[temp];
-//            }
-        }
-        return res;
-    }
-
-    void debug() {
-        for (int i = 0; i < L; i++) {
-            printf("id␣=␣%3d,fail␣=␣%3d,end␣=␣%3d,chi␣=␣[", i, fail[i
-            ], end[i]);
-            for (int j = 0; j < 26; j++)
-                printf("%2d", next[i][j]);
-            printf("]\n");
-        }
-    }
-};
-
-char buf[1000010], raw[1000010];
-Trie ac1, ac2;
 
 int main() {
 
@@ -124,31 +54,49 @@ int main() {
 */
 
 //    ios::sync_with_stdio(false);
-    long long T;
-//    cin >> raw;
-//    cin >> T;
-    scanf("%s", raw), scanf("%I64d", &T);
-    ac1.init(), ac2.init();
-    while (T--) {
-//        cin >> buf;
-        scanf("%s", buf);
-        long long cur_len = strlen(buf);
-        ac1.insert(buf);
-        reverse(buf, buf + cur_len);
-        ac2.insert(buf);
+    long long m, k, q;
+    cin >> n >> m >> k >> q;
+    for (long long i = 1; i <= k; i++) {
+        long long u, x;
+        cin >> u >> x;
+        v[u].push_back(x);
     }
-    ac1.build(), ac2.build();
-//    strcpy(buf, raw);
-    long long str_len = strlen(raw);
-    ac1.query(raw, res1);
-    reverse(raw, raw + str_len);
-    ac2.query(raw, res2);
-    long long res = 0;
-    for (long long i = 0; i < str_len - 1; i++) {
-        res += res1[i] * res2[str_len - i - 2];
+    for (long long i = 1; i <= q; i++) {
+        long long u;
+        cin >> u;
+        buf.push_back(u);
     }
-//    cout << res << endl;
-    printf("%I64d\n", res);
+    for (long long i = 1; i <= n; i++) sort(v[i].begin(), v[i].end());
+
+    buf.push_back(INF), buf.push_back(-INF);
+    sort(buf.begin(), buf.end());
+    for (long long i = 1; i <= m; i++) {
+        rb[i] = buf[lower_bound(buf.begin(), buf.end(), i) - buf.begin()];
+        lb[i] = buf[lower_bound(buf.begin(), buf.end(), i) - buf.begin() - 1];
+    }
+
+    if (!v[1].empty()) {
+        dp[1][1] = dp[1][0] = v[1].back() - 1;
+        v[1][0]=v[1].back();
+    } else {
+        v[1].push_back(1);
+        dp[1][1] = dp[1][0] = 0;
+    }
+    long long lst = 1;
+    for (long long i = 2; i <= n; i++) {
+        if (!v[i].empty()) {
+            long long l_to_l = dp[lst][0] + dist(lst, v[lst].front(), i, v[i].front());
+            long long r_to_l = dp[lst][1] + dist(lst, v[lst].back(), i, v[i].front());
+            long long l_to_r = dp[lst][0] + dist(lst, v[lst].front(), i, v[i].back());
+            long long r_to_r = dp[lst][1] + dist(lst, v[lst].back(), i, v[i].back());
+            long long cur = v[i].back() - v[i].front();
+            dp[i][0] = min(l_to_r, r_to_r) + cur;
+            dp[i][1] = min(l_to_l, r_to_l) + cur;
+            lst = i;
+        }
+    }
+    cout << min(dp[lst][0], dp[lst][1]) << endl;
+
 
 #ifndef ONLINE_JUDGE
     auto end_time = clock();
