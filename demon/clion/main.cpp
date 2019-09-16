@@ -2,28 +2,16 @@
 
 using namespace std;
 
-const long long MAXN = 200500;
+const long long MAXN = 300500;
 const long long INF = 0x3f3f3f3f;
 const long long LINF = 0x1f3f3f3f3f3f3f3f;
 const long long MOD = 998244353;
 const long long OVER_FLOW = 0xffffffff;
 
 long long n;
-long long lb[MAXN], rb[MAXN];
-vector<long long> v[MAXN], buf;
-long long dp[MAXN][2];
-
-long long calc(long long y1, long long y2, long long line) {
-    return abs(y1 - line) + abs(line - y2);
-}
-
-long long dist(long long x1, long long y1, long long x2, long long y2) {
-    long long dis_x = abs(x1 - x2);
-    long long dis_y = min(min(calc(y1, y2, lb[y1]), calc(y1, y2, lb[y2])),
-                          min(calc(y1, y2, rb[y1]), calc(y1, y2, rb[y2])));
-    return dis_x + dis_y;
-}
-
+vector<pair<long long, long long >> edges;
+vector<long long> res;
+bool vis[MAXN];
 
 int main() {
 
@@ -53,50 +41,48 @@ int main() {
     4.如果存在等式.转换关系少可以暴力枚举变量,或者考虑从数据大小入手
 */
 
-//    ios::sync_with_stdio(false);
-    long long m, k, q;
-    cin >> n >> m >> k >> q;
-    for (long long i = 1; i <= k; i++) {
-        long long u, x;
-        cin >> u >> x;
-        v[u].push_back(x);
-    }
-    for (long long i = 1; i <= q; i++) {
-        long long u;
-        cin >> u;
-        buf.push_back(u);
-    }
-    for (long long i = 1; i <= n; i++) sort(v[i].begin(), v[i].end());
-
-    buf.push_back(INF), buf.push_back(-INF);
-    sort(buf.begin(), buf.end());
-    for (long long i = 1; i <= m; i++) {
-        rb[i] = buf[lower_bound(buf.begin(), buf.end(), i) - buf.begin()];
-        lb[i] = buf[lower_bound(buf.begin(), buf.end(), i) - buf.begin() - 1];
-    }
-
-    if (!v[1].empty()) {
-        dp[1][1] = dp[1][0] = v[1].back() - 1;
-        v[1][0]=v[1].back();
-    } else {
-        v[1].push_back(1);
-        dp[1][1] = dp[1][0] = 0;
-    }
-    long long lst = 1;
-    for (long long i = 2; i <= n; i++) {
-        if (!v[i].empty()) {
-            long long l_to_l = dp[lst][0] + dist(lst, v[lst].front(), i, v[i].front());
-            long long r_to_l = dp[lst][1] + dist(lst, v[lst].back(), i, v[i].front());
-            long long l_to_r = dp[lst][0] + dist(lst, v[lst].front(), i, v[i].back());
-            long long r_to_r = dp[lst][1] + dist(lst, v[lst].back(), i, v[i].back());
-            long long cur = v[i].back() - v[i].front();
-            dp[i][0] = min(l_to_r, r_to_r) + cur;
-            dp[i][1] = min(l_to_l, r_to_l) + cur;
-            lst = i;
+    ios::sync_with_stdio(false);
+    long long T;
+    cin >> T;
+    while (T--) {
+        edges.clear(), res.clear();
+        long long cnt = 0, m;
+        cin >> n >> m;
+        for (long long i = 1; i <= 3 * n; i++) vis[i] = false;
+        for (long long i = 1; i <= m; i++) {
+            long long u, v;
+            cin >> u >> v;
+            edges.emplace_back(u, v);
+        }
+        for (long long i = 0; i < edges.size(); i++) {
+            if (!vis[edges[i].first] && !vis[edges[i].second]) {
+                vis[edges[i].first] = vis[edges[i].second] = true;
+                cnt += 2;
+                res.push_back(i + 1);
+            }
+        }
+        if (res.size() >= n) {
+            cout << "Matching" << '\n';
+            long long cur = 0;
+            for (auto it:res) {
+                cur++;
+                cout << it << " ";
+                if (cur == n) break;
+            }
+            cout << '\n';
+        } else {
+            cout << "IndSet" << '\n';
+            long long cur = 0;
+            for (long long i = 1; i <= 3 * n; i++) {
+                if (!vis[i]) {
+                    cout << i << " ";
+                    cur++;
+                }
+                if (cur == n) break;
+            }
+            cout << '\n';
         }
     }
-    cout << min(dp[lst][0], dp[lst][1]) << endl;
-
 
 #ifndef ONLINE_JUDGE
     auto end_time = clock();
