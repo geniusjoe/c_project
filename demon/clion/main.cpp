@@ -2,16 +2,30 @@
 
 using namespace std;
 
-const long long MAXN = 300500;
+const long long MAXN = 55;
 const long long INF = 0x3f3f3f3f;
 const long long LINF = 0x1f3f3f3f3f3f3f3f;
 const long long MOD = 998244353;
 const long long OVER_FLOW = 0xffffffff;
 
 long long n;
-vector<pair<long long, long long >> edges;
-vector<long long> res;
-bool vis[MAXN];
+long long dp[MAXN][MAXN][MAXN][MAXN];
+string str[MAXN];
+
+long long dfs(long long x1, long long y1, long long x2, long long y2) {
+    if (dp[x1][y1][x2][y2] != -1) return dp[x1][y1][x2][y2];
+    else {
+        dp[x1][y1][x2][y2] = max(x2 - x1 + 1, y2 - y1 + 1);
+        for (long long i = x1; i < x2; i++) {
+            dp[x1][y1][x2][y2] = min(dp[x1][y1][x2][y2], dfs(x1, y1, i, y2) + dfs(i + 1, y1, x2, y2));
+        }
+        for (long long i = y1; i < y2; i++) {
+            dp[x1][y1][x2][y2] = min(dp[x1][y1][x2][y2], dfs(x1, y1, x2, i) + dfs(x1, i + 1, x2, y2));
+        }
+    }
+    return dp[x1][y1][x2][y2];
+}
+
 
 int main() {
 
@@ -42,47 +56,16 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
-    long long T;
-    cin >> T;
-    while (T--) {
-        edges.clear(), res.clear();
-        long long cnt = 0, m;
-        cin >> n >> m;
-        for (long long i = 1; i <= 3 * n; i++) vis[i] = false;
-        for (long long i = 1; i <= m; i++) {
-            long long u, v;
-            cin >> u >> v;
-            edges.emplace_back(u, v);
-        }
-        for (long long i = 0; i < edges.size(); i++) {
-            if (!vis[edges[i].first] && !vis[edges[i].second]) {
-                vis[edges[i].first] = vis[edges[i].second] = true;
-                cnt += 2;
-                res.push_back(i + 1);
-            }
-        }
-        if (res.size() >= n) {
-            cout << "Matching" << '\n';
-            long long cur = 0;
-            for (auto it:res) {
-                cur++;
-                cout << it << " ";
-                if (cur == n) break;
-            }
-            cout << '\n';
-        } else {
-            cout << "IndSet" << '\n';
-            long long cur = 0;
-            for (long long i = 1; i <= 3 * n; i++) {
-                if (!vis[i]) {
-                    cout << i << " ";
-                    cur++;
-                }
-                if (cur == n) break;
-            }
-            cout << '\n';
+    cin >> n;
+    memset(dp, -1, sizeof(dp));
+    for (long long i = 1; i <= n; i++) {
+        cin >> str[i];
+        for (long long j = 1; j <= n; j++) {
+            if (str[i][j - 1] == '#') dp[i][j][i][j] = 1;
+            else dp[i][j][i][j] = 0;
         }
     }
+    cout << dfs(1, 1, n, n) << endl;
 
 #ifndef ONLINE_JUDGE
     auto end_time = clock();
