@@ -2,29 +2,16 @@
 
 using namespace std;
 
-const long long MAXN = 55;
+const long long MAXN = 400050;
 const long long INF = 0x3f3f3f3f;
 const long long LINF = 0x1f3f3f3f3f3f3f3f;
-const long long MOD = 998244353;
+const long long MOD = (long long) 1e9 + 7;
 const long long OVER_FLOW = 0xffffffff;
 
 long long n;
-long long dp[MAXN][MAXN][MAXN][MAXN];
-string str[MAXN];
-
-long long dfs(long long x1, long long y1, long long x2, long long y2) {
-    if (dp[x1][y1][x2][y2] != -1) return dp[x1][y1][x2][y2];
-    else {
-        dp[x1][y1][x2][y2] = max(x2 - x1 + 1, y2 - y1 + 1);
-        for (long long i = x1; i < x2; i++) {
-            dp[x1][y1][x2][y2] = min(dp[x1][y1][x2][y2], dfs(x1, y1, i, y2) + dfs(i + 1, y1, x2, y2));
-        }
-        for (long long i = y1; i < y2; i++) {
-            dp[x1][y1][x2][y2] = min(dp[x1][y1][x2][y2], dfs(x1, y1, x2, i) + dfs(x1, i + 1, x2, y2));
-        }
-    }
-    return dp[x1][y1][x2][y2];
-}
+vector<long long> edges[MAXN], hsh;
+vector<pair<long long, long long>> points;
+long long f[MAXN], cnt[MAXN];
 
 
 int main() {
@@ -53,19 +40,63 @@ int main() {
     2.dp
     3.如果规模小的话还能尝试dfs
     4.如果存在等式.转换关系少可以暴力枚举变量,或者考虑从数据大小入手
+    5.离散化+打表
 */
 
     ios::sync_with_stdio(false);
     cin >> n;
-    memset(dp, -1, sizeof(dp));
     for (long long i = 1; i <= n; i++) {
-        cin >> str[i];
-        for (long long j = 1; j <= n; j++) {
-            if (str[i][j - 1] == '#') dp[i][j][i][j] = 1;
-            else dp[i][j][i][j] = 0;
+        long long u, v;
+        cin >> u >> v;
+        points.emplace_back(v, u);
+        hsh.push_back(u), hsh.push_back(v);
+    }
+    sort(hsh.begin(), hsh.end());
+    auto ip = unique(hsh.begin(), hsh.end());
+    hsh.resize(distance(hsh.begin(), ip));
+    long long mx = 0;
+    for (auto it:points) {
+        long long u, v;
+        u = lower_bound(hsh.begin(), hsh.end(), it.first) - hsh.begin();
+        v = lower_bound(hsh.begin(), hsh.end(), it.second) - hsh.begin();
+        edges[u].push_back(v);
+        mx = max(mx, u);
+    }
+
+    long long res = 0, mn = INF;
+    for (long long i = 0; i < hsh.size(); i++) {
+        if (i == 0) {
+            f[0] = 0, cnt[0] = 1;
+        } else if (f[i] > f[i - 1]) {
+            f[i] = f[i - 1];
+            cnt[i] = cnt[i - 1];
+        } else if (f[i] == f[i - 1]) {
+            cnt[i] += cnt[i - 1];
+            cnt[i] %= MOD;
+        }
+
+        for (auto it:edges[i]) {
+
+            long long cur = f[i] + hsh[i];
+            if (it > mx && cur == mn) {
+                res += cnt[i];
+                res %= MOD;
+            } else if (it > mx && cur < mn) {
+                res = cnt[i];
+                mn = cur;
+            }
+            if (f[it] == cur - hsh[it]) {
+                cnt[it] += cnt[i];
+                cnt[it] %= MOD;
+            } else if (f[it] > cur - hsh[it]) {
+                f[it] = cur - hsh[it];
+                cnt[it] = cnt[i];
+            }
         }
     }
-    cout << dfs(1, 1, n, n) << endl;
+
+    cout << res << endl;
+
 
 #ifndef ONLINE_JUDGE
     auto end_time = clock();
