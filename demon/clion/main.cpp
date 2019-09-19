@@ -2,19 +2,19 @@
 
 using namespace std;
 
-const long long MAXN = 4000;
+const long long MAXN = 5050;
 const long long INF = 0x3f3f3f3f;
 const long long LINF = 0x1f3f3f3f3f3f3f3f;
 const long long MOD = (long long) 1e9 + 7;
 const long long OVER_FLOW = 0xffffffff;
 
 long long n;
-int g[MAXN * MAXN];
-int buf[MAXN][MAXN];
-int mx[MAXN][MAXN];
+bitset<MAXN + 5> edge[MAXN];
 
-
-deque<long long> q;
+struct line {
+    long long x1, x2, y1, y2;
+};
+vector<line> row, col;
 
 int main() {
 
@@ -46,37 +46,47 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
-    long long m, a, b;
-    cin >> n >> m >> a >> b;
-    long long x, y, z;
-    cin >> g[0] >> x >> y >> z;
-    for (long long i = 1; i <= n * m; i++) g[i] = (g[i - 1] * x + y) % z;
+    cin >> n;
     for (long long i = 1; i <= n; i++) {
-        for (long long j = 1; j <= m; j++) {
-            buf[i][j] = g[(i - 1) * m + j - 1];
-        }
-    }
-    for (long long i = 1; i <= n; i++) {
-        q.clear();
-        for (long long j = 1; j <= m; j++) {
-            while (!q.empty() && j - q.front() + 1 > b) q.pop_front();
-            while (!q.empty() && buf[i][q.back()] > buf[i][j]) q.pop_back();
-            q.push_back(j);
-            mx[i][j] = buf[i][q.front()];
-        }
+        long long x1, y1, x2, y2;
+        cin >> x1 >> y1 >> x2 >> y2;
+        if (x1 == x2) row.push_back(line{x1, x2, min(y1, y2), max(y1, y2)});
+        else col.push_back(line{min(x1, x2), max(x1, x2), y1, y2});
     }
 
-    long long res = 0;
-    for (long long i = b; i <= m; i++) {
-        q.clear();
-        for (long long j = 1; j <= n; j++) {
-            while (!q.empty() && j - q.front() + 1 > a) q.pop_front();
-            while (!q.empty() && mx[q.back()][i] > mx[j][i]) q.pop_back();
-            q.push_back(j);
-            if (j >= a) res += mx[q.front()][i];
+    if (row.size() < col.size()) {
+        for (long long i = 0; i < row.size(); i++) {
+            for (long long j = 0; j < col.size(); j++) {
+                if (row[i].y1 <= col[j].y1 && row[i].y2 >= col[j].y1
+                    && row[i].x1 >= col[j].x1 && row[i].x1 <= col[j].x2)
+                    edge[i].set(j);
+            }
         }
+        long long res = 0;
+        for (long long i = 0; i < row.size(); i++) {
+            for (long long j = i + 1; j < row.size(); j++) {
+                long long t = (edge[i] & edge[j]).count();
+                res += t * (t - 1) / 2;
+            }
+        }
+        cout << res << endl;
+    } else {
+        for (long long i = 0; i < col.size(); i++) {
+            for (long long j = 0; j < row.size(); j++) {
+                if (col[i].x1 <= row[j].x1 && col[i].x2 >= row[j].x1
+                    && col[i].y1 >= row[j].y1 && col[i].y1 <= row[j].y2)
+                    edge[i].set(j);
+            }
+        }
+        long long res = 0;
+        for (long long i = 0; i < col.size(); i++) {
+            for (long long j = i + 1; j < col.size(); j++) {
+                long long t = (edge[i] & edge[j]).count();
+                res += t * (t - 1) / 2;
+            }
+        }
+        cout << res << endl;
     }
-    cout << res << endl;
 
 
 #ifndef ONLINE_JUDGE
