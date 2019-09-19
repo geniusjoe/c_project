@@ -2,17 +2,19 @@
 
 using namespace std;
 
-const long long MAXN = 400050;
+const long long MAXN = 4000;
 const long long INF = 0x3f3f3f3f;
 const long long LINF = 0x1f3f3f3f3f3f3f3f;
 const long long MOD = (long long) 1e9 + 7;
 const long long OVER_FLOW = 0xffffffff;
 
 long long n;
-vector<long long> edges[MAXN], hsh;
-vector<pair<long long, long long>> points;
-long long f[MAXN], cnt[MAXN];
+int g[MAXN * MAXN];
+int buf[MAXN][MAXN];
+int mx[MAXN][MAXN];
 
+
+deque<long long> q;
 
 int main() {
 
@@ -44,57 +46,36 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
-    cin >> n;
+    long long m, a, b;
+    cin >> n >> m >> a >> b;
+    long long x, y, z;
+    cin >> g[0] >> x >> y >> z;
+    for (long long i = 1; i <= n * m; i++) g[i] = (g[i - 1] * x + y) % z;
     for (long long i = 1; i <= n; i++) {
-        long long u, v;
-        cin >> u >> v;
-        points.emplace_back(v, u);
-        hsh.push_back(u), hsh.push_back(v);
-    }
-    sort(hsh.begin(), hsh.end());
-    auto ip = unique(hsh.begin(), hsh.end());
-    hsh.resize(distance(hsh.begin(), ip));
-    long long mx = 0;
-    for (auto it:points) {
-        long long u, v;
-        u = lower_bound(hsh.begin(), hsh.end(), it.first) - hsh.begin();
-        v = lower_bound(hsh.begin(), hsh.end(), it.second) - hsh.begin();
-        edges[u].push_back(v);
-        mx = max(mx, u);
-    }
-
-    long long res = 0, mn = INF;
-    for (long long i = 0; i < hsh.size(); i++) {
-        if (i == 0) {
-            f[0] = 0, cnt[0] = 1;
-        } else if (f[i] > f[i - 1]) {
-            f[i] = f[i - 1];
-            cnt[i] = cnt[i - 1];
-        } else if (f[i] == f[i - 1]) {
-            cnt[i] += cnt[i - 1];
-            cnt[i] %= MOD;
+        for (long long j = 1; j <= m; j++) {
+            buf[i][j] = g[(i - 1) * m + j - 1];
         }
-
-        for (auto it:edges[i]) {
-
-            long long cur = f[i] + hsh[i];
-            if (it > mx && cur == mn) {
-                res += cnt[i];
-                res %= MOD;
-            } else if (it > mx && cur < mn) {
-                res = cnt[i];
-                mn = cur;
-            }
-            if (f[it] == cur - hsh[it]) {
-                cnt[it] += cnt[i];
-                cnt[it] %= MOD;
-            } else if (f[it] > cur - hsh[it]) {
-                f[it] = cur - hsh[it];
-                cnt[it] = cnt[i];
-            }
+    }
+    for (long long i = 1; i <= n; i++) {
+        q.clear();
+        for (long long j = 1; j <= m; j++) {
+            while (!q.empty() && j - q.front() + 1 > b) q.pop_front();
+            while (!q.empty() && buf[i][q.back()] > buf[i][j]) q.pop_back();
+            q.push_back(j);
+            mx[i][j] = buf[i][q.front()];
         }
     }
 
+    long long res = 0;
+    for (long long i = b; i <= m; i++) {
+        q.clear();
+        for (long long j = 1; j <= n; j++) {
+            while (!q.empty() && j - q.front() + 1 > a) q.pop_front();
+            while (!q.empty() && mx[q.back()][i] > mx[j][i]) q.pop_back();
+            q.push_back(j);
+            if (j >= a) res += mx[q.front()][i];
+        }
+    }
     cout << res << endl;
 
 
