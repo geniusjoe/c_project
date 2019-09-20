@@ -2,15 +2,74 @@
 
 using namespace std;
 
-const long long MAXN = 200500;
+const long long MAXN = 400050;
 const long long INF = 0x3f3f3f3f;
 const long long LINF = 0x1f3f3f3f3f3f3f3f;
 const long long MOD = (long long) 1e9 + 7;
 const long long OVER_FLOW = 0xffffffff;
 
 long long n;
-string str;
-long long l[MAXN], r[MAXN];
+long long ans[MAXN << 2];
+vector<pair<long long, long long>> points;
+vector<long long> pts[MAXN];
+vector<long long> buf;
+
+inline long long lchild(long long x)
+/**<  每个树节点的编号*/
+{
+    return x << 1;
+}
+
+inline long long rchild(long long x) {
+    return x << 1 | 1;
+}
+
+inline void push_up(long long p) {
+    ans[p] = (ans[lchild(p)] + ans[rchild(p)]);
+}
+
+/**< 由顶向下建立线段树 */
+/**< 左右均为闭区间 */
+void build(long long p, long long l, long long r) {
+    if (l == r) {
+        ans[p] = 0;
+        return;
+    }
+    long long mid = (l + r) >> 1;
+    build(lchild(p), l, mid);
+    build(rchild(p), mid + 1, r);
+    push_up(p);
+}
+/**< 区间赋值操作 */
+/**< 区间内元素增加的值 */
+inline void update(long long nl, long long nr,   /**< 目标边界 */
+                   long long l, long long r, long long p /**< 当前边界和节点 */
+) {
+    if (nl <= l && r <= nr) {
+        ans[p] = 1;
+        return;
+    }
+    long long mid = (l + r) >> 1;
+    if (nl <= mid)
+        update(nl, nr, l, mid, lchild(p));
+    if (nr > mid)
+        update(nl, nr, mid + 1, r, rchild(p));
+    push_up(p);
+}
+
+/**< 区间查询操作 */
+long long query(long long q_x, long long q_y, long long l, long long r, long long p) {
+    if (q_x > q_y) return 0;
+    long long res = 0;
+    if (q_x <= l && r <= q_y)
+        return ans[p];
+    long long mid = (l + r) >> 1;
+    if (q_x <= mid)
+        res += query(q_x, q_y, l, mid, lchild(p));
+    if (q_y > mid)
+        res += query(q_x, q_y, mid + 1, r, rchild(p));
+    return res;
+}
 
 int main() {
 
@@ -42,35 +101,43 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
-    long long k;
-    cin >> n >> k >> str;
-    l[0] = l[1] = 1, r[n + 1] = r[n] = n;
-    for (long long i = 2; i <= n; i++) {
-        if (str[i - 1] == str[i - 1 - 1]) l[i] = l[i - 1];
-        else l[i] = i;
+    cin >> n;
+
+    for (long long i = 1; i <= n; i++) {
+        long long x, y;
+        cin >> x >> y;
+        points.emplace_back(x, y);
+        buf.push_back(x), buf.push_back(y);
     }
-    for (long long i = n - 1; i >= 1; i--) {
-        if (str[i - 1] == str[i + 1 - 1]) r[i] = r[i + 1];
-        else r[i] = i;
+    sort(buf.begin(), buf.end());
+    auto ip = unique(buf.begin(), buf.end());
+    buf.resize(distance(buf.begin(), ip));
+
+    build(1, 1, buf.size() + 10);
+
+    for (auto cur : points) {
+        cur.first = lower_bound(buf.begin(), buf.end(), cur.first) - buf.begin() + 1;
+        cur.second = lower_bound(buf.begin(), buf.end(), cur.second) - buf.begin() + 1;
+        pts[cur.second].push_back(cur.first);
+    }
+    for (long long i = 1; i < 4e5 + 5; i++)
+        sort(pts[i].begin(), pts[i].end());
+
+    long long res = 0;
+    for (long long i = 4e5 + 5; i >= 1; i--) {
+        if (!pts[i].empty()) {
+            pts[i].push_back(buf.size() + 5);
+            for (long long j = 0; j < pts[i].size() - 1; j++) {
+                long long t1 = query(1, pts[i][j] - 1, 1, buf.size(), 1);
+                long long t2 = query(pts[i][j] + 1, buf.size(), 1, buf.size(), 1) -
+                               query(pts[i][j + 1], buf.size(), 1, buf.size(), 1);
+                res += (t1 + 1) * (t2 + 1);
+                update(pts[i][j], pts[i][j], 1, buf.size(), 1);
+            }
+        }
     }
 
-    long long cnt = 0;
-    bool flg = false;
-    for (long long lft = 1; lft <= n - k + 1; lft++) {
-        long long rgt = lft + k - 1;
-        if (l[lft - 1] == 1 && r[rgt + 1] == n) {
-            if (lft == 1 || rgt == n || (str[lft - 1 - 1] == str[rgt + 1 - 1])) {
-                flg = true;
-            } else if (lft - 1 <= k && n - rgt <= k) cnt++;
-        } else if (lft == 1 && n - rgt <= k) cnt++;
-        else if (rgt == n && lft - 1 <= k) cnt++;
-    }
-    if (flg) {
-        cout << "tokitsukaze" << endl;
-    } else if (cnt == n - k + 1)
-        cout << "quailty" << endl;
-    else
-        cout << "once again" << endl;
+    cout << res << endl;
 
 
 #ifndef ONLINE_JUDGE
