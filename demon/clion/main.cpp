@@ -2,19 +2,15 @@
 
 using namespace std;
 
-const long long MAXN = 5050;
+const long long MAXN = 200500;
 const long long INF = 0x3f3f3f3f;
 const long long LINF = 0x1f3f3f3f3f3f3f3f;
 const long long MOD = (long long) 1e9 + 7;
 const long long OVER_FLOW = 0xffffffff;
 
 long long n;
-bitset<MAXN + 5> edge[MAXN];
-
-struct line {
-    long long x1, x2, y1, y2;
-};
-vector<line> row, col;
+string str;
+long long l[MAXN], r[MAXN];
 
 int main() {
 
@@ -46,47 +42,35 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
-    cin >> n;
-    for (long long i = 1; i <= n; i++) {
-        long long x1, y1, x2, y2;
-        cin >> x1 >> y1 >> x2 >> y2;
-        if (x1 == x2) row.push_back(line{x1, x2, min(y1, y2), max(y1, y2)});
-        else col.push_back(line{min(x1, x2), max(x1, x2), y1, y2});
+    long long k;
+    cin >> n >> k >> str;
+    l[0] = l[1] = 1, r[n + 1] = r[n] = n;
+    for (long long i = 2; i <= n; i++) {
+        if (str[i - 1] == str[i - 1 - 1]) l[i] = l[i - 1];
+        else l[i] = i;
+    }
+    for (long long i = n - 1; i >= 1; i--) {
+        if (str[i - 1] == str[i + 1 - 1]) r[i] = r[i + 1];
+        else r[i] = i;
     }
 
-    if (row.size() < col.size()) {
-        for (long long i = 0; i < row.size(); i++) {
-            for (long long j = 0; j < col.size(); j++) {
-                if (row[i].y1 <= col[j].y1 && row[i].y2 >= col[j].y1
-                    && row[i].x1 >= col[j].x1 && row[i].x1 <= col[j].x2)
-                    edge[i].set(j);
-            }
-        }
-        long long res = 0;
-        for (long long i = 0; i < row.size(); i++) {
-            for (long long j = i + 1; j < row.size(); j++) {
-                long long t = (edge[i] & edge[j]).count();
-                res += t * (t - 1) / 2;
-            }
-        }
-        cout << res << endl;
-    } else {
-        for (long long i = 0; i < col.size(); i++) {
-            for (long long j = 0; j < row.size(); j++) {
-                if (col[i].x1 <= row[j].x1 && col[i].x2 >= row[j].x1
-                    && col[i].y1 >= row[j].y1 && col[i].y1 <= row[j].y2)
-                    edge[i].set(j);
-            }
-        }
-        long long res = 0;
-        for (long long i = 0; i < col.size(); i++) {
-            for (long long j = i + 1; j < col.size(); j++) {
-                long long t = (edge[i] & edge[j]).count();
-                res += t * (t - 1) / 2;
-            }
-        }
-        cout << res << endl;
+    long long cnt = 0;
+    bool flg = false;
+    for (long long lft = 1; lft <= n - k + 1; lft++) {
+        long long rgt = lft + k - 1;
+        if (l[lft - 1] == 1 && r[rgt + 1] == n) {
+            if (lft == 1 || rgt == n || (str[lft - 1 - 1] == str[rgt + 1 - 1])) {
+                flg = true;
+            } else if (lft - 1 <= k && n - rgt <= k) cnt++;
+        } else if (lft == 1 && n - rgt <= k) cnt++;
+        else if (rgt == n && lft - 1 <= k) cnt++;
     }
+    if (flg) {
+        cout << "tokitsukaze" << endl;
+    } else if (cnt == n - k + 1)
+        cout << "quailty" << endl;
+    else
+        cout << "once again" << endl;
 
 
 #ifndef ONLINE_JUDGE
