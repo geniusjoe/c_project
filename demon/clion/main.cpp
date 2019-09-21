@@ -2,74 +2,14 @@
 
 using namespace std;
 
-const long long MAXN = 400050;
+const long long MAXN = 1050;
 const long long INF = 0x3f3f3f3f;
 const long long LINF = 0x1f3f3f3f3f3f3f3f;
-const long long MOD = (long long) 1e9 + 7;
+const long long MOD = (long long) 998244353;
 const long long OVER_FLOW = 0xffffffff;
 
 long long n;
-long long ans[MAXN << 2];
-vector<pair<long long, long long>> points;
-vector<long long> pts[MAXN];
-vector<long long> buf;
-
-inline long long lchild(long long x)
-/**<  每个树节点的编号*/
-{
-    return x << 1;
-}
-
-inline long long rchild(long long x) {
-    return x << 1 | 1;
-}
-
-inline void push_up(long long p) {
-    ans[p] = (ans[lchild(p)] + ans[rchild(p)]);
-}
-
-/**< 由顶向下建立线段树 */
-/**< 左右均为闭区间 */
-void build(long long p, long long l, long long r) {
-    if (l == r) {
-        ans[p] = 0;
-        return;
-    }
-    long long mid = (l + r) >> 1;
-    build(lchild(p), l, mid);
-    build(rchild(p), mid + 1, r);
-    push_up(p);
-}
-/**< 区间赋值操作 */
-/**< 区间内元素增加的值 */
-inline void update(long long nl, long long nr,   /**< 目标边界 */
-                   long long l, long long r, long long p /**< 当前边界和节点 */
-) {
-    if (nl <= l && r <= nr) {
-        ans[p] = 1;
-        return;
-    }
-    long long mid = (l + r) >> 1;
-    if (nl <= mid)
-        update(nl, nr, l, mid, lchild(p));
-    if (nr > mid)
-        update(nl, nr, mid + 1, r, rchild(p));
-    push_up(p);
-}
-
-/**< 区间查询操作 */
-long long query(long long q_x, long long q_y, long long l, long long r, long long p) {
-    if (q_x > q_y) return 0;
-    long long res = 0;
-    if (q_x <= l && r <= q_y)
-        return ans[p];
-    long long mid = (l + r) >> 1;
-    if (q_x <= mid)
-        res += query(q_x, q_y, l, mid, lchild(p));
-    if (q_y > mid)
-        res += query(q_x, q_y, mid + 1, r, rchild(p));
-    return res;
-}
+long long a[MAXN], f[MAXN][MAXN], res[100050], s[MAXN][MAXN];
 
 int main() {
 
@@ -101,43 +41,27 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
-    cin >> n;
-
-    for (long long i = 1; i <= n; i++) {
-        long long x, y;
-        cin >> x >> y;
-        points.emplace_back(x, y);
-        buf.push_back(x), buf.push_back(y);
-    }
-    sort(buf.begin(), buf.end());
-    auto ip = unique(buf.begin(), buf.end());
-    buf.resize(distance(buf.begin(), ip));
-
-    build(1, 1, buf.size() + 10);
-
-    for (auto cur : points) {
-        cur.first = lower_bound(buf.begin(), buf.end(), cur.first) - buf.begin() + 1;
-        cur.second = lower_bound(buf.begin(), buf.end(), cur.second) - buf.begin() + 1;
-        pts[cur.second].push_back(cur.first);
-    }
-    for (long long i = 1; i < 4e5 + 5; i++)
-        sort(pts[i].begin(), pts[i].end());
-
-    long long res = 0;
-    for (long long i = 4e5 + 5; i >= 1; i--) {
-        if (!pts[i].empty()) {
-            pts[i].push_back(buf.size() + 5);
-            for (long long j = 0; j < pts[i].size() - 1; j++) {
-                long long t1 = query(1, pts[i][j] - 1, 1, buf.size(), 1);
-                long long t2 = query(pts[i][j] + 1, buf.size(), 1, buf.size(), 1) -
-                               query(pts[i][j + 1], buf.size(), 1, buf.size(), 1);
-                res += (t1 + 1) * (t2 + 1);
-                update(pts[i][j], pts[i][j], 1, buf.size(), 1);
+    long long k;
+    cin >> n >> k;
+    for (long long i = 1; i <= n; i++) cin >> a[i];
+    sort(a + 1, a + 1 + n);
+    a[0] = -INF;
+    long long ans = 0;
+    for (long long v = 1; v * (k - 1) <= a[n]; v++) {
+        f[0][0] = 1;
+        long long now = 0;
+        s[0][0] = 1;
+        for (long long i = 1; i <= n; i++) {
+            while (a[now] <= a[i] - v) now++;
+            for (long long j = 0; j <= k; j++) {
+                if (j) f[i][j] = s[now - 1][j - 1];
+                s[i][j] = (s[i - 1][j] + f[i][j]) % MOD;
             }
+            res[v] += f[i][k];
         }
+        ans += res[v] % MOD;
     }
-
-    cout << res << endl;
+    cout << ans % MOD << endl;
 
 
 #ifndef ONLINE_JUDGE
