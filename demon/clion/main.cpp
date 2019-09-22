@@ -9,9 +9,31 @@ const long long MOD = (long long) 998244353;
 const long long OVER_FLOW = 0xffffffff;
 
 long long n, m, q;
-string buf[MAXN];
-char tar[MAXN][MAXN];
-vector<pair<long long, long long >> num[MAXN];
+
+map<long long, long long> people;
+map<long long, vector<pair<long long, long long>>> cakes;
+
+#define setbit(x, y) x|=(1ll<<y)
+
+#define clrbit(x, y) x&=~(1ll<<y)
+
+#define reversebit(x, y) x^=(1ll<<y)
+
+#define getbit(x, y) ((x) >> (y)&1ll)
+
+void update(long long pos, long long cur) {
+    if (pos == 10) {
+        people[cur]++;
+        return;
+    }
+    if (getbit(cur, pos)) update(pos + 1, cur);
+    else {
+        auto now = cur;
+        setbit(now, pos);
+        update(pos + 1, now);
+        update(pos + 1, cur);
+    }
+}
 
 int main() {
 
@@ -43,89 +65,69 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
-    long long T;
-    cin >> T;
-    while (T--) {
-        cin >> n >> m;
-        for (long long i = 1; i <= n; i++) cin >> buf[i];
-        for (long long i = 1; i <= n; i++) for (long long j = 1; j <= m; j++) tar[i][j - 1] = '.';
-        for (long long i = 0; i <= 26; i++) num[i].clear();
-
-        bool flg = true;
-        for (long long i = 1; i <= n; i++) {
-            for (long long j = 1; j <= m; j++) {
-                if (buf[i][j - 1] == '.') continue;
-                else {
-                    long long cur = buf[i][j - 1] - 'a';
-                    if (num[cur].empty() or num[cur].size() == 1) num[cur].emplace_back(i, j);
-                    else if ((num[cur][0].first == num[cur][1].first and num[cur][0].first == i) or
-                             (num[cur][0].second == num[cur][1].second and num[cur][0].second == j)) {
-                        num[cur].pop_back();
-                        num[cur].emplace_back(i, j);
-                    } else {
-                        flg = false;
-                        break;
-                    }
-                }
-            }
-            if (!flg) break;
+    cin >> n >> m;
+    for (long long i = 1; i <= n; i++) {
+        long long nm, cur = 0;
+        cin >> nm;
+        for (long long j = 1; j <= nm; j++) {
+            long long u;
+            cin >> u;
+            setbit(cur, u);
         }
-        long long lst = -1;
-        for (long long i = 0; i <= 26; i++) {
-            if (num[i].empty()) continue;
-            else {
-                lst = i;
-                if (num[i].size() == 1) {
-                    auto cur = num[i].back();
-                    tar[cur.first][cur.second - 1] = i + 'a';
-                } else if (num[i].size() == 2) {
-                    auto front = num[i][0], tail = num[i][1];
-                    if (front.first == tail.first) {
-                        for (long long j = front.second; j <= tail.second; j++)
-                            tar[front.first][j - 1] = i + 'a';
-                    } else if (front.second == tail.second) {
-                        for (long long j = front.first; j <= tail.first; j++)
-                            tar[j][front.second - 1] = i + 'a';
-                    }
-                }
-            }
+        update(1, cur);
+    }
+    for (long long i = 1; i <= m; i++) {
+        long long price, nm, cur = 0;
+        cin >> price >> nm;
+        for (long long j = 1; j <= nm; j++) {
+            long long u;
+            cin >> u;
+            setbit(cur, u);
         }
-
-        for (long long i = 1; i <= n; i++) {
-            for (long long j = 1; j <= m; j++) {
-                if (buf[i][j - 1] == tar[i][j - 1]) continue;
-                else flg = false;
-            }
-            if (!flg) break;
-        }
-
-        if (!flg)
-            cout << "NO" << '\n';
-        else {
-            cout << "YES" << '\n';
-            if (lst == -1) cout << "0" << '\n';
-            else {
-                cout << lst + 1 << '\n';
-                for (long long i = 0; i <= lst; i++) {
-                    if (num[i].empty()) {
-                        auto cur = num[lst].back();
-                        cout << cur.first << " " << cur.second << " " << cur.first << " " << cur.second << "\n";
-                    } else if (num[i].size() == 1) {
-                        auto cur = num[i].back();
-                        cout << cur.first << " " << cur.second << " " << cur.first << " " << cur.second << "\n";
-                    } else if (num[i].size() == 2) {
-                        auto cur1 = num[i][0], cur2 = num[i][1];
-                        cout << cur1.first << " " << cur1.second << " " << cur2.first << " " << cur2.second << "\n";
-                    }
-                }
+        if (cakes[cur].empty()) {
+            cakes[cur].emplace_back(price, i);
+        } else if (cakes[cur].size() == 1) {
+            auto fst = cakes[cur][0], snd = make_pair(price, i);
+            if (fst.first > snd.first) swap(fst, snd);
+            cakes[cur][0] = fst;
+            cakes[cur].push_back(snd);
+        } else {
+            auto fst = cakes[cur][0], snd = cakes[cur][1];
+            if (fst.first > snd.first) swap(fst, snd);
+            if (price < fst.first) {
+                cakes[cur][0] = make_pair(price, i);
+                cakes[cur][1] = fst;
+            } else if (price < snd.first) {
+                cakes[cur][0] = fst;
+                cakes[cur][1] = make_pair(price, i);
             }
         }
     }
 
+    long long res = 0, cst = LINF;
+    pair<long long, long long> ans;
+    for (auto it = cakes.begin(); it != cakes.end(); it++) {
+        if (it->second.size() == 2) {
+            auto cur = people[it->first];
+            if (cur > res or (cur == res and it->second[0].first + it->second[1].first < cst)) {
+                ans.first = it->second[0].second, ans.second = it->second[1].second;
+                res = cur, cst = it->second[0].first + it->second[1].first;
+            }
+        }
+        for (auto it2 = next(it); it2 != cakes.end(); it2++) {
+            long long cur = people[it->first | it2->first];
+            if (cur > res or (cur == res and it->second[0].first + it2->second[0].first < cst)) {
+                ans.first = it->second[0].second, ans.second = it2->second[0].second;
+                res = cur, cst = it->second[0].first + it2->second[0].first;
+            }
+        }
+    }
+
+    cout << ans.first << " " << ans.second << "\n";
+
 
 #ifndef ONLINE_JUDGE
-    auto
-            end_time = clock();
+    auto end_time = clock();
     cerr << "Execution time: " << (end_time - start_time) * (int) 1e3 / CLOCKS_PER_SEC << " ms\n";
 #endif
 
