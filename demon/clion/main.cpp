@@ -2,36 +2,14 @@
 
 using namespace std;
 
-const long long MAXN = 2050;
+const long long MAXN = 200500;
 const long long INF = 0x3f3f3f3f;
 const long long LINF = 0x1f3f3f3f3f3f3f3f;
 const long long MOD = (long long) 998244353;
 const long long OVER_FLOW = 0xffffffff;
 
 long long n, m, q;
-
-const long long N = 400100;
-long long lst[N]; //如果数字是合数,为其除去本身最大的因数
-long long num[N]; //如果数字是质数,求出质数的序号
-long long rnum[N]; //第几个质数
-
-void sieve() {
-    for (long long i = 1; i < N; i++) lst[i] = i;
-    for (long long i = 2; i < N; ++i) {
-        if (lst[i] != i) {
-            lst[i] = i / lst[i];
-            continue;
-        }
-        for (long long j = i * 1ll * i; j < N; j += i)
-            lst[j] = min(lst[j], i);
-    }
-    long long cur = 0;
-    for (long long i = 2; i < N; ++i)
-        if (lst[i] == i) {
-            num[i] = ++cur;
-            rnum[cur] = i;
-        }
-}
+long long buf[MAXN], res[MAXN];
 
 int main() {
 
@@ -64,18 +42,33 @@ int main() {
 
     ios::sync_with_stdio(false);
     cin >> n;
-    sieve();
-    vector<pair<long long, long long>> res;
-    for (long long i = 2; i <= n; i++) res.emplace_back(i, i - 1);
-    res.emplace_back(1, n);
-    if (!num[n]) {
-        long long cnt = n;
-        while (!num[cnt]) cnt++;
-        for (long long i = 1; i <= cnt - n; i++) res.emplace_back(i, i + n / 2);
+    double eps = 1e-7;
+    long long sm = 0;
+    fill_n(buf + 1, n, INF);
+    for (long long i = 1; i <= n; i++) {
+        double cur;
+        cin >> cur;
+        if (abs(cur - floor(cur)) < eps) {
+            res[i] = (long long) cur;
+            buf[i] = INF;
+            sm += res[i];
+        } else {
+            buf[i] = (long long) floor(cur);
+            sm += buf[i];
+        }
     }
-    cout << res.size() << "\n";
-    for (auto it:res) {
-        cout << it.first << " " << it.second << "\n";
+    for (long long i = 1; sm != 0 and i <= n; i++) {
+        if (buf[i] != INF) {
+            res[i] = buf[i] + 1;
+            buf[i] = INF;
+            sm++;
+        }
+    }
+    for (long long i = 1; i <= n; i++) {
+        if (buf[i] != INF) res[i] = buf[i];
+    }
+    for (long long i = 1; i <= n; i++) {
+        cout << res[i] << "\n";
     }
 
 
