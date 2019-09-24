@@ -10,29 +10,27 @@ const long long OVER_FLOW = 0xffffffff;
 
 long long n, m, q;
 
-map<long long, long long> people;
-map<long long, vector<pair<long long, long long>>> cakes;
+const long long N = 400100;
+long long lst[N]; //如果数字是合数,为其除去本身最大的因数
+long long num[N]; //如果数字是质数,求出质数的序号
+long long rnum[N]; //第几个质数
 
-#define setbit(x, y) x|=(1ll<<y)
-
-#define clrbit(x, y) x&=~(1ll<<y)
-
-#define reversebit(x, y) x^=(1ll<<y)
-
-#define getbit(x, y) ((x) >> (y)&1ll)
-
-void update(long long pos, long long cur) {
-    if (pos == 10) {
-        people[cur]++;
-        return;
+void sieve() {
+    for (long long i = 1; i < N; i++) lst[i] = i;
+    for (long long i = 2; i < N; ++i) {
+        if (lst[i] != i) {
+            lst[i] = i / lst[i];
+            continue;
+        }
+        for (long long j = i * 1ll * i; j < N; j += i)
+            lst[j] = min(lst[j], i);
     }
-    if (getbit(cur, pos)) update(pos + 1, cur);
-    else {
-        auto now = cur;
-        setbit(now, pos);
-        update(pos + 1, now);
-        update(pos + 1, cur);
-    }
+    long long cur = 0;
+    for (long long i = 2; i < N; ++i)
+        if (lst[i] == i) {
+            num[i] = ++cur;
+            rnum[cur] = i;
+        }
 }
 
 int main() {
@@ -65,65 +63,20 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
-    cin >> n >> m;
-    for (long long i = 1; i <= n; i++) {
-        long long nm, cur = 0;
-        cin >> nm;
-        for (long long j = 1; j <= nm; j++) {
-            long long u;
-            cin >> u;
-            setbit(cur, u);
-        }
-        update(1, cur);
+    cin >> n;
+    sieve();
+    vector<pair<long long, long long>> res;
+    for (long long i = 2; i <= n; i++) res.emplace_back(i, i - 1);
+    res.emplace_back(1, n);
+    if (!num[n]) {
+        long long cnt = n;
+        while (!num[cnt]) cnt++;
+        for (long long i = 1; i <= cnt - n; i++) res.emplace_back(i, i + n / 2);
     }
-    for (long long i = 1; i <= m; i++) {
-        long long price, nm, cur = 0;
-        cin >> price >> nm;
-        for (long long j = 1; j <= nm; j++) {
-            long long u;
-            cin >> u;
-            setbit(cur, u);
-        }
-        if (cakes[cur].empty()) {
-            cakes[cur].emplace_back(price, i);
-        } else if (cakes[cur].size() == 1) {
-            auto fst = cakes[cur][0], snd = make_pair(price, i);
-            if (fst.first > snd.first) swap(fst, snd);
-            cakes[cur][0] = fst;
-            cakes[cur].push_back(snd);
-        } else {
-            auto fst = cakes[cur][0], snd = cakes[cur][1];
-            if (fst.first > snd.first) swap(fst, snd);
-            if (price < fst.first) {
-                cakes[cur][0] = make_pair(price, i);
-                cakes[cur][1] = fst;
-            } else if (price < snd.first) {
-                cakes[cur][0] = fst;
-                cakes[cur][1] = make_pair(price, i);
-            }
-        }
+    cout << res.size() << "\n";
+    for (auto it:res) {
+        cout << it.first << " " << it.second << "\n";
     }
-
-    long long res = 0, cst = LINF;
-    pair<long long, long long> ans;
-    for (auto it = cakes.begin(); it != cakes.end(); it++) {
-        if (it->second.size() == 2) {
-            auto cur = people[it->first];
-            if (cur > res or (cur == res and it->second[0].first + it->second[1].first < cst)) {
-                ans.first = it->second[0].second, ans.second = it->second[1].second;
-                res = cur, cst = it->second[0].first + it->second[1].first;
-            }
-        }
-        for (auto it2 = next(it); it2 != cakes.end(); it2++) {
-            long long cur = people[it->first | it2->first];
-            if (cur > res or (cur == res and it->second[0].first + it2->second[0].first < cst)) {
-                ans.first = it->second[0].second, ans.second = it2->second[0].second;
-                res = cur, cst = it->second[0].first + it2->second[0].first;
-            }
-        }
-    }
-
-    cout << ans.first << " " << ans.second << "\n";
 
 
 #ifndef ONLINE_JUDGE
