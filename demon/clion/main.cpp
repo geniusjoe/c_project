@@ -9,7 +9,7 @@ const long long MOD = (long long) 998244353;
 const long long OVER_FLOW = 0xffffffff;
 
 long long n, m, q;
-long long buf[MAXN], res[MAXN];
+string buf, tar;
 
 int main() {
 
@@ -29,7 +29,7 @@ int main() {
     2.实数精度
     3.下标能从最小值开始就从最小值开始
     5.排序之前不能取模.
-    6.0-1子矩阵子序列:前缀和
+    6.0-1子矩阵子序列:前缀和,异或和
     7.模拟题注意代码复用.
     8.单个区间问题考虑前缀和,多个区间左右端点拆开,排序,记录端点极值
 思考提醒：
@@ -41,36 +41,15 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
-    cin >> n;
-    double eps = 1e-7;
-    long long sm = 0;
-    fill_n(buf + 1, n, INF);
-    for (long long i = 1; i <= n; i++) {
-        double cur;
-        cin >> cur;
-        if (abs(cur - floor(cur)) < eps) {
-            res[i] = (long long) cur;
-            buf[i] = INF;
-            sm += res[i];
-        } else {
-            buf[i] = (long long) floor(cur);
-            sm += buf[i];
-        }
+    cin >> buf >> tar;
+    long long cur = 0, res = 0;
+    for (long long i = 0; i < tar.size(); i++) cur ^= buf[i] ^ tar[i];
+    if (cur % 2 == 0) res++;
+    for (long long i = tar.size(); i < buf.size(); i++) {
+        cur ^= buf[i - tar.size()] ^ buf[i];
+        if (cur % 2 == 0) res++;
     }
-    for (long long i = 1; sm != 0 and i <= n; i++) {
-        if (buf[i] != INF) {
-            res[i] = buf[i] + 1;
-            buf[i] = INF;
-            sm++;
-        }
-    }
-    for (long long i = 1; i <= n; i++) {
-        if (buf[i] != INF) res[i] = buf[i];
-    }
-    for (long long i = 1; i <= n; i++) {
-        cout << res[i] << "\n";
-    }
-
+    cout << res << endl;
 
 #ifndef ONLINE_JUDGE
     auto end_time = clock();
