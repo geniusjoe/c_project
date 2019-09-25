@@ -9,7 +9,25 @@ const long long MOD = (long long) 998244353;
 const long long OVER_FLOW = 0xffffffff;
 
 long long n, m, q;
-string buf, tar;
+long long buf[MAXN];
+
+template<class T>
+inline bool scan_d(T &ret) {
+    char c;
+    int sgn;
+    if (c = getchar(), c == EOF) return 0;
+    while (c != '-' && (c < '0' || c > '9')) c = getchar();
+    sgn = (c == '-') ? -1 : 1;
+    ret = (c == '-') ? 0 : (c - '0');
+    while (c = getchar(), c >= '0' && c <= '9') ret = ret * 10 + (c - '0');
+    ret *= sgn;
+    return 1;
+}
+
+inline void out(int x) {
+    if (x > 9) out(x / 10);
+    putchar(x % 10 + '0');
+}
 
 int main() {
 
@@ -40,16 +58,39 @@ int main() {
     5.离散化+打表
 */
 
-    ios::sync_with_stdio(false);
-    cin >> buf >> tar;
-    long long cur = 0, res = 0;
-    for (long long i = 0; i < tar.size(); i++) cur ^= buf[i] ^ tar[i];
-    if (cur % 2 == 0) res++;
-    for (long long i = tar.size(); i < buf.size(); i++) {
-        cur ^= buf[i - tar.size()] ^ buf[i];
-        if (cur % 2 == 0) res++;
+//    ios::sync_with_stdio(false);
+    long long T;
+    cin >> T;
+    while (T--) {
+        cin >> n;
+        long long res = 0;
+        for (long long i = 1; i <= n; i++)
+            scan_d(buf[i]);
+        res = max(res, *max_element(buf + 1, buf + 1 + n));
+        long long flg2 = false, flg3 = false, flg5 = false;
+        for (long long i = 1; i <= n; i++) {
+            if (res == 2 * buf[i]) flg2 = true;
+            if (res == 3 * buf[i]) flg3 = true;
+            if (res == 5 * buf[i]) flg5 = true;
+        }
+        if (flg2 and flg3 and flg5) res = max(res, res / 2 + res / 3 + res / 5);
+        sort(buf + 1, buf + 1 + n);
+        for (long long i = 1; i < n; i++) {
+            if (buf[n] % buf[i] == 0) {
+                buf[i] = INF;
+            }
+        }
+        sort(buf + 1, buf + 1 + n);
+        n = lower_bound(buf + 1, buf + 1 + n, INF) - buf - 1;
+        if (n >= 2) res = max(res, buf[n] + buf[n - 1]);
+        for (long long i = n - 2; i >= 1; i--) {
+            if (buf[n - 1] % buf[i] != 0)
+                res = max(res, buf[n] + buf[n - 1] + buf[i]);
+        }
+        cout << res << '\n';
+
     }
-    cout << res << endl;
+
 
 #ifndef ONLINE_JUDGE
     auto end_time = clock();
