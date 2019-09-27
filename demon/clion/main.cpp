@@ -2,7 +2,7 @@
 
 using namespace std;
 
-const long long MAXN = 200500;
+const long long MAXN = 300500;
 const long long PHI = (long long) 1e9 + 6;
 const long long INF = 0x3f3f3f3f;
 const long long LINF = 0x1f3f3f3f3f3f3f3f;
@@ -10,53 +10,16 @@ const long long MOD = (long long) 1e9 + 7;
 const long long OVER_FLOW = 0xffffffff;
 
 long long n, m, q;
-long long buf[MAXN];
+long long tar[MAXN];
+vector<tuple<long long, long long, long long>> res;
 
-struct Matrix {
-    long long mat[7][7];
-    long long row, col;
+struct item {
+    long long id, nm, delta;
 
-    Matrix(long long x, long long y) {
-        memset(this->mat, 0, sizeof this->mat);
-        this->row = x, this->col = y;
+    bool operator<(item item1) {
+        return this->nm < item1.nm;
     }
-};
-
-Matrix mul_M(Matrix a, Matrix b, long long mod) {
-    Matrix ret(a.row, b.col);
-    for (int i = 0; i < a.row; i++)
-        for (int j = 0; j < a.col; j++) {
-            ret.mat[i][j] = 0;
-            for (int k = 0; k < b.row; k++) {
-                ret.mat[i][j] += a.mat[i][k] * b.mat[k][j] % mod;
-                ret.mat[i][j] %= mod;
-            }
-        }
-    return ret;
-}
-
-Matrix pow_M(Matrix a, long long n, long long mod) {
-    Matrix ret(a.row, a.col);
-    for (int i = 0; i < ret.col; i++)ret.mat[i][i] = 1;
-    Matrix tmp = a;
-    while (n) {
-        if (n & 1)ret = mul_M(ret, tmp, mod);
-        tmp = mul_M(tmp, tmp, mod);
-        n >>= 1;
-    }
-    return ret;
-}
-
-// a ^ b % c
-long long qpow(long long a, long long b, long long c) {
-    long long cur = 1;
-    while (b) {
-        if (b & 1) cur = cur * a % c;
-        a = a * a % c, b >>= 1;
-    }
-    return cur;
-}
-
+} items[MAXN];
 
 int main() {
 
@@ -87,30 +50,48 @@ int main() {
     5.离散化+打表
 */
 
-//    ios::sync_with_stdio(false);
-    long long f1, f2, f3, w;
-    cin >> n >> f1 >> f2 >> f3 >> w;
-    Matrix a(3, 3), b(5, 5), a1(3, 1), b1(3, 1), c1(3, 1), d1(5, 1);
-    a.mat[0][0] = a.mat[0][1] = a.mat[0][2] = a.mat[1][0] = a.mat[2][1] = 1;
+    ios::sync_with_stdio(false);
+    cin >> n;
+    for (long long i = 1; i <= n; i++) {
+        items[i].id = i;
+        cin >> items[i].nm;
+    }
+    for (long long i = 1; i <= n; i++) cin >> tar[i];
+    sort(tar + 1, tar + 1 + n), sort(items + 1, items + 1 + n);
 
-    a1.mat[2][0] = 1, b1.mat[1][0] = 1, c1.mat[0][0] = 1;
-    a = pow_M(a, n - 3, PHI);
-    a1 = mul_M(a, a1, PHI), b1 = mul_M(a, b1, PHI), c1 = mul_M(a, c1, PHI);
+    long long sm = 0;
+    for (long long i = 1; i <= n; i++) {
+        items[i].delta = items[i].nm - tar[i];
+        sm += items[i].delta;
+    }
+    if (sm != 0) {
+        cout << "NO" << endl;
+    } else {
+        bool flg = true;
+        long long tail = 1;
+        for (long long front = 1; front <= n; front++) {
+            if (items[front].delta > 0) {
+                cout << "NO" << '\n';
+                flg = false;
+                break;
+            } else {
+                while (items[front].delta < 0) {
+                    while (items[tail].delta <= 0) tail++;
+                    long long d = min(-items[front].delta, items[tail].delta);
+                    res.emplace_back(items[front].id, items[tail].id, d);
+                    items[front].delta += d, items[tail].delta -= d;
+                }
+            }
+        }
+        if (flg) {
+            cout << "YES" << '\n';
+            cout << res.size() << '\n';
+            for (auto it:res) {
+                cout << get<0>(it) << " " << get<1>(it) << " " << get<2>(it) << '\n';
+            }
+        }
+    }
 
-    b.mat[0][0] = b.mat[0][1] = b.mat[0][2] = b.mat[0][3] = b.mat[0][4] = 1;
-    b.mat[1][0] = b.mat[2][1] = b.mat[3][3] = b.mat[3][4] = b.mat[4][4] = 1;
-    b = pow_M(b, n - 3, PHI);
-//    d1.mat[0][0] = f3, d1.mat[1][0] = f2, d1.mat[2][0] = f1, d1.mat[4][0] = 2;
-    d1.mat[4][0] = 2;
-    d1 = mul_M(b, d1, PHI);
-
-    long long res = 0;
-    res = qpow(w, d1.mat[0][0], MOD)
-          * qpow(f1, a1.mat[0][0], MOD) % MOD
-          * qpow(f2, b1.mat[0][0], MOD) % MOD
-          * qpow(f3, c1.mat[0][0], MOD) % MOD;
-
-    cout << res << endl;
 
 #ifndef ONLINE_JUDGE
     auto end_time = clock();
