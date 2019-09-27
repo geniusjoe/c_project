@@ -10,16 +10,7 @@ const long long MOD = (long long) 1e9 + 7;
 const long long OVER_FLOW = 0xffffffff;
 
 long long n, m, q;
-long long tar[MAXN];
-vector<tuple<long long, long long, long long>> res;
-
-struct item {
-    long long id, nm, delta;
-
-    bool operator<(item item1) {
-        return this->nm < item1.nm;
-    }
-} items[MAXN];
+bitset<10050> buf[100];
 
 int main() {
 
@@ -51,45 +42,29 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
-    cin >> n;
-    for (long long i = 1; i <= n; i++) {
-        items[i].id = i;
-        cin >> items[i].nm;
+    cin >> m >> n;
+    for (long long i = 1; i <= m; i++) {
+        long long nm;
+        cin >> nm;
+        for (long long j = 1; j <= nm; j++) {
+            long long u;
+            cin >> u;
+            buf[i].set(u);
+        }
     }
-    for (long long i = 1; i <= n; i++) cin >> tar[i];
-    sort(tar + 1, tar + 1 + n), sort(items + 1, items + 1 + n);
-
-    long long sm = 0;
-    for (long long i = 1; i <= n; i++) {
-        items[i].delta = items[i].nm - tar[i];
-        sm += items[i].delta;
-    }
-    if (sm != 0) {
-        cout << "NO" << endl;
-    } else {
-        bool flg = true;
-        long long tail = 1;
-        for (long long front = 1; front <= n; front++) {
-            if (items[front].delta > 0) {
-                cout << "NO" << '\n';
+    bool flg = true;
+    for (long long i = 1; i <= m; i++) {
+        for (long long j = i + 1; j <= m; j++) {
+            if ((buf[i] & buf[j]).count() == 0) {
                 flg = false;
                 break;
-            } else {
-                while (items[front].delta < 0) {
-                    while (items[tail].delta <= 0) tail++;
-                    long long d = min(-items[front].delta, items[tail].delta);
-                    res.emplace_back(items[front].id, items[tail].id, d);
-                    items[front].delta += d, items[tail].delta -= d;
-                }
             }
         }
-        if (flg) {
-            cout << "YES" << '\n';
-            cout << res.size() << '\n';
-            for (auto it:res) {
-                cout << get<0>(it) << " " << get<1>(it) << " " << get<2>(it) << '\n';
-            }
-        }
+    }
+    if (!flg) {
+        cout << "impossible" << '\n';
+    } else {
+        cout << "possible" << '\n';
     }
 
 
