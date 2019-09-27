@@ -9,8 +9,8 @@ const long long LINF = 0x1f3f3f3f3f3f3f3f;
 const long long MOD = (long long) 1e9 + 7;
 const long long OVER_FLOW = 0xffffffff;
 
-long long n, m, q;
-bitset<10050> buf[100];
+long long n;
+vector<long long> res;
 
 int main() {
 
@@ -42,29 +42,44 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
-    cin >> m >> n;
-    for (long long i = 1; i <= m; i++) {
-        long long nm;
-        cin >> nm;
-        for (long long j = 1; j <= nm; j++) {
-            long long u;
-            cin >> u;
-            buf[i].set(u);
-        }
-    }
-    bool flg = true;
-    for (long long i = 1; i <= m; i++) {
-        for (long long j = i + 1; j <= m; j++) {
-            if ((buf[i] & buf[j]).count() == 0) {
-                flg = false;
-                break;
+    long long T;
+    cin >> T;
+    while (T--) {
+        long long a, b, m;
+        cin >> a >> b >> m;
+        if (a == b) {
+            cout << "1 " << a << '\n';
+        } else {
+            bool flg = false;
+            for (long long k = 2; k <= 50; k++) {
+                res.clear();
+                long long a1 = a, b1 = b;
+                b1 = b1 - (1ll << k - 2) * a1 - (1ll << k - 2);
+                if (b1 < 0) break;
+                for (long long i = 2; i < k; i++) {
+                    res.push_back(min(m - 1, b1 / (1ll << k - i - 1)));
+                    b1 -= res.back() * (1ll << k - i - 1);
+                }
+                if (b1 < m) {
+                    res.push_back(b1);
+                    flg = true;
+                    break;
+                }
+            }
+            if (flg) {
+                cout << res.size() + 1 << ' ';
+                long long sm = a;
+                cout << a << " ";
+                for (auto it:res) {
+                    it++;
+                    cout << it + sm << " ";
+                    sm += sm + it;
+                }
+                cout << '\n';
+            } else {
+                cout << -1 << '\n';
             }
         }
-    }
-    if (!flg) {
-        cout << "impossible" << '\n';
-    } else {
-        cout << "possible" << '\n';
     }
 
 
