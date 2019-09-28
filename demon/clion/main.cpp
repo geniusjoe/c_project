@@ -10,7 +10,7 @@ const long long MOD = (long long) 1e9 + 7;
 const long long OVER_FLOW = 0xffffffff;
 
 long long n;
-vector<long long> res;
+long long buf[MAXN];
 
 int main() {
 
@@ -42,10 +42,37 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
-    long long k;
-    cin >> n >> k;
-    for (int i = 1; i <= n; i++) {
-        printf("%d", (i % ((n - k) / 2 + 1) > 0));
+    long long k, delta;
+    cin >> k >> n;
+    bool flg = true;
+    for (long long i = 1; k >= 0 and i <= n; i++) {
+        buf[i] = i, k -= i;
+    }
+    if (k < 0) flg = false;
+    else {
+        delta = k / n;
+        k -= delta * n;
+        while (k) {
+            for (long long i = n; k and i >= 1; i--) {
+                if (buf[i] + delta + 1 <= (buf[i - 1] + delta) * 2) {
+                    buf[i]++, k--;
+                } else break;
+            }
+            if (k and buf[n] + delta + 1 > (buf[n - 1] + delta) * 2) {
+                flg = false;
+                break;
+            }
+        }
+    }
+
+    if (!flg) {
+        cout << "NO" << '\n';
+    } else {
+        cout << "YES" << '\n';
+        for (long long i = 1; i <= n; i++) {
+            cout << buf[i] + delta << " ";
+        }
+        cout << "\n";
     }
 
 
