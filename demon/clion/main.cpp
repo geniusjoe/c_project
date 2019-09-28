@@ -42,44 +42,10 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
-    long long T;
-    cin >> T;
-    while (T--) {
-        long long a, b, m;
-        cin >> a >> b >> m;
-        if (a == b) {
-            cout << "1 " << a << '\n';
-        } else {
-            bool flg = false;
-            for (long long k = 2; k <= 50; k++) {
-                res.clear();
-                long long a1 = a, b1 = b;
-                b1 = b1 - (1ll << k - 2) * a1 - (1ll << k - 2);
-                if (b1 < 0) break;
-                for (long long i = 2; i < k; i++) {
-                    res.push_back(min(m - 1, b1 / (1ll << k - i - 1)));
-                    b1 -= res.back() * (1ll << k - i - 1);
-                }
-                if (b1 < m) {
-                    res.push_back(b1);
-                    flg = true;
-                    break;
-                }
-            }
-            if (flg) {
-                cout << res.size() + 1 << ' ';
-                long long sm = a;
-                cout << a << " ";
-                for (auto it:res) {
-                    it++;
-                    cout << it + sm << " ";
-                    sm += sm + it;
-                }
-                cout << '\n';
-            } else {
-                cout << -1 << '\n';
-            }
-        }
+    long long k;
+    cin >> n >> k;
+    for (int i = 1; i <= n; i++) {
+        printf("%d", (i % ((n - k) / 2 + 1) > 0));
     }
 
 
