@@ -10,13 +10,14 @@ const long long MOD = (long long) 1e6 + 3;
 const long long OVER_FLOW = 0xffffffff;
 
 long long n;
-long long buf[MAXN];
+vector<pair<long long, long long>> buf;
+
 
 int main() {
 
 #ifndef ONLINE_JUDGE
-//    freopen("testdata.in", "r+", stdin);
-//    freopen("testdata.out", "w+", stdout);
+    freopen("testdata.in", "r+", stdin);
+    freopen("testdata.out", "w+", stdout);
 #endif // ONLINE_JUDGE
 
 #ifndef ONLINE_JUDGE
@@ -43,13 +44,19 @@ int main() {
 
     ios::sync_with_stdio(false);
     cin >> n;
-    for (long long i = 1; i <= n; i++) cin >> buf[i];
-    long long res = 0;
-    for (long long i = 1; i < n; i++) {
-        if (buf[i] > buf[i + 1]) res += (buf[i] - buf[i + 1]) * (n - buf[i] + 1);
-        else if (buf[i] < buf[i + 1]) res += (buf[i]) * (buf[i + 1] - buf[i]);
+    for (long long i = 1; i <= n; i++) {
+        long long u, v;
+        cin >> u >> v;
+        buf.emplace_back(u, v);
     }
-    res += buf[n] * (n - buf[n] + 1);
+    sort(buf.begin(), buf.end(), [](pair<long long, long long> p1, pair<long long, long long> p2) {
+        return p1.first - p1.second > p2.first - p2.second;
+    });
+
+    long long res = 0;
+    for (long long i = 0; i < buf.size(); i++) {
+        res += buf[i].first * (i) + buf[i].second * (n - i - 1);
+    }
     cout << res << '\n';
 
 #ifndef ONLINE_JUDGE
