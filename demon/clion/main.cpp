@@ -2,21 +2,91 @@
 
 using namespace std;
 
-const long long MAXN = 300500;
+//const long long MAXN = 500500;
 const long long PHI = (long long) 1e9 + 6;
 const long long INF = 0x3f3f3f3f;
 const long long LINF = 0x1f3f3f3f3f3f3f3f;
-const long long MOD = (long long) 1e9 + 7;
+const long long MOD = (long long) 1e6 + 3;
 const long long OVER_FLOW = 0xffffffff;
 
-long long n;
-long long buf[MAXN];
+// a ^ b % c
+long long qpow(long long a, long long b, long long c) {
+    long long cur = 1;
+    while (b) {
+        if (b & 1) cur = cur * a % c;
+        a = a * a % c, b >>= 1;
+    }
+    return cur;
+}
+
+long long inv(long long num, long long m) {
+    return qpow(num, m - 2, m);
+}
+
+#define eps 1e-9
+const int MAXN = 220;
+long long a[MAXN][MAXN], x[MAXN];//方程的左边的矩阵和等式右边的值, 求解之后x存的就是结果
+int equ, var;//方程数和未知数个数
+/*
+* 返回0 表示无解,1 表示有解
+*/
+int Gauss() {
+    int i, j, k, col, max_r;
+    for (k = 0, col = 0; k < equ && col < var; k++, col++) {
+        max_r = k;
+        for (i = k + 1; i < equ; i++)
+            if (abs(a[i][col]) > abs(a[max_r][col]))
+                max_r = i;
+        if (abs(a[max_r][col]) == 0)
+            return 0;
+        if (k != max_r) {
+            for (j = col; j < var; j++)
+                swap(a[k][j], a[max_r][j]);
+            swap(x[k], x[max_r]);
+        }
+        x[k] = x[k] * inv(a[k][col], MOD) % MOD;
+        for (j = col + 1; j < var; j++)a[k][j] = a[k][j] * inv(a[k][col], MOD) % MOD;
+        a[k][col] = 1;
+        for (i = 0; i < equ; i++)
+            if (i != k) {
+                x[i] = (x[i] - (x[k] * a[i][col] % MOD) + MOD) % MOD;
+                for (j = col + 1; j < var; j++)a[i][j] = (a[i][j] - (a[k][j] * a[i][col] % MOD) + MOD) % MOD;
+                a[i][col] = 0;
+            }
+    }
+    return 1;
+}
+
+long long get(long long p) {
+    cout << "? " << p << '\n';
+    cout.flush();
+    long long cur;
+    cin >> cur;
+    return cur;
+}
+
+long long cur[15];
+
+bool ok(long long p) {
+    long long res = 0;
+    cur[0] = 1;
+    for (long long i = 1; i <= 10; i++) {
+        if (i == 1) cur[i] = p % MOD;
+        else cur[i] = cur[i - 1] * p;
+        cur[i] %= MOD;
+    }
+    for (long long i = 0; i <= 10; i++) {
+        res += x[i] * cur[i] % MOD;
+        res %= MOD;
+    }
+    return res == 0;
+}
 
 int main() {
 
 #ifndef ONLINE_JUDGE
-    freopen("testdata.in", "r+", stdin);
-    freopen("testdata.out", "w+", stdout);
+//    freopen("testdata.in", "r+", stdin);
+//    freopen("testdata.out", "w+", stdout);
 #endif // ONLINE_JUDGE
 
 #ifndef ONLINE_JUDGE
@@ -42,39 +112,34 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
-    long long k, delta;
-    cin >> k >> n;
-    bool flg = true;
-    for (long long i = 1; k >= 0 and i <= n; i++) {
-        buf[i] = i, k -= i;
-    }
-    if (k < 0) flg = false;
-    else {
-        delta = k / n;
-        k -= delta * n;
-        while (k) {
-            for (long long i = n; k and i >= 1; i--) {
-                if (buf[i] + delta + 1 <= (buf[i - 1] + delta) * 2) {
-                    buf[i]++, k--;
-                } else break;
-            }
-            if (k and buf[n] + delta + 1 > (buf[n - 1] + delta) * 2) {
-                flg = false;
-                break;
-            }
+    equ = var = 11;
+    a[0][0] = 1;
+    for (long long i = 1; i <= 10; i++) {
+        long long cnt = i;
+        a[i][0] = 1;
+        for (long long j = 1; j <= 10; j++) {
+            a[i][j] = cnt;
+            cnt *= i;
+            cnt %= MOD;
         }
     }
+    for (long long i = 0; i <= 10; i++) {
+        long long cur = get(i);
+        x[i] = cur;
+    }
 
+    Gauss();
+    bool flg = false;
+    for (long long i = 0; i <= (long long) 1e6 + 3; i++) {
+        if (ok(i)) {
+            cout << "! " << i << '\n';
+            flg = true;
+            break;
+        }
+    }
     if (!flg) {
-        cout << "NO" << '\n';
-    } else {
-        cout << "YES" << '\n';
-        for (long long i = 1; i <= n; i++) {
-            cout << buf[i] + delta << " ";
-        }
-        cout << "\n";
+        cout << "! " << -1 << '\n';
     }
-
 
 #ifndef ONLINE_JUDGE
     auto end_time = clock();
