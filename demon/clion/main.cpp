@@ -2,7 +2,7 @@
 
 using namespace std;
 
-const long long MAXN = 550;
+const long long MAXN = 200500;
 const long long PHI = (long long) 1e9 + 6;
 const long long INF = 0x3f3f3f3f;
 const long long LINF = 0x1f3f3f3f3f3f3f3f;
@@ -10,7 +10,8 @@ const long long MOD = (long long) 1e9 + 7;
 const long long OVER_FLOW = 0xffffffff;
 
 long long n;
-long long buf[MAXN][MAXN], tar[MAXN][MAXN];
+string buf, tar, res;
+long long nm[MAXN];
 
 int main() {
 
@@ -42,34 +43,18 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
-    long long m;
-    cin >> n >> m;
-    for (long long i = 1; i <= n; i++) {
-        for (long long j = 1; j <= m; j++) cin >> buf[i][j];
+    cin >> n >> buf >> tar;
+    for (long long i = buf.size() - 1; i >= 0; i--) {
+        nm[i + 1] += buf[i] + tar[i] - 'a' - 'a';
+        if (nm[i + 1] >= 26) nm[i]++, nm[i + 1] -= 26;
     }
-    for (long long i = 1; i <= n; i++) {
-        for (long long j = 1; j <= m; j++) cin >> tar[i][j];
-    }
-
-    bool flg = true;
-    for (long long i = 1; i <= n; i++) {
-        for (long long j = 1; j <= m; j++) {
-            if (buf[i][j] != tar[i][j]) {
-                if (i == n or j == m) {
-                    flg = false;
-                    break;
-                } else {
-                    buf[i][j] ^= 1, buf[i][j + 1] ^= 1, buf[i + 1][j] ^= 1, buf[i + 1][j + 1] ^= 1;
-                }
-            }
+    for (long long i = 0; i <= buf.size(); i++) {
+        if (nm[i] % 2) {
+            nm[i + 1] += 26;
         }
+        if (i > 0)res.push_back(nm[i] / 2 + 'a');
     }
-
-    if (!flg) {
-        cout << "No" << endl;
-    } else {
-        cout << "Yes" << endl;
-    }
+    cout << res << endl;
 
 
 #ifndef ONLINE_JUDGE
