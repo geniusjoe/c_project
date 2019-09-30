@@ -2,7 +2,7 @@
 
 using namespace std;
 
-const long long MAXN = 50005000;
+const long long MAXN = 550;
 const long long PHI = (long long) 1e9 + 6;
 const long long INF = 0x3f3f3f3f;
 const long long LINF = 0x1f3f3f3f3f3f3f3f;
@@ -10,7 +10,7 @@ const long long MOD = (long long) 1e9 + 7;
 const long long OVER_FLOW = 0xffffffff;
 
 long long n;
-long long pos[MAXN];
+long long buf[MAXN][MAXN], tar[MAXN][MAXN];
 
 int main() {
 
@@ -42,36 +42,34 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
-    long long res = LINF;
-    int p1 = 0, p2 = 0;
-    cin >> n;
+    long long m;
+    cin >> n >> m;
     for (long long i = 1; i <= n; i++) {
-        long long u;
-        cin >> u;
-        if (pos[u] == 0) pos[u] = i;
-        else {
-            if (res > u) {
-                res = u;
-                p1 = i, p2 = pos[u];
-            }
-        }
+        for (long long j = 1; j <= m; j++) cin >> buf[i][j];
     }
-    for (long long i = 1; i <= 1e7 + 5; i++) {
-        long long s1 = 0, v1 = 0;
-        for (long long j = i; j <= 1e7 + 5; j += i) {
-            if (pos[j] and s1) {
-                if (res > 1ll * v1 * j / i) {
-                    res = v1 * j / i;
-                    p1 = s1, p2 = pos[j];
+    for (long long i = 1; i <= n; i++) {
+        for (long long j = 1; j <= m; j++) cin >> tar[i][j];
+    }
+
+    bool flg = true;
+    for (long long i = 1; i <= n; i++) {
+        for (long long j = 1; j <= m; j++) {
+            if (buf[i][j] != tar[i][j]) {
+                if (i == n or j == m) {
+                    flg = false;
+                    break;
+                } else {
+                    buf[i][j] ^= 1, buf[i][j + 1] ^= 1, buf[i + 1][j] ^= 1, buf[i + 1][j + 1] ^= 1;
                 }
-                break;
-            } else if (pos[j] and s1 == 0) {
-                s1 = pos[j], v1 = j;
             }
         }
     }
 
-    cout << min(p1, p2) << " " << max(p1, p2) << endl;
+    if (!flg) {
+        cout << "No" << endl;
+    } else {
+        cout << "Yes" << endl;
+    }
 
 
 #ifndef ONLINE_JUDGE
