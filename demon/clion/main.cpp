@@ -2,7 +2,7 @@
 
 using namespace std;
 
-const long long MAXN = 5050;
+const long long MAXN = 200500;
 const long long PHI = (long long) 1e9 + 6;
 const long long INF = 0x3f3f3f3f;
 const long long LINF = 0x1f3f3f3f3f3f3f3f;
@@ -10,21 +10,7 @@ const long long MOD = (long long) 998244353;
 const long long OVER_FLOW = 0xffffffff;
 
 long long n;
-long long buf[MAXN], dp[MAXN][MAXN], fac[MAXN];
-
-// a ^ b % c
-long long qpow(long long a, long long b, long long c) {
-    long long cur = 1;
-    while (b) {
-        if (b & 1) cur = cur * a % c;
-        a = a * a % c, b >>= 1;
-    }
-    return cur;
-}
-
-long long inv(long long num, long long m) {
-    return qpow(num, m - 2, m);
-}
+long long buf[MAXN];
 
 int main() {
 
@@ -56,37 +42,26 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
-    fac[0] = fac[1] = 1;
-    for (long long i = 2; i <= 5000; i++) {
-        fac[i] = fac[i - 1] * i;
-        fac[i] %= MOD;
-    }
-
-    cin >> n;
+    long long hp;
+    cin >> hp >> n;
     for (long long i = 1; i <= n; i++) {
         long long u;
         cin >> u;
-        buf[u]++;
+        buf[i] = -u + buf[i - 1];
     }
-
-    for (long long i = 0; i <= n; i++) dp[i][0] = 1;
-    for (long long j = 1; j <= n; j++) {
-        for (long long i = 1; i <= n; i++) {
-            dp[i][j] = dp[i - 1][j] + dp[i - 1][j - 1] * buf[i];
-            dp[i][j] %= MOD;
-        }
-    }
-
-    long long res = 0;
+    long long res = -1;
     for (long long i = 1; i <= n; i++) {
-        if (buf[i] >= 2) {
-            for (long long j = 0; j <= i - 1; j++) {
-                res += dp[i - 1][j] * buf[i] % MOD * (buf[i] - 1) % MOD * fac[n - 2 - j] % MOD;
-                res %= MOD;
-            }
+        if (buf[i] >= hp) {
+            res = i;
+            break;
         }
     }
-    res = res * inv(fac[n], MOD) % MOD;
+    if (res == -1 and buf[n] > 0) {
+        res = LINF;
+        for (long long i = 1; i <= n; i++) {
+            res = min(res, i + (hp - buf[i] + buf[n] - 1) / buf[n] * n);
+        }
+    }
 
     cout << res << endl;
 
