@@ -6,11 +6,28 @@ const long long MAXN = 200500;
 const long long PHI = (long long) 1e9 + 6;
 const long long INF = 0x3f3f3f3f;
 const long long LINF = 0x1f3f3f3f3f3f3f3f;
-const long long MOD = (long long) 998244353;
+const long long MOD = (long long) 1e9 + 7;
+const long long MOD1 = (long long) 1e8 + 3;
+const long long MOD2 = (long long) 988244353;
 const long long OVER_FLOW = 0xffffffff;
 
 long long n;
-long long buf[MAXN];
+map<double, long long> hsh1, hsh2, hsh3;
+long long buf[MAXN], tar[MAXN];
+
+// a ^ b % c
+long long qpow(long long a, long long b, long long c) {
+    long long cur = 1;
+    while (b) {
+        if (b & 1) cur = cur * a % c;
+        a = a * a % c, b >>= 1;
+    }
+    return cur;
+}
+
+long long inv(long long num, long long m) {
+    return qpow(num, m - 2, m);
+}
 
 int main() {
 
@@ -42,28 +59,32 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
-    long long hp;
-    cin >> hp >> n;
+    cin >> n;
+    for (long long i = 1; i <= n; i++) cin >> buf[i];
+
+    long long cnt = 0;
+
     for (long long i = 1; i <= n; i++) {
         long long u;
         cin >> u;
-        buf[i] = -u + buf[i - 1];
-    }
-    long long res = -1;
-    for (long long i = 1; i <= n; i++) {
-        if (buf[i] >= hp) {
-            res = i;
-            break;
-        }
-    }
-    if (res == -1 and buf[n] > 0) {
-        res = LINF;
-        for (long long i = 1; i <= n; i++) {
-            res = min(res, i + (hp - buf[i] + buf[n] - 1) / buf[n] * n);
+        if (buf[i] == 0 and u != 0) continue;
+        else if (buf[i] == 0 and u == 0) cnt++;
+        else {
+            long long x = buf[i] / __gcd(buf[i], u), y = u / __gcd(buf[i], u);
+            hsh1[1.0l * x / y]++;
+            hsh2[x * inv(y, MOD) % MOD]++;
         }
     }
 
-    cout << res << endl;
+    long long res1 = cnt, res2 = cnt;
+    for (auto &it:hsh1) {
+        res1 = max(res1, it.second + cnt);
+    }
+    for (auto it:hsh2) {
+        res2 = max(res2, it.second + cnt);
+    }
+
+    cout << min(res1, res2)  << endl;
 
 
 #ifndef ONLINE_JUDGE
