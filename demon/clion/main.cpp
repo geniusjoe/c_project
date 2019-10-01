@@ -2,14 +2,15 @@
 
 using namespace std;
 
-const long long MAXN = 100500;
+const long long MAXN = 5050;
 const long long PHI = (long long) 1e9 + 6;
 const long long INF = 0x3f3f3f3f;
 const long long LINF = 0x1f3f3f3f3f3f3f3f;
-const long long MOD = (long long) 1e9 + 7;
+const long long MOD = (long long) 998244353;
 const long long OVER_FLOW = 0xffffffff;
 
 long long n;
+long long buf[MAXN], dp[MAXN][MAXN], fac[MAXN];
 
 // a ^ b % c
 long long qpow(long long a, long long b, long long c) {
@@ -24,54 +25,6 @@ long long qpow(long long a, long long b, long long c) {
 long long inv(long long num, long long m) {
     return qpow(num, m - 2, m);
 }
-
-const long long N = 100100;
-long long lst[N]; //如果数字是合数,为其除去本身最大的因数
-vector<long long> prm_factor[N], factor[N];
-long long num[N]; //如果数字是质数,求出质数的序号
-long long rnum[N]; //第几个质数
-
-void sieve() {
-    for (long long i = 1; i < N; i++) factor[i].push_back(1);
-    for (long long i = 1; i < N; i++) lst[i] = i;
-    for (long long i = 2; i < N; ++i) {
-        for (long long j = 2; i * j < N; j++) factor[i * j].push_back(i);
-        if (lst[i] != i) {
-            lst[i] = i / lst[i];
-            continue;
-        }
-        for (long long j = i; j < N; j += i) {
-            lst[j] = min(lst[j], i);
-            prm_factor[j].push_back(i);
-        }
-    }
-    long long cur = 0;
-    for (long long i = 2; i < N; ++i)
-        if (lst[i] == i) {
-            num[i] = ++cur;
-            rnum[cur] = i;
-        }
-}
-
-//1-b中有多少个数与a互质
-long long coprime(long long a, long long b) {
-    long long ret = b;
-    vector<long long> buf;
-    for (long long &it : prm_factor[a]) buf.push_back(it);
-    long long len = buf.size();
-    for (long long i = 1; i < 1 << len; i++) {
-        long long tmp = 1;
-        for (long long j = 0; j < len; j++) {
-            if ((i >> j) & 1) {
-                tmp = -tmp * buf[j];
-            }
-        }
-        ret += b / tmp;
-    }
-    return ret;
-}
-
-long long f[MAXN];
 
 int main() {
 
@@ -103,27 +56,40 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
-    sieve();
-    long long m;
-    cin >> m;
-    f[1] = 1;
-    for (long long i = 2; i <= m; i++) {
-        f[i] = 1;
-        for (auto it:factor[i]) {
-            f[i] += f[it] * coprime(i / it, m / it) % MOD * inv(m, MOD) % MOD;
-            f[i] %= MOD;
+    fac[0] = fac[1] = 1;
+    for (long long i = 2; i <= 5000; i++) {
+        fac[i] = fac[i - 1] * i;
+        fac[i] %= MOD;
+    }
+
+    cin >> n;
+    for (long long i = 1; i <= n; i++) {
+        long long u;
+        cin >> u;
+        buf[u]++;
+    }
+
+    for (long long i = 0; i <= n; i++) dp[i][0] = 1;
+    for (long long j = 1; j <= n; j++) {
+        for (long long i = 1; i <= n; i++) {
+            dp[i][j] = dp[i - 1][j] + dp[i - 1][j - 1] * buf[i];
+            dp[i][j] %= MOD;
         }
-        f[i] = inv((1ll + MOD - m / i % MOD * inv(m, MOD) % MOD) % MOD, MOD)
-               * f[i] % MOD;
     }
 
     long long res = 0;
-    for (long long i = 1; i <= m; i++) {
-        res += f[i];
-        res %= MOD;
+    for (long long i = 1; i <= n; i++) {
+        if (buf[i] >= 2) {
+            for (long long j = 0; j <= i - 1; j++) {
+                res += dp[i - 1][j] * buf[i] % MOD * (buf[i] - 1) % MOD * fac[n - 2 - j] % MOD;
+                res %= MOD;
+            }
+        }
     }
-    res = res * inv(m, MOD) % MOD;
+    res = res * inv(fac[n], MOD) % MOD;
+
     cout << res << endl;
+
 
 #ifndef ONLINE_JUDGE
     auto end_time = clock();
