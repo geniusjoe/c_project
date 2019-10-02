@@ -10,7 +10,7 @@ const long long MOD = (long long) 1e9 + 7;
 const long long OVER_FLOW = 0xffffffff;
 
 long long n;
-long long buf[MAXN], buf1[MAXN], tar[MAXN], tar1[MAXN];
+map<long long, long long> mp;
 
 int main() {
 
@@ -41,28 +41,45 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
-    cin >> n;
-    for (long long i = 1; i <= n; i++) cin >> buf[i];
-    for (long long i = 1; i <= n; i++) cin >> buf1[i];
+    mp[3] = 1;
+    mp[7] = 1;
+    mp[15] = 5;
+    mp[31] = 1;
+    mp[63] = 21;
+    mp[127] = 1;
+    mp[255] = 85;
+    mp[511] = 73;
+    mp[1023] = 341;
+    mp[2047] = 89;
+    mp[4095] = 1365;
+    mp[8191] = 1;
+    mp[16383] = 5461;
+    mp[32767] = 4681;
+    mp[65535] = 21845;
+    mp[131071] = 1;
+    mp[262143] = 87381;
+    mp[524287] = 1;
+    mp[1048575] = 349525;
+    mp[2097151] = 299593;
+    mp[4194303] = 1398101;
+    mp[8388607] = 178481;
+    mp[16777215] = 5592405;
+    mp[33554431] = 1082401;
 
-    for (long long i = 2; i <= n; i++) {
-        tar[i] = buf[i] - buf[i - 1], tar1[i] = buf1[i] - buf1[i - 1];
-    }
-    sort(tar + 1, tar + 1 + n), sort(tar1 + 1, tar1 + 1 + n);
-
-    bool flg = buf[1] == buf1[1];
-
-    for (long long i = 1; i <= n; i++) {
-        if (tar[i] != tar1[i]) {
-            flg = false;
-            break;
+    long long T;
+    cin >> T;
+    while (T--) {
+        cin >> n;
+        if (mp.count(n)) {
+            cout << mp[n] << '\n';
+        } else {
+            long long cnt = 0;
+            while (n) {
+                cnt++;
+                n >>= 1;
+            }
+            cout << (1 << cnt) - 1 << '\n';
         }
-    }
-
-    if (flg) {
-        cout << "YES" << endl;
-    } else {
-        cout << "NO" << endl;
     }
 
 
