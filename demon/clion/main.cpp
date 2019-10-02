@@ -2,7 +2,7 @@
 
 using namespace std;
 
-const long long MAXN = 2000;
+const long long MAXN = 200500;
 const long long PHI = (long long) 1e9 + 6;
 const long long INF = 0x3f3f3f3f;
 const long long LINF = 0x1f3f3f3f3f3f3f3f;
@@ -10,51 +10,7 @@ const long long MOD = (long long) 1e9 + 7;
 const long long OVER_FLOW = 0xffffffff;
 
 long long n;
-
-struct Matrix {
-    long long mat[150][150];
-
-    Matrix() { memset(mat, 0, sizeof mat); }
-};
-
-Matrix mul_M(Matrix a, Matrix b, long long mod) {
-    Matrix ret;
-    for (int i = 0; i < 100; i++)
-        for (int j = 0; j < 100; j++) {
-            ret.mat[i][j] = 0;
-            for (int k = 0; k < 100; k++) {
-                ret.mat[i][j] += a.mat[i][k] * b.mat[k][j] % mod;
-                ret.mat[i][j] %= mod;
-            }
-        }
-    return ret;
-}
-
-Matrix pow_M(Matrix a, long long n, long long mod) {
-    Matrix ret;
-    memset(ret.mat, 0, sizeof(ret.mat));
-    for (int i = 0; i < 100; i++)ret.mat[i][i] = 1;
-    Matrix tmp = a;
-    while (n) {
-        if (n & 1)ret = mul_M(ret, tmp, mod);
-        tmp = mul_M(tmp, tmp, mod);
-        n >>= 1;
-    }
-    return ret;
-}
-
-long long pow_m(long long a, long long n, long long mod)//a^b % mod
-{
-    long long ret = 1;
-    long long tmp = a % mod;
-    while (n) {
-        if (n & 1)
-            ret = ret * tmp % mod;
-        tmp = tmp * tmp % mod;
-        n >>= 1;
-    }
-    return ret;
-}
+long long buf[MAXN], buf1[MAXN], tar[MAXN], tar1[MAXN];
 
 int main() {
 
@@ -70,9 +26,8 @@ int main() {
 
 /*
 写代码时请注意：
-    1.是否要开Long Long？数组边界处理好了么？
-    2.实数精度
-    3.下标能从最小值开始就从最小值开始
+    1.数学公式尝试化简
+    2.数量值太大尝试给出递推公式
     5.排序之前不能取模.
     6.0-1子矩阵子序列:前缀和,异或和
     7.模拟题注意代码复用.
@@ -86,24 +41,28 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
+    cin >> n;
+    for (long long i = 1; i <= n; i++) cin >> buf[i];
+    for (long long i = 1; i <= n; i++) cin >> buf1[i];
 
-    long long N, M;
-    cin >> N >> M;
-    if (N >= M) {
-        Matrix m, rgt;
-        m.mat[0][0] = m.mat[0][M - 1] = 1;
-        for (long long i = 1; i < M; i++) {
-            m.mat[i][i - 1] = 1;
-        }
-        for (long long i = 0; i < M; i++) {
-            rgt.mat[i][0] = 1;
-        }
-        rgt.mat[0][0]++;
+    for (long long i = 2; i <= n; i++) {
+        tar[i] = buf[i] - buf[i - 1], tar1[i] = buf1[i] - buf1[i - 1];
+    }
+    sort(tar + 1, tar + 1 + n), sort(tar1 + 1, tar1 + 1 + n);
 
-        m = pow_M(m, N - M, MOD);
-        cout << mul_M(m, rgt, MOD).mat[0][0] << endl;
+    bool flg = buf[1] == buf1[1];
+
+    for (long long i = 1; i <= n; i++) {
+        if (tar[i] != tar1[i]) {
+            flg = false;
+            break;
+        }
+    }
+
+    if (flg) {
+        cout << "YES" << endl;
     } else {
-        cout << 1 << endl;
+        cout << "NO" << endl;
     }
 
 
