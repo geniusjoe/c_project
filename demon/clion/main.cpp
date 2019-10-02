@@ -12,28 +12,23 @@ const long long MOD2 = (long long) 988244353;
 const long long OVER_FLOW = 0xffffffff;
 
 long long n;
-map<double, long long> hsh1, hsh2, hsh3;
-long long buf[MAXN], tar[MAXN];
+string str1, str2, str3, buf;
+string tar1, tar2, tar3;
+long long pos[MAXN];
 
-// a ^ b % c
-long long qpow(long long a, long long b, long long c) {
-    long long cur = 1;
-    while (b) {
-        if (b & 1) cur = cur * a % c;
-        a = a * a % c, b >>= 1;
-    }
+string get_res(string str) {
+    cout << "? " << str << endl;
+    cout.flush();
+    string cur;
+    cin >> cur;
     return cur;
-}
-
-long long inv(long long num, long long m) {
-    return qpow(num, m - 2, m);
 }
 
 int main() {
 
 #ifndef ONLINE_JUDGE
-    freopen("testdata.in", "r+", stdin);
-    freopen("testdata.out", "w+", stdout);
+//    freopen("testdata.in", "r+", stdin);
+//    freopen("testdata.out", "w+", stdout);
 #endif // ONLINE_JUDGE
 
 #ifndef ONLINE_JUDGE
@@ -59,32 +54,24 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
-    cin >> n;
-    for (long long i = 1; i <= n; i++) cin >> buf[i];
-
-    long long cnt = 0;
-
-    for (long long i = 1; i <= n; i++) {
-        long long u;
-        cin >> u;
-        if (buf[i] == 0 and u != 0) continue;
-        else if (buf[i] == 0 and u == 0) cnt++;
-        else {
-            long long x = buf[i] / __gcd(buf[i], u), y = u / __gcd(buf[i], u);
-            hsh1[1.0l * x / y]++;
-            hsh2[x * inv(y, MOD) % MOD]++;
-        }
+    cin >> buf;
+    for (long long i = 0; i < buf.size(); i++) {
+        str1.push_back('a' + i % 26);
+        str2.push_back('a' + i / 26 % 26);
+        str3.push_back('a' + i / 26 / 26 % 26);
     }
 
-    long long res1 = cnt, res2 = cnt;
-    for (auto &it:hsh1) {
-        res1 = max(res1, it.second + cnt);
+    tar1 = get_res(str1), tar2 = get_res(str2), tar3 = get_res(str3);
+    for (long long i = 0; i < buf.size(); i++) {
+        pos[i] = tar1[i] - 'a' + (tar2[i] - 'a') * 26 + (tar3[i] - 'a') * 26 * 26;
     }
-    for (auto it:hsh2) {
-        res2 = max(res2, it.second + cnt);
+    string res(buf.size(), 'a');
+
+    for (long long i = 0; i < buf.size(); i++) {
+        res[pos[i]] = buf[i];
     }
 
-    cout << min(res1, res2)  << endl;
+    cout << "! " << res << endl;
 
 
 #ifndef ONLINE_JUDGE
