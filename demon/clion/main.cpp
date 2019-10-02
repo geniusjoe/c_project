@@ -2,33 +2,65 @@
 
 using namespace std;
 
-const long long MAXN = 200500;
+const long long MAXN = 2000;
 const long long PHI = (long long) 1e9 + 6;
 const long long INF = 0x3f3f3f3f;
 const long long LINF = 0x1f3f3f3f3f3f3f3f;
 const long long MOD = (long long) 1e9 + 7;
-const long long MOD1 = (long long) 1e8 + 3;
-const long long MOD2 = (long long) 988244353;
 const long long OVER_FLOW = 0xffffffff;
 
 long long n;
-string str1, str2, str3, buf;
-string tar1, tar2, tar3;
-long long pos[MAXN];
 
-string get_res(string str) {
-    cout << "? " << str << endl;
-    cout.flush();
-    string cur;
-    cin >> cur;
-    return cur;
+struct Matrix {
+    long long mat[150][150];
+
+    Matrix() { memset(mat, 0, sizeof mat); }
+};
+
+Matrix mul_M(Matrix a, Matrix b, long long mod) {
+    Matrix ret;
+    for (int i = 0; i < 100; i++)
+        for (int j = 0; j < 100; j++) {
+            ret.mat[i][j] = 0;
+            for (int k = 0; k < 100; k++) {
+                ret.mat[i][j] += a.mat[i][k] * b.mat[k][j] % mod;
+                ret.mat[i][j] %= mod;
+            }
+        }
+    return ret;
+}
+
+Matrix pow_M(Matrix a, long long n, long long mod) {
+    Matrix ret;
+    memset(ret.mat, 0, sizeof(ret.mat));
+    for (int i = 0; i < 100; i++)ret.mat[i][i] = 1;
+    Matrix tmp = a;
+    while (n) {
+        if (n & 1)ret = mul_M(ret, tmp, mod);
+        tmp = mul_M(tmp, tmp, mod);
+        n >>= 1;
+    }
+    return ret;
+}
+
+long long pow_m(long long a, long long n, long long mod)//a^b % mod
+{
+    long long ret = 1;
+    long long tmp = a % mod;
+    while (n) {
+        if (n & 1)
+            ret = ret * tmp % mod;
+        tmp = tmp * tmp % mod;
+        n >>= 1;
+    }
+    return ret;
 }
 
 int main() {
 
 #ifndef ONLINE_JUDGE
-//    freopen("testdata.in", "r+", stdin);
-//    freopen("testdata.out", "w+", stdout);
+    freopen("testdata.in", "r+", stdin);
+    freopen("testdata.out", "w+", stdout);
 #endif // ONLINE_JUDGE
 
 #ifndef ONLINE_JUDGE
@@ -54,24 +86,25 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
-    cin >> buf;
-    for (long long i = 0; i < buf.size(); i++) {
-        str1.push_back('a' + i % 26);
-        str2.push_back('a' + i / 26 % 26);
-        str3.push_back('a' + i / 26 / 26 % 26);
-    }
 
-    tar1 = get_res(str1), tar2 = get_res(str2), tar3 = get_res(str3);
-    for (long long i = 0; i < buf.size(); i++) {
-        pos[i] = tar1[i] - 'a' + (tar2[i] - 'a') * 26 + (tar3[i] - 'a') * 26 * 26;
-    }
-    string res(buf.size(), 'a');
+    long long N, M;
+    cin >> N >> M;
+    if (N >= M) {
+        Matrix m, rgt;
+        m.mat[0][0] = m.mat[0][M - 1] = 1;
+        for (long long i = 1; i < M; i++) {
+            m.mat[i][i - 1] = 1;
+        }
+        for (long long i = 0; i < M; i++) {
+            rgt.mat[i][0] = 1;
+        }
+        rgt.mat[0][0]++;
 
-    for (long long i = 0; i < buf.size(); i++) {
-        res[pos[i]] = buf[i];
+        m = pow_M(m, N - M, MOD);
+        cout << mul_M(m, rgt, MOD).mat[0][0] << endl;
+    } else {
+        cout << 1 << endl;
     }
-
-    cout << "! " << res << endl;
 
 
 #ifndef ONLINE_JUDGE
