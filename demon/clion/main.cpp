@@ -11,98 +11,25 @@ const long long OVER_FLOW = 0xffffffff;
 
 long long n, K, m;
 
-struct Matrix {
-    long long mat[150][150];
-
-} lft, rgt;
-
-Matrix mul_M(Matrix a, Matrix b, long long mod) {
-    Matrix ret;
-    for (int i = 0; i < K; i++)
-        for (int j = 0; j < K; j++) {
-            ret.mat[i][j] = 0;
-            for (int k = 0; k < K; k++) {
-                ret.mat[i][j] += a.mat[i][k] * b.mat[k][j] % mod;
-                if (ret.mat[i][j] >= mod)ret.mat[i][j] -= mod;
+const long long MAX_BASE = 30;
+long long a[MAXN], b[MAXN]; // a为所有元素的集合,b为线性基
+long long cal() {
+    long long res = 0;
+    for (long long i = 1; i <= n; ++i) {
+        for (long long j = MAX_BASE; j >= 0; --j) {
+            if (a[i] >> j & 1) {
+                if (b[j]) a[i] ^= b[j];
+                else {
+                    b[j] = a[i];
+                    for (long long k = j - 1; k >= 0; --k) if (b[k] && (b[j] >> k & 1)) b[j] ^= b[k];
+                    for (long long k = j + 1; k <= MAX_BASE; ++k) if (b[k] >> j & 1) b[k] ^= b[j];
+                    res++;
+                    break;
+                }
             }
         }
-    return ret;
-}
-
-Matrix pow_M(Matrix a, long long n, long long mod) {
-    Matrix ret;
-    memset(ret.mat, 0, sizeof(ret.mat));
-    for (int i = 0; i < K; i++)ret.mat[i][i] = 1;
-    Matrix tmp = a;
-    while (n) {
-        if (n & 1)ret = mul_M(ret, tmp, mod);
-        tmp = mul_M(tmp, tmp, mod);
-        n >>= 1;
     }
-    return ret;
-}
-
-
-// a ^ b % c
-long long qpow(long long a, long long b, long long c) {
-    long long cur = 1;
-    while (b) {
-        if (b & 1) cur = cur * a % c;
-        a = a * a % c, b >>= 1;
-    }
-    return cur;
-}
-
-
-void exgcd(long long a, long long b, long long &g, long long &x, long long &y) {
-    if (!b) return (void) (x = 1, y = 0, g = a);
-    exgcd(b, a % b, g, y, x);
-    y -= x * (a / b);
-}
-
-long long rmd_equation(long long A, long long B, long long P) { //Ax == B (mod P), solve x
-    long long a = A, b = P, g, x, y;
-    exgcd(a, b, g, x, y);
-    if (B % g) return -1;
-    x *= B / g, y *= B / g;
-    long long t = b / g;
-    x = (x % t + t) % t;
-    return x;
-}
-
-
-//(POJ 2417,3243)
-//baby_step giant_step
-// a^x = b (mod n) n 是素数和不是素数都可以
-// 求解上式0<=x < n 的解
-#define md 76543
-int hs[md], head[md], nxt[md], id[md], top;
-
-void insert(int x, int y) {
-    int k = x % md;
-    hs[top] = x, id[top] = y, nxt[top] = head[k], head[k] = top++;
-}
-
-int find(int x) {
-    int k = x % md;
-    for (int i = head[k]; i != -1; i = nxt[i])
-        if (hs[i] == x)
-            return id[i];
-    return -1;
-}
-
-int BSGS(int a, int b, int n) {
-    memset(head, -1, sizeof(head));
-    top = 1;
-    if (b == 1)return 0;
-    int m = sqrt(n * 1.0), j;
-    long long x = 1, p = 1;
-    for (int i = 0; i < m; ++i, p = p * a % n)insert(p * b % n, i);
-    for (long long i = m;; i += m) {
-        if ((j = find(x = x * p % n)) != -1)return i - j;
-        if (i > n)break;
-    }
-    return -1;
+    return res;
 }
 
 
@@ -135,28 +62,14 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
-    cin >> K;
-    lft.mat[0][K - 1] = 1;
-    for (long long i = 0; i < K - 1; i++) {
-        rgt.mat[i + 1][i] = 1;
-    }
-    for (long long i = 0; i < K; i++) {
-        long long u;
-        cin >> u;
-        rgt.mat[K - 1 - i][K - 1] = u;
-    }
-    cin >> n >> m;
-
-    rgt = pow_M(rgt, n - K, PHI);
-    lft = mul_M(lft, rgt, PHI);
-    long long cur = lft.mat[0][K - 1];
-    long long x, a;
-    a = BSGS(3ll, m, MOD);
-    x = rmd_equation(cur, a, PHI);
-    if (x == -1) {
-        cout << -1 << endl;
-    } else {
-        cout << qpow(3ll, x, MOD) << endl;
+    cin>>n;
+    for(long long i=1;i<=n;i++) cin>>a[i];
+    long long cur=0;
+    for(long long i=1;i<=n;i++) cur^=a[i];
+    if(cur==0){
+        cout<<-1<<endl;
+    }else{
+        cout<<cal()<<endl;
     }
 
 
