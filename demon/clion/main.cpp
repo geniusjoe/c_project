@@ -6,7 +6,7 @@ const long long MAXN = 200500;
 const long long PHI = (long long) 998244352;
 const long long INF = 0x3f3f3f3f;
 const long long LINF = 0x1f3f3f3f3f3f3f3f;
-const long long MOD = (long long) 1e9 + 7;
+const long long MOD = (long long) 998244353;
 const long long OVER_FLOW = 0xffffffff;
 
 long long n, k, m;
@@ -34,34 +34,65 @@ long long inv(long long a, long long n) {
     else return -1;
 }
 
-long long f[10050][65];
+long long a[MAXN], ans[MAXN << 2];
 
-long long solve(long long x, long long cnt) {
-    for (long long i = 0; i <= k; i++) for (long long j = 0; j <= cnt; j++) f[i][j] = 0;
-//    memset(f,0,sizeof f);
-
-    f[0][cnt] = 1;
-    for (long long i = 0; i < k; i++) {
-        for (long long j = 0; j <= cnt; j++) {
-            if (f[i][j]) {
-                long long cur_inv = inv(j + 1, MOD);
-                assert(cur_inv != -1);
-
-                for (long long o = 0; o <= j; o++) {
-                    f[i + 1][o] = (f[i + 1][o] + f[i][j] * inv(j + 1, MOD) % MOD) % MOD;
-                }
-            }
-        }
-    }
-
-    long long cur = 0, mul = 1;
-    for (long long i = 0; i <= cnt; i++) {
-        cur = (cur + f[k][i] * mul % MOD) % MOD;
-        mul = mul * x % MOD;
-    }
-
-    return cur;
+inline long long lchild(long long x)
+/**<  每个树节点的编号*/
+{
+    return x << 1;
 }
+
+inline long long rchild(long long x) {
+    return x << 1 | 1;
+}
+
+inline void push_up(long long p) {
+    ans[p] = ans[lchild(p)] + ans[rchild(p)];
+}
+
+/**< 由顶向下建立线段树 */
+/**< 左右均为闭区间 */
+void build(long long p, long long l, long long r) {
+    if (l == r) {
+        ans[p] = 0;
+        return;
+    }
+    long long mid = (l + r) >> 1;
+    build(lchild(p), l, mid);
+    build(rchild(p), mid + 1, r);
+    push_up(p);
+}
+/**< 区间赋值操作 */
+/**< 区间内元素增加的值 */
+inline void update(long long nl, long long nr,   /**< 目标边界 */
+                   long long l, long long r, long long p /**< 当前边界和节点 */
+) {
+    if (nl <= l && r <= nr) {
+        ans[p] = 1;
+        return;
+    }
+    long long mid = (l + r) >> 1;
+    if (nl <= mid)
+        update(nl, nr, l, mid, lchild(p));
+    if (nr > mid)
+        update(nl, nr, mid + 1, r, rchild(p));
+    push_up(p);
+}
+
+/**< 区间查询操作 */
+long long query(long long q_x, long long q_y, long long l, long long r, long long p) {
+    long long res = 0;
+    if (q_x <= l && r <= q_y)
+        return ans[p];
+    long long mid = (l + r) >> 1;
+    if (q_x <= mid)
+        res += query(q_x, q_y, l, mid, lchild(p));
+    if (q_y > mid)
+        res += query(q_x, q_y, mid + 1, r, rchild(p));
+    return res;
+}
+
+long long buf[MAXN];
 
 int main() {
 
@@ -78,7 +109,8 @@ int main() {
 /*
 写代码时请注意：
     1.数学公式尝试化简
-    2.数量值太大尝试给出递推公式
+    2.dp或者数值太大,尝试给出递推公式
+    3.概率题随机生成考虑1/2的情况,或者是满足的方案/所有可能的方案
     5.排序之前不能取模.
     6.0-1子矩阵子序列:前缀和,异或和
     7.模拟题注意代码复用.
@@ -92,20 +124,32 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
-    cin >> n >> k;
-    long long res = 1, raw = n;
-    for (long long i = 2; i * i <= raw; i++) {
-        if (n % i == 0) {
-            long long cnt = 0;
-            while (n % i == 0) {
-                n /= i;
-                cnt++;
-            }
-            res = res * solve(i, cnt) % MOD;
+    cin >> n;
+    build(1, 1, n);
+    long long res = 0, tot = 0;
+    for (long long i = 1; i <= n; i++) {
+        cin >> buf[i];
+        if (buf[i] == -1) {
+            tot++;
+        } else {
+            res = (res + query(buf[i], n, 1, n, 1)) % MOD;
+            update(buf[i], buf[i], 1, n, 1);
         }
     }
-    if (n != 1) res = res * solve(n, 1) % MOD;
 
+    res = (res + tot * (tot - 1) % MOD * inv(4ll, MOD) % MOD) % MOD;
+
+    long long cnt = 0;
+    if (tot > 0) {
+        for (long long i = 1; i <= n; i++) {
+            if (buf[i] == -1) cnt++;
+            else {
+                long long les = buf[i] - query(1, buf[i], 1, n, 1), grt = tot - les;
+                res = (res + inv(tot, MOD) * grt % MOD * cnt % MOD) % MOD;
+                res = (res + inv(tot, MOD) * les % MOD * (tot - cnt) % MOD) % MOD;
+            }
+        }
+    }
     cout << res << endl;
 
 
