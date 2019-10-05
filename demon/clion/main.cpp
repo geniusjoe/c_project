@@ -9,90 +9,8 @@ const long long LINF = 0x1f3f3f3f3f3f3f3f;
 const long long MOD = (long long) 998244353;
 const long long OVER_FLOW = 0xffffffff;
 
-long long n, k, m;
+long long n;
 
-//******************************
-//返回d=gcd(a,b); 和对应于等式ax+by=d 中的x,y
-long long extend_gcd(long long a, long long b, long long &x, long long &y) {
-    if (a == 0 && b == 0) return -1;//无最大公约数
-    if (b == 0) {
-        x = 1;
-        y = 0;
-        return a;
-    }
-    long long d = extend_gcd(b, a % b, y, x);
-    y -= a / b * x;
-    return d;
-}
-
-//********* 求逆元*******************
-//ax = 1(mod n)
-long long inv(long long a, long long n) {
-    long long x, y;
-    long long d = extend_gcd(a, n, x, y);
-    if (d == 1) return (x % n + n) % n;
-    else return -1;
-}
-
-long long a[MAXN], ans[MAXN << 2];
-
-inline long long lchild(long long x)
-/**<  每个树节点的编号*/
-{
-    return x << 1;
-}
-
-inline long long rchild(long long x) {
-    return x << 1 | 1;
-}
-
-inline void push_up(long long p) {
-    ans[p] = ans[lchild(p)] + ans[rchild(p)];
-}
-
-/**< 由顶向下建立线段树 */
-/**< 左右均为闭区间 */
-void build(long long p, long long l, long long r) {
-    if (l == r) {
-        ans[p] = 0;
-        return;
-    }
-    long long mid = (l + r) >> 1;
-    build(lchild(p), l, mid);
-    build(rchild(p), mid + 1, r);
-    push_up(p);
-}
-/**< 区间赋值操作 */
-/**< 区间内元素增加的值 */
-inline void update(long long nl, long long nr,   /**< 目标边界 */
-                   long long l, long long r, long long p /**< 当前边界和节点 */
-) {
-    if (nl <= l && r <= nr) {
-        ans[p] = 1;
-        return;
-    }
-    long long mid = (l + r) >> 1;
-    if (nl <= mid)
-        update(nl, nr, l, mid, lchild(p));
-    if (nr > mid)
-        update(nl, nr, mid + 1, r, rchild(p));
-    push_up(p);
-}
-
-/**< 区间查询操作 */
-long long query(long long q_x, long long q_y, long long l, long long r, long long p) {
-    long long res = 0;
-    if (q_x <= l && r <= q_y)
-        return ans[p];
-    long long mid = (l + r) >> 1;
-    if (q_x <= mid)
-        res += query(q_x, q_y, l, mid, lchild(p));
-    if (q_y > mid)
-        res += query(q_x, q_y, mid + 1, r, rchild(p));
-    return res;
-}
-
-long long buf[MAXN];
 
 int main() {
 
@@ -124,33 +42,58 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
-    cin >> n;
-    build(1, 1, n);
-    long long res = 0, tot = 0;
-    for (long long i = 1; i <= n; i++) {
-        cin >> buf[i];
-        if (buf[i] == -1) {
-            tot++;
-        } else {
-            res = (res + query(buf[i], n, 1, n, 1)) % MOD;
-            update(buf[i], buf[i], 1, n, 1);
+    vector<pair<long long, long long>> buf, ans;
+    for (long long i = 1; i <= 3; i++) {
+        long long u, v;
+        cin >> u >> v;
+        buf.emplace_back(u, v);
+    }
+    long long res = LINF;
+    sort(buf.begin(), buf.end(), [](pair<long long, long long> p1, pair<long long, long long> p2) {
+        return p1.first < p2.first;
+    });
+
+    long long y_max = max(max(buf[0].second, buf[1].second), buf[2].second),
+            y_min = min(min(buf[0].second, buf[1].second), buf[2].second);
+    if (res > buf[2].first - buf[0].first + y_max - y_min) {
+        ans.clear();
+        long long cur_x = buf[1].first;
+        for (long long i = y_min; i <= y_max; i++) {
+            ans.emplace_back(cur_x, i);
         }
+        for (long long i = cur_x + 1; i <= buf[2].first; i++) {
+            ans.emplace_back(i, buf[2].second);
+        }
+        for (long long i = cur_x - 1; i >= buf[0].first; i--) {
+            ans.emplace_back(i, buf[0].second);
+        }
+        res = ans.size();
     }
 
-    res = (res + tot * (tot - 1) % MOD * inv(4ll, MOD) % MOD) % MOD;
-
-    long long cnt = 0;
-    if (tot > 0) {
-        for (long long i = 1; i <= n; i++) {
-            if (buf[i] == -1) cnt++;
-            else {
-                long long les = buf[i] - query(1, buf[i], 1, n, 1), grt = tot - les;
-                res = (res + inv(tot, MOD) * grt % MOD * cnt % MOD) % MOD;
-                res = (res + inv(tot, MOD) * les % MOD * (tot - cnt) % MOD) % MOD;
-            }
+    sort(buf.begin(), buf.end(), [](pair<long long, long long> p1, pair<long long, long long> p2) {
+        return p1.second < p2.second;
+    });
+    long long x_max = max(max(buf[0].first, buf[1].first), buf[2].first),
+            x_min = min(min(buf[0].first, buf[1].first), buf[2].first);
+    if (res > buf[2].second - buf[0].second + x_max - x_min) {
+        ans.clear();
+        long long cur_y = buf[1].second;
+        for (long long i = x_min; i <= x_max; i++) {
+            ans.emplace_back(i, cur_y);
         }
+        for (long long i = cur_y + 1; i <= buf[2].second; i++) {
+            ans.emplace_back(buf[2].first, i);
+        }
+        for (long long i = cur_y - 1; i >= buf[0].second; i--) {
+            ans.emplace_back(buf[0].first, i);
+        }
+        res = ans.size();
     }
+
     cout << res << endl;
+    for (auto it:ans) {
+        cout << it.first << " " << it.second << '\n';
+    }
 
 
 #ifndef ONLINE_JUDGE
