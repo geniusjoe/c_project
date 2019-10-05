@@ -42,58 +42,20 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
-    vector<pair<long long, long long>> buf, ans;
-    for (long long i = 1; i <= 3; i++) {
-        long long u, v;
-        cin >> u >> v;
-        buf.emplace_back(u, v);
-    }
-    long long res = LINF;
-    sort(buf.begin(), buf.end(), [](pair<long long, long long> p1, pair<long long, long long> p2) {
-        return p1.first < p2.first;
-    });
-
-    long long y_max = max(max(buf[0].second, buf[1].second), buf[2].second),
-            y_min = min(min(buf[0].second, buf[1].second), buf[2].second);
-    if (res > buf[2].first - buf[0].first + y_max - y_min) {
-        ans.clear();
-        long long cur_x = buf[1].first;
-        for (long long i = y_min; i <= y_max; i++) {
-            ans.emplace_back(cur_x, i);
-        }
-        for (long long i = cur_x + 1; i <= buf[2].first; i++) {
-            ans.emplace_back(i, buf[2].second);
-        }
-        for (long long i = cur_x - 1; i >= buf[0].first; i--) {
-            ans.emplace_back(i, buf[0].second);
-        }
-        res = ans.size();
+    vector<long long> buf;
+    cin >> n;
+    for (long long i = 1; i <= n; i++) {
+        long long u;
+        cin >> u;
+        if (buf.empty()) buf.push_back(u);
+        else if (abs(buf.back() - u) % 2 == 0) {
+            buf.pop_back();
+        } else buf.push_back(u);
     }
 
-    sort(buf.begin(), buf.end(), [](pair<long long, long long> p1, pair<long long, long long> p2) {
-        return p1.second < p2.second;
-    });
-    long long x_max = max(max(buf[0].first, buf[1].first), buf[2].first),
-            x_min = min(min(buf[0].first, buf[1].first), buf[2].first);
-    if (res > buf[2].second - buf[0].second + x_max - x_min) {
-        ans.clear();
-        long long cur_y = buf[1].second;
-        for (long long i = x_min; i <= x_max; i++) {
-            ans.emplace_back(i, cur_y);
-        }
-        for (long long i = cur_y + 1; i <= buf[2].second; i++) {
-            ans.emplace_back(buf[2].first, i);
-        }
-        for (long long i = cur_y - 1; i >= buf[0].second; i--) {
-            ans.emplace_back(buf[0].first, i);
-        }
-        res = ans.size();
-    }
-
-    cout << res << endl;
-    for (auto it:ans) {
-        cout << it.first << " " << it.second << '\n';
-    }
+    if (buf.empty() or buf.size() == 1) {
+        cout << "YES" << endl;
+    } else cout << "NO" << endl;
 
 
 #ifndef ONLINE_JUDGE
