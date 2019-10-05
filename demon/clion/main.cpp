@@ -1,5 +1,7 @@
 #include<bits/stdc++.h>
 
+#pragma GCC optimize(3)
+
 using namespace std;
 
 const long long MAXN = 200500;
@@ -10,7 +12,19 @@ const long long MOD = (long long) 998244353;
 const long long OVER_FLOW = 0xffffffff;
 
 long long n;
+map<long long, long long> buf;
+set<long long> res;
 
+void dfs(map<long long, long long>::iterator it, long long tmp) {
+    if (it == buf.end()) res.insert((2 + n - tmp) * (n / tmp) / 2);
+    else {
+        long long cur = 1;
+        for (long long i = 0; i <= it->second; i++) {
+            dfs(next(it), tmp * cur);
+            cur *= it->first;
+        }
+    }
+}
 
 int main() {
 
@@ -42,20 +56,23 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
-    vector<long long> buf;
     cin >> n;
-    for (long long i = 1; i <= n; i++) {
-        long long u;
-        cin >> u;
-        if (buf.empty()) buf.push_back(u);
-        else if (abs(buf.back() - u) % 2 == 0) {
-            buf.pop_back();
-        } else buf.push_back(u);
+    long long raw = n;
+    for (long long i = 2; i * i <= raw; i++) {
+        while (n % i == 0) {
+            buf[i]++;
+            n /= i;
+        }
     }
+    if (n != 1) buf[n]++;
+    n = raw;
 
-    if (buf.empty() or buf.size() == 1) {
-        cout << "YES" << endl;
-    } else cout << "NO" << endl;
+    dfs(buf.begin(), 1);
+
+    for (auto it:res) {
+        cout << it << " ";
+    }
+    cout << endl;
 
 
 #ifndef ONLINE_JUDGE
