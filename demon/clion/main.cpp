@@ -1,7 +1,5 @@
 #include<bits/stdc++.h>
 
-#pragma GCC optimize(3)
-
 using namespace std;
 
 const long long MAXN = 200500;
@@ -12,19 +10,7 @@ const long long MOD = (long long) 998244353;
 const long long OVER_FLOW = 0xffffffff;
 
 long long n;
-map<long long, long long> buf;
-set<long long> res;
-
-void dfs(map<long long, long long>::iterator it, long long tmp) {
-    if (it == buf.end()) res.insert((2 + n - tmp) * (n / tmp) / 2);
-    else {
-        long long cur = 1;
-        for (long long i = 0; i <= it->second; i++) {
-            dfs(next(it), tmp * cur);
-            cur *= it->first;
-        }
-    }
-}
+vector<pair<long long, long long>> buf[MAXN];
 
 int main() {
 
@@ -41,7 +27,7 @@ int main() {
 /*
 写代码时请注意：
     1.数学公式尝试化简
-    2.dp或者数值太大,尝试给出递推公式
+    2.dp或者数值太大,尝试给出递推公式或者预处理数据
     3.概率题随机生成考虑1/2的情况,或者是满足的方案/所有可能的方案
     5.排序之前不能取模.
     6.0-1子矩阵子序列:前缀和,异或和
@@ -56,23 +42,41 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
-    cin >> n;
-    long long raw = n;
-    for (long long i = 2; i * i <= raw; i++) {
-        while (n % i == 0) {
-            buf[i]++;
-            n /= i;
+    const long long m = 2e5 + 5;
+    for (long long i = 1; i <= m; i++) {
+        for (long long j = i + 1; j * j - i * i <= m; j++) {
+            buf[j * j - i * i].emplace_back(i, j);
         }
     }
-    if (n != 1) buf[n]++;
-    n = raw;
 
-    dfs(buf.begin(), 1);
-
-    for (auto it:res) {
-        cout << it << " ";
+    cin >> n;
+    vector<long long> res;
+    bool flg = true;
+    res.push_back(0);
+    for (long long i = 1; i <= n / 2; i++) {
+        long long u;
+        cin >> u;
+        bool flag = false;
+        for (auto it:buf[u]) {
+            if (it.first > res.back()) {
+                res.push_back(it.first), res.push_back(it.second);
+                flag = true;
+                break;
+            }
+        }
+        if (!flag) {
+            flg = false;
+        }
     }
-    cout << endl;
+    if (flg) {
+        cout << "Yes" << endl;
+        for (long long i = 1; i < res.size(); i++) {
+            cout << res[i] * res[i] - res[i - 1] * res[i - 1] << " ";
+        }
+        cout << endl;
+    } else {
+        cout << "No" << endl;
+    }
 
 
 #ifndef ONLINE_JUDGE
