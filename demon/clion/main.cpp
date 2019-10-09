@@ -1,6 +1,6 @@
 #include<bits/stdc++.h>
 
-#pragma GCC optimize(2)
+//#pragma GCC optimize(2)
 
 using namespace std;
 
@@ -12,7 +12,12 @@ const long long MOD = (long long) 998244353;
 const long long OVER_FLOW = 0xffffffff;
 
 long long n;
-long long dp[MAXN][MAXN];
+long long t, a, b, k;
+
+bool ok(long long x) {
+    long long cur_a = min(a, x), cur_b = min(b, x);
+    return cur_a * (n / 2 + n % 2) + cur_b * (n / 2) >= x * k;
+}
 
 int main() {
 
@@ -44,17 +49,15 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
-    long long m, k;
-    cin >> n >> m >> k;
-
-    for (long long i = 1; i <= n; i++) dp[i][0] = m;
-    for (long long i = 1; i <= n; i++) {
-        for (long long j = 1; j <= k; j++) {
-            dp[i][j] = (dp[i - 1][j] + (m - 1) * dp[i - 1][j - 1] % MOD) % MOD;
-        }
+    cin >> t >> n >> a >> b >> k;
+    long long lft = 0, rgt = t;
+    while (lft <= rgt) {
+        long long mid = (lft + rgt) >> 1;
+        if (ok(mid)) lft = mid + 1;
+        else rgt = mid - 1;
     }
 
-    cout << dp[n][k] << endl;
+    cout << rgt << endl;
 
 
 #ifndef ONLINE_JUDGE
