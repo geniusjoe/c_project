@@ -12,15 +12,7 @@ const long long MOD = (long long) 998244353;
 const long long OVER_FLOW = 0xffffffff;
 
 long long n;
-map<long long, map<string, vector<long long>>> mp;
-
-#define setbit(x, y) x|=(1ll<<y)
-
-#define clrbit(x, y) x&=~(1ll<<y)
-
-#define reversebit(x, y) x^=(1ll<<y)
-
-#define getbit(x, y) ((x) >> (y)&1ll)
+long long buf[MAXN], cur[MAXN];
 
 int main() {
 
@@ -53,38 +45,18 @@ int main() {
 
     ios::sync_with_stdio(false);
     cin >> n;
-    for (long long j = 1; j <= n; j++) {
-        string s, t;
-        cin >> s >> t;
-        long long cur = 0;
-        for (auto it:t) {
-            setbit(cur, (it - 'a'));
-        }
-        long long lst = s.size();
-        for (long long i = s.size() - 1; i >= 0; i--) {
-            if (getbit(cur, s[i] - 'a')) lst = i;
-            else break;
-        }
-#ifndef ONLINE_JUDGE
-        cout << s.substr(0, lst) << endl;
-#endif
-        mp[cur][s.substr(0, lst)].push_back(j);
+    for (long long i = 1; i <= n; i++) cin >> buf[i];
+    fill(cur + 1, cur + 1 + n, 0);
+    long long cnt = 0;
+    cout << n + 1 << "\n";
+    for (long long i = n; i >= 1; i--) {
+        buf[i] += cnt;
+        long long delta = (buf[i] + n) / (n + 1) * (n + 1) - buf[i] + i;
+        cnt += delta;
+        cout << 1 << " " << i << " " << delta << "\n";
     }
 
-    long long res = 0;
-    for (const auto &mpi:mp) {
-        res += mpi.second.size();
-    }
-    cout << res << endl;
-    for (auto mpi:mp) {
-        for (auto it:mpi.second) {
-            cout << it.second.size() << " ";
-            for (auto it2:it.second) {
-                cout << it2 << " ";
-            }
-            cout << '\n';
-        }
-    }
+    cout << 2 << " " << n << " " << n + 1 << "\n";
 
 
 #ifndef ONLINE_JUDGE
