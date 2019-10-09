@@ -12,7 +12,6 @@ const long long MOD = (long long) 998244353;
 const long long OVER_FLOW = 0xffffffff;
 
 long long n;
-long long buf[MAXN], cur[MAXN];
 
 int main() {
 
@@ -44,19 +43,17 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
-    cin >> n;
-    for (long long i = 1; i <= n; i++) cin >> buf[i];
-    fill(cur + 1, cur + 1 + n, 0);
-    long long cnt = 0;
-    cout << n + 1 << "\n";
-    for (long long i = n; i >= 1; i--) {
-        buf[i] += cnt;
-        long long delta = (buf[i] + n) / (n + 1) * (n + 1) - buf[i] + i;
-        cnt += delta;
-        cout << 1 << " " << i << " " << delta << "\n";
+    long long m;
+    cin >> n >> m;
+    long long rst = n % m, res = 0;
+    for (long long i = 1; i <= m; i++) {
+        for (long long j = 1; j <= m; j++) {
+            if ((i * i + j * j) % m == 0) {
+                res += (n / m + (rst >= i)) * (n / m + (rst >= j));
+            }
+        }
     }
-
-    cout << 2 << " " << n << " " << n + 1 << "\n";
+    cout << res << endl;
 
 
 #ifndef ONLINE_JUDGE
