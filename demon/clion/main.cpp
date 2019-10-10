@@ -7,11 +7,22 @@ using namespace std;
 const long long MAXN = 2050;
 const long long PHI = (long long) 998244352;
 const long long INF = 0x3f3f3f3f;
-const long long LINF = 0x1f3f3f3f3f3f3f3f;
+const long long LINF = 0x3f3f3f3f3f3f3f3f;
 const long long MOD = (long long) 998244353;
-const long long OVER_FLOW = 0xffffffff;
+const long long OVER_FLOW = 0x7fffffff;
+const long long LOVER_FLOW = 0x7fffffffffffffff;
 
 long long n;
+
+// a ^ b % c
+long long qpow(long long a, long long b, long long c) {
+    long long cur = 1;
+    while (b) {
+        if (b & 1) cur = cur * a % c;
+        a = a * a % c, b >>= 1;
+    }
+    return cur;
+}
 
 int main() {
 
@@ -43,17 +54,32 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
-    long long m;
-    cin >> n >> m;
-    long long rst = n % m, res = 0;
-    for (long long i = 1; i <= m; i++) {
-        for (long long j = 1; j <= m; j++) {
-            if ((i * i + j * j) % m == 0) {
-                res += (n / m + (rst >= i)) * (n / m + (rst >= j));
+    long long T;
+    cin >> T;
+    while (T--) {
+        long long k;
+        cin >> n >> k;
+        if (n > 31) {
+            cout << "YES " << n - 1 << '\n';
+        }else{
+            long long cur = 0, rst = 0, nm = 1, op = 0, brck = 1, all = (qpow(4ll, n, LOVER_FLOW) - 1) / 3;
+            for (long long i = 1; i <= min(n, 31ll); i++) {
+                brck *= 2;
+                op += nm;
+                nm = brck * 2 - 1;
+                if (op <= k) {
+                    cur = i;
+                    rst = nm;
+                    continue;
+                } else break;
+            }
+            if (k <= all - rst * ((qpow(4ll, n - cur, LOVER_FLOW) - 1)) / 3) {
+                cout << "YES " << n - cur << '\n';
+            } else {
+                cout << "NO" << '\n';
             }
         }
     }
-    cout << res << endl;
 
 
 #ifndef ONLINE_JUDGE
