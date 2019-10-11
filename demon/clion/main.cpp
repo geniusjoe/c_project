@@ -13,8 +13,7 @@ const long long OVER_FLOW = 0x7fffffff;
 const long long LOVER_FLOW = 0x7fffffffffffffff;
 
 int n;
-int dp[10050][MAXN];
-int buf[MAXN], tme[MAXN];
+
 
 long long C[MAXN][MAXN];
 
@@ -50,44 +49,13 @@ int main() {
     ios::sync_with_stdio(false);
     cin >> n;
 
-    C[0][0] = C[1][0] = C[1][1] = 1;
-    for (register int i = 2; i <= 100; ++i) {
-        C[i][0] = 1;
-        for (register int j = 1; j <= i; ++j)
-            C[i][j] = (C[i - 1][j] + C[i - 1][j - 1]) % MOD;
+    long long res = 0;
+    for (long long i = 2; i <= n; i++) {
+        long long cur = n / i;
+        if (cur <= 1) break;
+        res += (cur * (cur + 1) / 2) - 1;
     }
-
-
-    dp[0][0] = 1;
-    for (int i = 1; i <= n; i++) {
-        int u;
-        cin >> u;
-        buf[i] = u;
-        for (int j = 10000; j >= u; j--) {
-            for (int k = 1; k <= 100; k++) {
-                dp[j][k] += dp[j - u][k - 1];
-            }
-        }
-    }
-
-//    sort(buf + 1, buf + 1 + n);
-    for (int i = 1; i <= n; i++) tme[buf[i]]++;
-
-    long long cnt = 0;
-    for (long long i = 1; i <= 100; i++) if (tme[i]) cnt++;
-    if (cnt == 1 or cnt == 2) {
-        cout << n << endl;
-    } else {
-        int res = 0;
-        for (int i = 1; i <= 100; i++) {
-            for (int j = tme[i]; j >= 1; j--) {
-                if (dp[j * i][j] == C[tme[i]][j]) {
-                    res = max(res, j);
-                }
-            }
-        }
-        cout << res << endl;
-    }
+    cout << res * 4 << endl;
 
 
 #ifndef ONLINE_JUDGE
