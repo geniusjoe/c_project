@@ -4,7 +4,7 @@
 
 using namespace std;
 
-const long long MAXN = 150;
+const long long MAXN = 100500;
 const long long PHI = (long long) 998244352;
 const long long INF = 0x3f3f3f3f;
 const long long LINF = 0x3f3f3f3f3f3f3f3f;
@@ -13,9 +13,18 @@ const long long OVER_FLOW = 0x7fffffff;
 const long long LOVER_FLOW = 0x7fffffffffffffff;
 
 int n;
+long long pre_sm[MAXN], c[MAXN];
+string str;
 
-
-long long C[MAXN][MAXN];
+// a ^ b % c
+long long qpow(long long a, long long b, long long c) {
+    long long cur = 1;
+    while (b) {
+        if (b & 1) cur = cur * a % c;
+        a = a * a % c, b >>= 1;
+    }
+    return cur;
+}
 
 int main() {
 
@@ -47,15 +56,18 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
-    cin >> n;
-
-    long long res = 0;
-    for (long long i = 2; i <= n; i++) {
-        long long cur = n / i;
-        if (cur <= 1) break;
-        res += (cur * (cur + 1) / 2) - 1;
+    long long q;
+    cin >> n >> q >> str;
+    for (long long i = 0; i < str.size(); i++) pre_sm[i + 1] = pre_sm[i] + (str[i] == '1');
+    for (long long i = 1; i <= n; i++) {
+        c[i] = (c[i - 1] + qpow(2, i - 1, MOD)) % MOD;
     }
-    cout << res * 4 << endl;
+    for (long long i = 1; i <= q; i++) {
+        long long u, v;
+        cin >> u >> v;
+        long long one_nm = pre_sm[v] - pre_sm[u - 1], zro_nm = v - (u - 1) - one_nm;
+        cout << (MOD + c[v - (u - 1)] - c[zro_nm]) % MOD << '\n';
+    }
 
 
 #ifndef ONLINE_JUDGE
