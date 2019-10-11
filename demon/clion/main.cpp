@@ -4,7 +4,7 @@
 
 using namespace std;
 
-const long long MAXN = 1000500;
+const long long MAXN = 150;
 const long long PHI = (long long) 998244352;
 const long long INF = 0x3f3f3f3f;
 const long long LINF = 0x3f3f3f3f3f3f3f3f;
@@ -12,10 +12,11 @@ const long long MOD = (long long) 1e9 + 7;
 const long long OVER_FLOW = 0x7fffffff;
 const long long LOVER_FLOW = 0x7fffffffffffffff;
 
-long long n;
-//map<long long, long long> dp;
-long long dp[MAXN];
-vector<long long> buf;
+int n;
+int dp[10050][MAXN];
+int buf[MAXN], tme[MAXN];
+
+long long C[MAXN][MAXN];
 
 int main() {
 
@@ -48,31 +49,46 @@ int main() {
 
     ios::sync_with_stdio(false);
     cin >> n;
-    dp[0] = 1;
-    for (long long i = 1; i <= n; i++) {
-        long long u;
+
+    C[0][0] = C[1][0] = C[1][1] = 1;
+    for (register int i = 2; i <= 100; ++i) {
+        C[i][0] = 1;
+        for (register int j = 1; j <= i; ++j)
+            C[i][j] = (C[i - 1][j] + C[i - 1][j - 1]) % MOD;
+    }
+
+
+    dp[0][0] = 1;
+    for (int i = 1; i <= n; i++) {
+        int u;
         cin >> u;
-        buf.clear();
-        for (long long j = 1; j * j <= u; j++) {
-            if (u % j == 0) {
-                buf.push_back(j);
-                if (u / j != j) buf.push_back(u / j);
+        buf[i] = u;
+        for (int j = 10000; j >= u; j--) {
+            for (int k = 1; k <= 100; k++) {
+                dp[j][k] += dp[j - u][k - 1];
             }
-        }
-        sort(buf.begin(), buf.end());
-        while (!buf.empty()) {
-            dp[buf.back()] = (dp[buf.back()] + dp[buf.back() - 1]) % MOD;
-            buf.pop_back();
         }
     }
 
-    long long res = 0;
-//    for (auto it:dp) {
-//        res = (res + it.second) % MOD;
-//    }
-    for (long long i = 1; i <= 1000000; i++) res = (res + dp[i]) % MOD;
-//    cout << (MOD + res - 1) % MOD << endl;
-    cout << (MOD + res) % MOD << endl;
+//    sort(buf + 1, buf + 1 + n);
+    for (int i = 1; i <= n; i++) tme[buf[i]]++;
+
+    long long cnt = 0;
+    for (long long i = 1; i <= 100; i++) if (tme[i]) cnt++;
+    if (cnt == 1 or cnt == 2) {
+        cout << n << endl;
+    } else {
+        int res = 0;
+        for (int i = 1; i <= 100; i++) {
+            for (int j = tme[i]; j >= 1; j--) {
+                if (dp[j * i][j] == C[tme[i]][j]) {
+                    res = max(res, j);
+                }
+            }
+        }
+        cout << res << endl;
+    }
+
 
 #ifndef ONLINE_JUDGE
     auto end_time = clock();
