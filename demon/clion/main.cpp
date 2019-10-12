@@ -4,7 +4,7 @@
 
 using namespace std;
 
-const long long MAXN = 100500;
+const long long MAXN = 300500;
 const long long PHI = (long long) 998244352;
 const long long INF = 0x3f3f3f3f;
 const long long LINF = 0x3f3f3f3f3f3f3f3f;
@@ -14,10 +14,16 @@ const long long LOVER_FLOW = 0x7fffffffffffffff;
 
 long long n;
 
-long long get_res(long long l1, long long r1, long long l2, long long r2) {
-    return max(0ll, min(r2, r1) - max(l2, l1) + 1);
-}
+struct pts {
+    long long x, y, id;
 
+    bool operator<(pts pts1) {
+        return this->x - this->y < pts1.x - pts1.y;
+    }
+} buf[MAXN], tar[MAXN];
+
+long long pre_x[MAXN], pre_y[MAXN], suf_x[MAXN], suf_y[MAXN];
+long long res[MAXN];
 
 int main() {
 
@@ -49,23 +55,42 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
-    long long la, ra, ta, lb, rb, tb;
-    cin >> la >> ra >> ta >> lb >> rb >> tb;
-    long long d = __gcd(ta, tb), res = 0;
-    if (ra == rb) {
-        res = max(res, get_res(la, ra, lb, rb));
-    } else if (ra < rb) {
-        long long tme = (rb - ra) / d;
-        ra += tme * d, la += tme * d;
-        res = max(res, get_res(la, ra, lb, rb));
-        res = max(res, get_res(la + d, ra + d, lb, rb));
-    } else if (ra > rb) {
-        long long tme = (ra - rb) / d;
-        rb += tme * d, lb += tme * d;
-        res = max(res, get_res(la, ra, lb, rb));
-        res = max(res, get_res(la, ra, lb + d, rb + d));
+    long long m;
+    cin >> n >> m;
+    for (long long i = 1; i <= n; i++) {
+        cin >> buf[i].x >> buf[i].y;
+        buf[i].id = i;
+        tar[i].x = buf[i].x, tar[i].y = buf[i].y;
     }
-    cout << res << endl;
+    sort(buf + 1, buf + 1 + n);
+
+    for (long long i = 1; i <= n; i++) {
+        pre_x[i] = pre_x[i - 1] + buf[i].x, pre_y[i] = pre_y[i - 1] + buf[i].y;
+    }
+    for (long long i = n; i >= 1; i--) {
+        suf_x[i] = suf_x[i + 1] + buf[i].x, suf_y[i] = suf_y[i + 1] + buf[i].y;
+    }
+    for (long long i = 1; i <= n; i++) {
+        res[buf[i].id] += pre_x[i - 1] + (i - 1) * buf[i].y
+                          + (n - i) * buf[i].x + suf_y[i + 1];
+    }
+
+    for (long long i = 1; i <= m; i++) {
+        long long u, v;
+        cin >> u >> v;
+        long long cur = 0;
+        if (tar[u].x + tar[v].y < tar[u].y + tar[v].x) {
+            cur = tar[u].x + tar[v].y;
+        } else {
+            cur = tar[u].y + tar[v].x;
+        }
+        res[u] -= cur, res[v] -= cur;
+    }
+
+    for (long long i = 1; i <= n; i++) {
+        cout << res[i] << " ";
+    }
+    cout << endl;
 
 
 #ifndef ONLINE_JUDGE
