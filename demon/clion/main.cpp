@@ -13,17 +13,9 @@ const long long OVER_FLOW = 0x7fffffff;
 const long long LOVER_FLOW = 0x7fffffffffffffff;
 
 long long n;
+long long lst[MAXN];
+vector<long long> tar;
 
-struct pts {
-    long long x, y, id;
-
-    bool operator<(pts pts1) {
-        return this->x - this->y < pts1.x - pts1.y;
-    }
-} buf[MAXN], tar[MAXN];
-
-long long pre_x[MAXN], pre_y[MAXN], suf_x[MAXN], suf_y[MAXN];
-long long res[MAXN];
 
 int main() {
 
@@ -57,41 +49,32 @@ int main() {
     ios::sync_with_stdio(false);
     long long m;
     cin >> n >> m;
+    long long prv = 0;
     for (long long i = 1; i <= n; i++) {
-        cin >> buf[i].x >> buf[i].y;
-        buf[i].id = i;
-        tar[i].x = buf[i].x, tar[i].y = buf[i].y;
+        long long u;
+        cin >> u;
+        tar.push_back(u);
+        lst[u] = prv;
+        prv = u;
     }
-    sort(buf + 1, buf + 1 + n);
-
-    for (long long i = 1; i <= n; i++) {
-        pre_x[i] = pre_x[i - 1] + buf[i].x, pre_y[i] = pre_y[i - 1] + buf[i].y;
-    }
-    for (long long i = n; i >= 1; i--) {
-        suf_x[i] = suf_x[i + 1] + buf[i].x, suf_y[i] = suf_y[i + 1] + buf[i].y;
-    }
-    for (long long i = 1; i <= n; i++) {
-        res[buf[i].id] += pre_x[i - 1] + (i - 1) * buf[i].y
-                          + (n - i) * buf[i].x + suf_y[i + 1];
-    }
-
-    for (long long i = 1; i <= m; i++) {
-        long long u, v;
-        cin >> u >> v;
-        long long cur = 0;
-        if (tar[u].x + tar[v].y < tar[u].y + tar[v].x) {
-            cur = tar[u].x + tar[v].y;
-        } else {
-            cur = tar[u].y + tar[v].x;
+    for (long long i = 2; i <= m; i++) {
+        prv = 0;
+        for (long long j = 1; j <= n; j++) {
+            long long u;
+            cin >> u;
+            if (lst[u] != prv) lst[u] = 0;
+            prv = u;
         }
-        res[u] -= cur, res[v] -= cur;
     }
 
-    for (long long i = 1; i <= n; i++) {
-        cout << res[i] << " ";
+    long long res = 0, cur = 1;
+    for (auto it:tar) {
+        if (lst[it] == 0) cur = 1;
+        else cur++;
+        res += cur;
     }
-    cout << endl;
 
+    cout << res << endl;
 
 #ifndef ONLINE_JUDGE
     auto end_time = clock();
