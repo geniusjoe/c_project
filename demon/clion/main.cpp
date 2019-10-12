@@ -12,19 +12,12 @@ const long long MOD = (long long) 1e9 + 7;
 const long long OVER_FLOW = 0x7fffffff;
 const long long LOVER_FLOW = 0x7fffffffffffffff;
 
-int n;
-long long pre_sm[MAXN], c[MAXN];
-string str;
+long long n;
 
-// a ^ b % c
-long long qpow(long long a, long long b, long long c) {
-    long long cur = 1;
-    while (b) {
-        if (b & 1) cur = cur * a % c;
-        a = a * a % c, b >>= 1;
-    }
-    return cur;
+long long get_res(long long l1, long long r1, long long l2, long long r2) {
+    return max(0ll, min(r2, r1) - max(l2, l1) + 1);
 }
+
 
 int main() {
 
@@ -56,18 +49,23 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
-    long long q;
-    cin >> n >> q >> str;
-    for (long long i = 0; i < str.size(); i++) pre_sm[i + 1] = pre_sm[i] + (str[i] == '1');
-    for (long long i = 1; i <= n; i++) {
-        c[i] = (c[i - 1] + qpow(2, i - 1, MOD)) % MOD;
+    long long la, ra, ta, lb, rb, tb;
+    cin >> la >> ra >> ta >> lb >> rb >> tb;
+    long long d = __gcd(ta, tb), res = 0;
+    if (ra == rb) {
+        res = max(res, get_res(la, ra, lb, rb));
+    } else if (ra < rb) {
+        long long tme = (rb - ra) / d;
+        ra += tme * d, la += tme * d;
+        res = max(res, get_res(la, ra, lb, rb));
+        res = max(res, get_res(la + d, ra + d, lb, rb));
+    } else if (ra > rb) {
+        long long tme = (ra - rb) / d;
+        rb += tme * d, lb += tme * d;
+        res = max(res, get_res(la, ra, lb, rb));
+        res = max(res, get_res(la, ra, lb + d, rb + d));
     }
-    for (long long i = 1; i <= q; i++) {
-        long long u, v;
-        cin >> u >> v;
-        long long one_nm = pre_sm[v] - pre_sm[u - 1], zro_nm = v - (u - 1) - one_nm;
-        cout << (MOD + c[v - (u - 1)] - c[zro_nm]) % MOD << '\n';
-    }
+    cout << res << endl;
 
 
 #ifndef ONLINE_JUDGE
