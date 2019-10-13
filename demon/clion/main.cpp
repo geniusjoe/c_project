@@ -12,51 +12,7 @@ const long long MOD = (long long) 998244353;
 const long long OVER_FLOW = 0x7fffffff;
 const long long LOVER_FLOW = 0x7fffffffffffffff;
 
-long long n, k;
-long long w[MAXN], len;
-long long dp[25][1 << 12];
-long long ans[25][1 << 12];
-long long pw[25];
-
-pair<long long, long long> dfs(int pos, int limit, int pre) {
-    if (__builtin_popcount(pre) > k)
-        return {0, 0};
-    if (pos < 0) return {1, 0};
-    if (!limit && dp[pos][pre] != -1)
-        return {dp[pos][pre], ans[pos][pre]};
-
-    int up = limit ? w[pos] : 9;
-    long long res = 0, vle = 0;
-    pair<long long, long long> cur;
-
-    for (int i = 0; i <= up; i++) {
-        if (pre == 0 and i == 0) {
-            cur = dfs(pos - 1, limit && i == up, 0);
-        } else {
-            cur = dfs(pos - 1, limit && i == up, pre | (1 << i));
-        }
-        res = (res + cur.first) % MOD;
-        vle = (vle + i * pw[pos] % MOD * cur.first % MOD + cur.second) % MOD;
-    }
-    if (!limit) {
-        dp[pos][pre] = res;
-        ans[pos][pre] = vle;
-    }
-    return {res, vle};
-}
-
-long long solve(long long x) {
-    len = 0;
-    while (x) {
-        w[len++] = x % 10;
-        x /= 10;
-    }
-    pw[0] = 1;
-    for (long long i = 1; i <= 20; i++) pw[i] = pw[i - 1] * 10 % MOD;
-
-    memset(dp, -1, sizeof(dp));
-    return dfs(len - 1, 1, 0).second;
-}
+long long n;
 
 
 int main() {
@@ -89,9 +45,15 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
-    long long a, b;
-    cin >> a >> b >> k;
-    cout << (MOD + solve(b) - solve(a - 1)) % MOD << endl;
+    cin >> n;
+    long long res = 0;
+    for (long long i = 1; i * i <= n; i++) {
+        if (n % i == 0) {
+            res++;
+            if (n / i != i) res++;
+        }
+    }
+    cout << res << endl;
 
 #ifndef ONLINE_JUDGE
     auto end_time = clock();
