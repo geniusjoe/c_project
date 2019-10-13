@@ -8,13 +8,55 @@ const long long MAXN = 300500;
 const long long PHI = (long long) 998244352;
 const long long INF = 0x3f3f3f3f;
 const long long LINF = 0x3f3f3f3f3f3f3f3f;
-const long long MOD = (long long) 1e9 + 7;
+const long long MOD = (long long) 998244353;
 const long long OVER_FLOW = 0x7fffffff;
 const long long LOVER_FLOW = 0x7fffffffffffffff;
 
-long long n;
-long long lst[MAXN];
-vector<long long> tar;
+long long n, k;
+long long w[MAXN], len;
+long long dp[25][1 << 12];
+long long ans[25][1 << 12];
+long long pw[25];
+
+pair<long long, long long> dfs(int pos, int limit, int pre) {
+    if (__builtin_popcount(pre) > k)
+        return {0, 0};
+    if (pos < 0) return {1, 0};
+    if (!limit && dp[pos][pre] != -1)
+        return {dp[pos][pre], ans[pos][pre]};
+
+    int up = limit ? w[pos] : 9;
+    long long res = 0, vle = 0;
+    pair<long long, long long> cur;
+
+    for (int i = 0; i <= up; i++) {
+        if (pre == 0 and i == 0) {
+            cur = dfs(pos - 1, limit && i == up, 0);
+        } else {
+            cur = dfs(pos - 1, limit && i == up, pre | (1 << i));
+        }
+        res = (res + cur.first) % MOD;
+        vle = (vle + i * pw[pos] % MOD * cur.first % MOD + cur.second) % MOD;
+    }
+    if (!limit) {
+        dp[pos][pre] = res;
+        ans[pos][pre] = vle;
+    }
+    return {res, vle};
+}
+
+long long solve(long long x) {
+    len = 0;
+    while (x) {
+        w[len++] = x % 10;
+        x /= 10;
+    }
+    pw[0] = 1;
+    for (long long i = 1; i <= 20; i++) pw[i] = pw[i - 1] * 10 % MOD;
+
+    memset(dp, -1, sizeof(dp));
+    return dfs(len - 1, 1, 0).second;
+}
 
 
 int main() {
@@ -47,34 +89,9 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
-    long long m;
-    cin >> n >> m;
-    long long prv = 0;
-    for (long long i = 1; i <= n; i++) {
-        long long u;
-        cin >> u;
-        tar.push_back(u);
-        lst[u] = prv;
-        prv = u;
-    }
-    for (long long i = 2; i <= m; i++) {
-        prv = 0;
-        for (long long j = 1; j <= n; j++) {
-            long long u;
-            cin >> u;
-            if (lst[u] != prv) lst[u] = 0;
-            prv = u;
-        }
-    }
-
-    long long res = 0, cur = 1;
-    for (auto it:tar) {
-        if (lst[it] == 0) cur = 1;
-        else cur++;
-        res += cur;
-    }
-
-    cout << res << endl;
+    long long a, b;
+    cin >> a >> b >> k;
+    cout << (MOD + solve(b) - solve(a - 1)) % MOD << endl;
 
 #ifndef ONLINE_JUDGE
     auto end_time = clock();
