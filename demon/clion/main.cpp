@@ -4,7 +4,7 @@
 
 using namespace std;
 
-const long long MAXN = 350;
+const long long MAXN = 200500;
 const long long PHI = (long long) 998244352;
 const long long INF = 0x3f3f3f3f;
 const long long LINF = 0x3f3f3f3f3f3f3f3f;
@@ -13,8 +13,9 @@ const long long OVER_FLOW = 0x7fffffff;
 const long long LOVER_FLOW = 0x7fffffffffffffff;
 
 long long n;
-long long dp[2][MAXN][6000];
-long long buf[MAXN][4];
+string str1, str2;
+long long buf[MAXN];
+long long bse[MAXN];
 
 int main() {
 
@@ -46,14 +47,27 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
-    long long m, k, l;
-    cin >> n >> m >> k >> l;
-    long long x = (l + k + m - 1) / m;
-    if (m * x <= n) {
-        cout << x << endl;
-    } else {
-        cout << -1 << endl;
+    long long a, b;
+    cin >> a >> b >> str2 >> str1;
+    reverse(str1.begin(), str1.end()), reverse(str2.begin(), str2.end());
+    for (long long i = 0; i < str1.size(); i++) {
+        buf[i] = str1[i] == '1';
     }
+    for (long long i = str1.size() - 1; i >= 0; i--) {
+        buf[i] = (buf[i + 1] + buf[i]) % MOD;
+    }
+    long long res = 0;
+    bse[0] = 1;
+    for (long long i = 1; i <= max(str1.size(), str2.size()); i++) {
+        bse[i] = (bse[i - 1] * 2) % MOD;
+    }
+
+    for (long long i = 0; i < str2.size(); i++) {
+        if (str2[i] == '0') continue;
+        res = (res + bse[i] * buf[i] % MOD) % MOD;
+    }
+
+    cout << res << endl;
 
 
 #ifndef ONLINE_JUDGE
