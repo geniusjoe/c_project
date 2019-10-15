@@ -46,34 +46,13 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
-    long long T;
-    cin >> T;
-    while (T--) {
-        cin >> n;
-        memset(dp, 0, sizeof dp);
-        for (long long i = 1; i <= n; i++) {
-            cin >> buf[i][1] >> buf[i][2] >> buf[i][3];
-        }
-        dp[n & 1][1][n] = buf[n][1];
-        for (long long i = n - 1; i >= 1; i--) {
-            for (long long j = 1; j <= n - i; j++) {
-                long long down = (2 * i + j) * j / 2, up = (2 * n - j + 1) * j / 2;
-                for (long long k = down; k <= up; k++) {
-                    dp[i & 1][j + 1][k + i] = max(dp[i & 1][j + 1][k + i], dp[(i + 1) & 1][j][k] + buf[i][1]);
-                    dp[i & 1][j][k] = max(dp[1 & i][j][k], dp[(i + 1) & 1][j][k] + buf[i][2] * (k - i * j));
-                    dp[i & 1][j][k] = max(dp[i & 1][j][k], dp[(i + 1) & 1][j][k] + buf[i][3] * j);
-                }
-            }
-        }
-
-        long long res = 0;
-        for (long long i = 1; i <= n; i++) {
-            for (long long j = 1; j <= 5050; j++) {
-                res = max(res, dp[1][i][j]);
-            }
-        }
-
-        cout << res << '\n';
+    long long m, k, l;
+    cin >> n >> m >> k >> l;
+    long long x = (l + k + m - 1) / m;
+    if (m * x <= n) {
+        cout << x << endl;
+    } else {
+        cout << -1 << endl;
     }
 
 
