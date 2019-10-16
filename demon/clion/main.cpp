@@ -13,9 +13,11 @@ const long long OVER_FLOW = 0x7fffffff;
 const long long LOVER_FLOW = 0x7fffffffffffffff;
 
 long long n;
-string str1, str2;
-long long buf[MAXN];
-long long bse[MAXN];
+vector<long long> res;
+
+void insert(long long tme, long long x) {
+    for (long long i = 1; i <= tme; i++) res.push_back(x);
+}
 
 int main() {
 
@@ -47,27 +49,22 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
-    long long a, b;
-    cin >> a >> b >> str2 >> str1;
-    reverse(str1.begin(), str1.end()), reverse(str2.begin(), str2.end());
-    for (long long i = 0; i < str1.size(); i++) {
-        buf[i] = str1[i] == '1';
-    }
-    for (long long i = str1.size() - 1; i >= 0; i--) {
-        buf[i] = (buf[i + 1] + buf[i]) % MOD;
-    }
-    long long res = 0;
-    bse[0] = 1;
-    for (long long i = 1; i <= max(str1.size(), str2.size()); i++) {
-        bse[i] = (bse[i - 1] * 2) % MOD;
-    }
+    cin >> n;
 
-    for (long long i = 0; i < str2.size(); i++) {
-        if (str2[i] == '0') continue;
-        res = (res + bse[i] * buf[i] % MOD) % MOD;
+    for (long long cnt = 2; res.empty() or res.size() < n; cnt *= 2) {
+        long long lst = (n / (cnt / 2)), nxt = n / cnt;
+        long long tme = lst - nxt;
+        if (nxt == 0 or nxt == 1) {
+            insert(lst - 1, (cnt / 2));
+            insert(1, n / (cnt / 2) * (cnt / 2));
+            break;
+        } else
+            insert(tme, cnt / 2);
     }
-
-    cout << res << endl;
+    for (auto it:res) {
+        cout << it << " ";
+    }
+    cout << endl;
 
 
 #ifndef ONLINE_JUDGE
