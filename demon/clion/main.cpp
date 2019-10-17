@@ -13,11 +13,7 @@ const long long OVER_FLOW = 0x7fffffff;
 const long long LOVER_FLOW = 0x7fffffffffffffff;
 
 long long n;
-vector<long long> res;
-
-void insert(long long tme, long long x) {
-    for (long long i = 1; i <= tme; i++) res.push_back(x);
-}
+vector<long long> lft, rgt;
 
 int main() {
 
@@ -50,21 +46,17 @@ int main() {
 
     ios::sync_with_stdio(false);
     cin >> n;
-
-    for (long long cnt = 2; res.empty() or res.size() < n; cnt *= 2) {
-        long long lst = (n / (cnt / 2)), nxt = n / cnt;
-        long long tme = lst - nxt;
-        if (nxt == 0 or nxt == 1) {
-            insert(lst - 1, (cnt / 2));
-            insert(1, n / (cnt / 2) * (cnt / 2));
-            break;
-        } else
-            insert(tme, cnt / 2);
+    for (long long i = 1; i <= n; i++) {
+        long long u, v;
+        cin >> u >> v;
+        lft.push_back(u), rgt.push_back(v);
     }
-    for (auto it:res) {
-        cout << it << " ";
+    sort(lft.begin(), lft.end()), sort(rgt.begin(), rgt.end());
+    long long res = n;
+    for (long long i = 0; i < n; i++) {
+        res += max(lft[i], rgt[i]);
     }
-    cout << endl;
+    cout << res << endl;
 
 
 #ifndef ONLINE_JUDGE
