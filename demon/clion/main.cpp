@@ -12,8 +12,8 @@ const long long OVER_FLOW = 0x7fffffff;
 const long long LOVER_FLOW = 0x7fffffffffffffff;
 
 long long n;
-long long buf[MAXN];
-map<long long, long long> mp[15];
+vector<pair<long long, long long>> buf;
+multiset<long long> l, r;
 
 int main() {
 
@@ -35,7 +35,7 @@ int main() {
     5.排序之前不能取模.
     6.0-1子矩阵子序列:前缀和,异或和
     7.模拟题注意代码复用.
-    8.单个区间问题考虑前缀和,多个区间左右端点拆开,排序,记录端点极值
+    8.单个区间问题考虑前缀和,多个区间左右端点拆开,排序,记录端点极值,分别存储左右端点
 思考提醒：
     1.最大值和最小值问题可不可以用二分+贪心？
     2.dp
@@ -45,34 +45,18 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
-    long long k, power[15];
-    fill(power, power + 12, 0);
-    for (long long i = 1; i <= 10; i++) {
-        if (i == 1) power[i] = 10;
-        else power[i] = power[i - 1] * 10;
+    cin >> n;
+    for (long long i = 1; i <= n; i++) {
+        long long u, v;
+        cin >> u >> v;
+        buf.emplace_back(u, v);
+        l.insert(u), r.insert(v);
     }
-
-    cin >> n >> k;
     long long res = 0;
-    for (long long i = 1; i <= n; i++) {
-        long long u;
-        cin >> buf[i];
-        u = buf[i];
-        for (long long j = 1; j <= 10; j++) {
-            u *= 10;
-            u %= k;
-            mp[j][u]++;
-        }
-    }
-    for (long long i = 1; i <= n; i++) {
-        long long u = buf[i], len = 0;
-        while (u) {
-            u /= 10;
-            len++;
-        }
-//        assert(len <= 9);
-        res += mp[len][(k - buf[i] % k) % k];
-        if (((power[len] / 10 % k) * 10 % k * buf[i] % k + buf[i]) % k == 0) res--;
+    for (auto it:buf) {
+        l.erase(l.find(it.first)), r.erase(r.find(it.second));
+        res = max(res, *r.begin() - *l.rbegin());
+        l.insert(it.first), r.insert(it.second);
     }
     cout << res << endl;
 
