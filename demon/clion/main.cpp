@@ -1,5 +1,4 @@
 #include<bits/stdc++.h>
-
 //#pragma GCC optimize(2)
 
 using namespace std;
@@ -13,26 +12,8 @@ const long long OVER_FLOW = 0x7fffffff;
 const long long LOVER_FLOW = 0x7fffffffffffffff;
 
 long long n;
-vector<long long> fac;
-
-long long solve(long long sm, long long cur) {
-    fac.clear();
-    for (long long i = 1; i * i <= cur; i++) {
-        if (cur % i == 0) {
-            fac.push_back(i);
-        }
-    }
-    long long res = 2 + 2 * sm;
-    for (long long i = 1; i * i <= sm; i++) {
-        if (sm % i == 0) {
-            for (auto it:fac) {
-                if (it > i) break;
-                if (cur / it <= sm / i) res = min(res, 2 * (i + sm / i));
-            }
-        }
-    }
-    return res;
-}
+long long buf[MAXN];
+map<long long, long long> mp[15];
 
 int main() {
 
@@ -64,9 +45,36 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
-    long long a, b;
-    cin >> a >> b;
-    cout << min(solve(a + b, a), solve(a + b, b)) << endl;
+    long long k, power[15];
+    fill(power, power + 12, 0);
+    for (long long i = 1; i <= 10; i++) {
+        if (i == 1) power[i] = 10;
+        else power[i] = power[i - 1] * 10;
+    }
+
+    cin >> n >> k;
+    long long res = 0;
+    for (long long i = 1; i <= n; i++) {
+        long long u;
+        cin >> buf[i];
+        u = buf[i];
+        for (long long j = 1; j <= 10; j++) {
+            u *= 10;
+            u %= k;
+            mp[j][u]++;
+        }
+    }
+    for (long long i = 1; i <= n; i++) {
+        long long u = buf[i], len = 0;
+        while (u) {
+            u /= 10;
+            len++;
+        }
+//        assert(len <= 9);
+        res += mp[len][(k - buf[i] % k) % k];
+        if (((power[len] / 10 % k) * 10 % k * buf[i] % k + buf[i]) % k == 0) res--;
+    }
+    cout << res << endl;
 
 
 #ifndef ONLINE_JUDGE
