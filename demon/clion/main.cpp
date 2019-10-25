@@ -3,7 +3,7 @@
 
 using namespace std;
 
-const long long MAXN = 2005000;
+const long long MAXN = 2050;
 const long long PHI = (long long) 998244352;
 const long long INF = 0x3f3f3f3f;
 const long long LINF = 0x3f3f3f3f3f3f3f3f;
@@ -12,8 +12,8 @@ const long long OVER_FLOW = 0x7fffffff;
 const long long LOVER_FLOW = 0x7fffffffffffffff;
 
 long long n;
-vector<pair<long long, long long>> buf;
-multiset<long long> l, r;
+long long dp[MAXN][MAXN];
+long long res[MAXN];
 
 int main() {
 
@@ -45,20 +45,25 @@ int main() {
 */
 
     ios::sync_with_stdio(false);
-    cin >> n;
+    long long k;
+    cin >> n >> k;
+    for (long long i = 0; i <= n; i++) dp[0][i] = 1;
     for (long long i = 1; i <= n; i++) {
-        long long u, v;
-        cin >> u >> v;
-        buf.emplace_back(u, v);
-        l.insert(u), r.insert(v);
+        for (long long j = 1; j <= n; j++) {
+            for (long long l = 1; l <= min(i, j); l++) {
+                dp[i][j] = (dp[i][j] + dp[i - l][j]) % MOD;
+            }
+        }
     }
-    long long res = 0;
-    for (auto it:buf) {
-        l.erase(l.find(it.first)), r.erase(r.find(it.second));
-        res = max(res, *r.begin() - *l.rbegin());
-        l.insert(it.first), r.insert(it.second);
+    long long cnt = 0;
+    for (long long i = 1; i <= n; i++) res[i] = (MOD + dp[n][i] - dp[n][i - 1]) % MOD;
+    for (long long i = 1; i <= n; i++) {
+        for (long long j = 1; j <= n; j++) {
+            if (i * j >= k) continue;
+            cnt = (cnt + res[i] * res[j] % MOD) % MOD;
+        }
     }
-    cout << res << endl;
+    cout << (cnt * 2) % MOD << endl;
 
 
 #ifndef ONLINE_JUDGE
